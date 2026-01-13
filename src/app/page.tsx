@@ -29,8 +29,8 @@ export default function Home() {
             priority
           />
           {/* Gradient Overlay for seamless transition to bg */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[var(--background)]/20 to-[var(--background)] z-10" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[var(--background)] via-[var(--background)]/60 to-transparent z-10" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[var(--background)] z-10" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[var(--background)] via-transparent to-transparent z-10" />
         </div>
 
         {/* Hero Content */}
@@ -53,41 +53,34 @@ export default function Home() {
       {/* Content Container */}
       <div className="px-5 space-y-10 relative z-20 -mt-4">
 
-        {/* Digital Business Card */}
-        <div className="bg-gradient-to-br from-[var(--card)] to-[var(--secondary)] rounded-3xl p-6 border border-[var(--border)] shadow-2xl relative overflow-hidden group">
-          {/* Card Shine */}
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-          
-          <div className="relative z-10">
-            <div className="flex justify-between items-start mb-8">
-              <div>
-                <h2 className="text-2xl font-bold text-[var(--foreground)] mb-1">Олег Ивченко</h2>
-                <p className="text-[#C5A66F] font-medium text-sm">Предприниматель, Инвестор</p>
-              </div>
-              <div className="w-12 h-12 bg-[var(--background)] rounded-full flex items-center justify-center border border-[var(--border)]">
-                <Send size={20} className="text-[#C5A66F]" />
-              </div>
-            </div>
+        {/* New Share Card (Screenshot Style) */}
+        <div className="bg-[#18181B] text-white rounded-[2rem] p-8 border border-white/20 shadow-2xl relative overflow-hidden">
+          <div className="relative z-10 flex flex-col items-center text-center">
+            
+            <p className="text-gray-300 text-sm leading-relaxed mb-6">
+              Я предприниматель и инвестор. Моя команда помогает масштабировать бизнес, находить точки роста и привлекать инвестиции.
+            </p>
 
-            <div className="space-y-4">
-              <ContactRow 
-                icon={<Send size={18} />}
-                label="Telegram"
-                value="@Oleg_Ivchenko"
-                onCopy={() => handleCopy("@Oleg_Ivchenko", "tg")}
-                isCopied={copied === "tg"}
-                action={() => window.open("https://t.me/Oleg_Ivchenko", "_blank")}
-              />
-              
-              <ContactRow 
-                icon={<Mail size={18} />}
-                label="Email"
-                value="oleg@alun.ru"
-                onCopy={() => handleCopy("oleg@alun.ru", "email")}
-                isCopied={copied === "email"}
-                action={() => window.location.href = "mailto:oleg@alun.ru"}
-              />
-            </div>
+            <p className="text-gray-300 text-sm leading-relaxed mb-8">
+              Внедрение наших стратегий позволяет бизнесу кратно расти. Чтобы связаться со мной или обсудить партнерство, сохраните эту визитку.
+            </p>
+
+            <button 
+              onClick={() => {
+                if (navigator.share) {
+                  navigator.share({
+                    title: 'Олег Ивченко',
+                    text: 'Предприниматель, Инвестор. Контакты и проекты.',
+                    url: window.location.href,
+                  });
+                } else {
+                  handleCopy(window.location.href, "share");
+                }
+              }}
+              className="w-full bg-white text-black font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+            >
+               {copied === "share" ? "Ссылка скопирована!" : "Поделиться визиткой"}
+            </button>
           </div>
         </div>
         
