@@ -20,21 +20,26 @@ export default function Home() {
       {/* Hero Section */}
       <div className="relative w-full h-[65vh] min-h-[500px]">
         {/* Main Image */}
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-0 bg-black">
           <Image 
             src="/олегив.jpg" 
             alt="Олег Ивченко" 
             fill
-            className="object-cover object-top opacity-90"
+            className="object-cover object-top"
             priority
           />
           {/* Gradient Overlay for seamless transition to bg */}
-          {/* <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[var(--background)] z-10" /> */}
-          {/* <div className="absolute inset-0 bg-gradient-to-t from-[var(--background)] via-transparent to-transparent z-10" /> */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[var(--background)] z-10" />
         </div>
 
-        {/* Hero Content - Removed Text as per request */}
+        {/* Hero Content */}
         <div className="absolute bottom-0 left-0 w-full z-20 flex flex-col items-center justify-end pb-8 px-4 text-center">
+           <h1 className="text-5xl font-bold text-white leading-none tracking-tight">
+             ОЛЕГ
+           </h1>
+           <h2 className="text-5xl font-bold text-white leading-none tracking-tight mb-4">
+             ИВЧЕНКО
+           </h2>
         </div>
       </div>
 
