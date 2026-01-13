@@ -28,8 +28,8 @@ export default function Home() {
             className="object-cover object-top"
             priority
           />
-          {/* Gradient Overlay removed as per request */}
-          {/* <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[var(--background)] z-10" /> */}
+          {/* Gradient Overlay for smooth transition to white bg */}
+          <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-[var(--background)] to-transparent z-10" />
         </div>
 
         {/* Hero Content - Removed Text as per request */}
