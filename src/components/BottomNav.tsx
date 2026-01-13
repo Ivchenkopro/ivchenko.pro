@@ -49,7 +49,7 @@ export default function BottomNav() {
                   <div className={`relative z-10 transition-all duration-300 ${
                     isActive 
                       ? "text-white scale-110" 
-                      : "text-[var(--muted-foreground)] group-hover:text-[var(--foreground)]"
+                      : "text-[var(--muted-foreground)] group-hover:text-[var(--card-foreground)]"
                   }`}>
                     <Icon 
                       size={24} 

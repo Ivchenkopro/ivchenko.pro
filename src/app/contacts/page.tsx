@@ -31,7 +31,7 @@ export default function Contacts() {
           <div className="relative z-10">
             <div className="flex justify-between items-start mb-8">
               <div>
-                <h2 className="text-2xl font-bold text-[var(--foreground)] mb-1">Олег Ивченко</h2>
+                <h2 className="text-2xl font-bold text-[var(--card-foreground)] mb-1">Олег Ивченко</h2>
                 <p className="text-[#C5A66F] font-medium text-sm">Предприниматель, Инвестор</p>
               </div>
               <div className="w-12 h-12 bg-[var(--background)] rounded-full flex items-center justify-center border border-[var(--border)]">
@@ -107,12 +107,12 @@ interface ContactRowProps {
 
 function ContactRow({ icon, label, value, onCopy, isCopied, action }: ContactRowProps) {
   return (
-    <div className="flex items-center justify-between p-3 bg-[var(--background)] rounded-xl border border-[var(--border)] group hover:border-[#C5A66F]/30 transition-colors">
+    <div className="flex items-center justify-between p-3 bg-[var(--card)] rounded-xl border border-[var(--border)] group hover:border-[#C5A66F]/30 transition-colors">
       <div className="flex items-center gap-3 cursor-pointer" onClick={action}>
         <div className="text-[#C5A66F]">{icon}</div>
         <div>
           <div className="text-[10px] text-[var(--muted-foreground)] uppercase tracking-wider">{label}</div>
-          <div className="text-[var(--foreground)] font-medium text-sm">{value}</div>
+          <div className="text-[var(--card-foreground)] font-medium text-sm">{value}</div>
         </div>
       </div>
       <button 

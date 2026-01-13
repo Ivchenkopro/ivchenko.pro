@@ -229,7 +229,7 @@ function BlogCard({ title, category, image }: { title: string, category: string,
       </div>
       <div>
         <div className="text-[#C5A66F] text-[10px] font-bold uppercase tracking-wider mb-1">{category}</div>
-        <div className="text-[var(--foreground)] font-bold text-sm leading-tight">{title}</div>
+        <div className="text-[var(--card-foreground)] font-bold text-sm leading-tight">{title}</div>
       </div>
     </div>
   );

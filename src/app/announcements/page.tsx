@@ -83,7 +83,7 @@ export default function Announcements() {
                 </span>
               </div>
 
-              <h3 className="text-lg font-bold text-[var(--foreground)] mb-2 leading-tight group-hover:text-[#C5A66F] transition-colors">
+              <h3 className="text-lg font-bold text-[var(--card-foreground)] mb-2 leading-tight group-hover:text-[#C5A66F] transition-colors">
                 {item.title}
               </h3>
               

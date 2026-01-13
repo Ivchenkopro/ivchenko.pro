@@ -110,7 +110,7 @@ function CaseCard({ icon, title, description, details }: { icon: React.ReactNode
       <p className="text-[var(--muted-foreground)] leading-relaxed mb-4">{description}</p>
       {details && (
         <div className="bg-[var(--secondary)]/50 rounded-xl p-4 border border-[var(--border)]">
-          <p className="text-sm text-[var(--foreground)] font-medium">{details}</p>
+          <p className="text-sm text-[var(--card-foreground)] font-medium">{details}</p>
         </div>
       )}
     </div>

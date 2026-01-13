@@ -74,7 +74,7 @@ export default function Services() {
 
         {/* 5. Business Concierge Detailed */}
         <div className="bg-[var(--card)] rounded-2xl p-6 shadow-xl border border-[var(--border)]">
-          <h2 className="text-xl font-bold text-[var(--foreground)] mb-4 flex items-center gap-2">
+          <h2 className="text-xl font-bold text-[var(--card-foreground)] mb-4 flex items-center gap-2">
             <span className="w-1.5 h-6 bg-[#C5A66F] rounded-full shadow-[0_0_10px_#C5A66F]"></span>
             Бизнес-консьерж
           </h2>
@@ -108,7 +108,7 @@ export default function Services() {
         <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-[var(--card)] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[var(--border)] sm:border shadow-2xl">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold text-[var(--foreground)]">
+              <h3 className="text-xl font-bold text-[var(--card-foreground)]">
                 {modalStep === "main" ? "Выберите формат" : "Выберите направление"}
               </h3>
               <button onClick={closeModal} className="p-2 bg-[var(--secondary)] rounded-full hover:bg-[var(--border)] transition-colors">
@@ -142,7 +142,7 @@ export default function Services() {
               <div className="space-y-3">
                 <button 
                   onClick={() => setModalStep("main")}
-                  className="text-sm text-[var(--muted-foreground)] mb-2 flex items-center gap-1 hover:text-[var(--foreground)] transition-colors"
+                  className="text-sm text-[var(--muted-foreground)] mb-2 flex items-center gap-1 hover:text-[var(--card-foreground)] transition-colors"
                 >
                   ← Назад
                 </button>
@@ -190,7 +190,7 @@ function ServiceCard({ icon, title, subtitle, description, details, isItalicDeta
             {icon}
           </div>
           <div>
-            <h3 className="text-lg font-bold text-[var(--foreground)] leading-tight">{title}</h3>
+            <h3 className="text-lg font-bold text-[var(--card-foreground)] leading-tight">{title}</h3>
             {subtitle && <p className="text-sm text-[#C5A66F] font-medium">{subtitle}</p>}
           </div>
         </div>
