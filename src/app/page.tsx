@@ -20,7 +20,7 @@ export default function Home() {
       {/* Hero Section */}
       <div className="relative w-full h-[65vh] min-h-[500px]">
         {/* Main Image */}
-        <div className="absolute inset-0 z-0 bg-black">
+        <div className="absolute inset-0 z-0 bg-black [mask-image:linear-gradient(to_bottom,black_50%,transparent_100%)]">
           <Image 
             src="/олегив.jpg" 
             alt="Олег Ивченко" 
@@ -28,8 +28,7 @@ export default function Home() {
             className="object-cover object-top"
             priority
           />
-          {/* Gradient Overlay for smooth transition to white bg */}
-          <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-[var(--background)] to-transparent z-10" />
+          {/* Gradient Overlay removed as per request */}
         </div>
 
         {/* Hero Content - Removed Text as per request */}
