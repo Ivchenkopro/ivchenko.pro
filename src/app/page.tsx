@@ -44,6 +44,44 @@ export default function Home() {
 
       {/* Content Container */}
       <div className="px-5 space-y-10 relative z-20 -mt-4">
+
+        {/* Digital Business Card */}
+        <div className="bg-gradient-to-br from-[#1A1A1A] to-[#121212] rounded-3xl p-6 border border-[#333] shadow-2xl relative overflow-hidden group">
+          {/* Card Shine */}
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+          
+          <div className="relative z-10">
+            <div className="flex justify-between items-start mb-8">
+              <div>
+                <h2 className="text-2xl font-bold text-white mb-1">Олег Ивченко</h2>
+                <p className="text-[#C5A66F] font-medium text-sm">Предприниматель, Инвестор</p>
+              </div>
+              <div className="w-12 h-12 bg-[#2A2A2A] rounded-full flex items-center justify-center border border-[#333]">
+                <Send size={20} className="text-[#C5A66F]" />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <ContactRow 
+                icon={<Send size={18} />}
+                label="Telegram"
+                value="@Oleg_Ivchenko"
+                onCopy={() => handleCopy("@Oleg_Ivchenko", "tg")}
+                isCopied={copied === "tg"}
+                action={() => window.open("https://t.me/Oleg_Ivchenko", "_blank")}
+              />
+              
+              <ContactRow 
+                icon={<Mail size={18} />}
+                label="Email"
+                value="oleg@alun.ru"
+                onCopy={() => handleCopy("oleg@alun.ru", "email")}
+                isCopied={copied === "email"}
+                action={() => window.location.href = "mailto:oleg@alun.ru"}
+              />
+            </div>
+          </div>
+        </div>
         
         {/* Zakrytye Sdelki (Closed Deals) */}
         <section>
@@ -121,13 +159,46 @@ export default function Home() {
 
 function DealCard({ image, title, subtitle }: { image: string, title: string, subtitle: string }) {
   return (
-    <div className="min-w-[200px] h-[140px] rounded-2xl relative overflow-hidden group">
+    <div className="min-w-[200px] h-[140px] rounded-2xl relative overflow-hidden group cursor-pointer">
       <Image src={image} alt={title} fill className="object-cover transition-transform duration-500 group-hover:scale-110" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-      <div className="absolute bottom-3 left-3 right-3">
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 group-hover:opacity-90 transition-opacity" />
+      <div className="absolute bottom-3 left-3 right-3 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+        <div className="text-[#C5A66F] text-[10px] font-bold uppercase tracking-wider mb-1">КАТЕГОРИЯ</div>
         <div className="text-white font-bold text-sm leading-tight mb-0.5">{title}</div>
         <div className="text-gray-400 text-[10px]">{subtitle}</div>
       </div>
+    </div>
+  );
+}
+
+interface ContactRowProps {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  onCopy: () => void;
+  isCopied: boolean;
+  action: () => void;
+}
+
+function ContactRow({ icon, label, value, onCopy, isCopied, action }: ContactRowProps) {
+  return (
+    <div className="flex items-center justify-between p-3 bg-[#121212] rounded-xl border border-[#333] group hover:border-[#C5A66F]/30 transition-colors">
+      <div className="flex items-center gap-3 cursor-pointer" onClick={action}>
+        <div className="text-[#C5A66F]">{icon}</div>
+        <div>
+          <div className="text-[10px] text-gray-500 uppercase tracking-wider">{label}</div>
+          <div className="text-white font-medium text-sm">{value}</div>
+        </div>
+      </div>
+      <button 
+        onClick={(e) => {
+          e.stopPropagation();
+          onCopy();
+        }}
+        className="p-2 text-gray-500 hover:text-[#C5A66F] transition-colors"
+      >
+        {isCopied ? <Check size={16} /> : <Copy size={16} />}
+      </button>
     </div>
   );
 }
