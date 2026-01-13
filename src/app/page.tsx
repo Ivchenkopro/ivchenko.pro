@@ -32,14 +32,8 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[var(--background)] z-10" />
         </div>
 
-        {/* Hero Content */}
+        {/* Hero Content - Removed Text as per request */}
         <div className="absolute bottom-0 left-0 w-full z-20 flex flex-col items-center justify-end pb-8 px-4 text-center">
-           <h1 className="text-5xl font-bold text-white leading-none tracking-tight">
-             ОЛЕГ
-           </h1>
-           <h2 className="text-5xl font-bold text-white leading-none tracking-tight mb-4">
-             ИВЧЕНКО
-           </h2>
         </div>
       </div>
 
