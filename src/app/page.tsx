@@ -15,7 +15,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-[#0F0F0F] text-white pb-32 font-sans overflow-x-hidden">
+    <main className="min-h-screen bg-[var(--background)] text-[var(--foreground)] pb-32 font-sans overflow-x-hidden">
       
       {/* Hero Section */}
       <div className="relative w-full h-[65vh] min-h-[500px]">
@@ -28,9 +28,9 @@ export default function Home() {
             className="object-cover object-top opacity-90"
             priority
           />
-          {/* Gradient Overlay for seamless transition to dark bg */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0F0F0F]/20 to-[#0F0F0F] z-10" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0F0F0F] via-[#0F0F0F]/60 to-transparent z-10" />
+          {/* Gradient Overlay for seamless transition to bg */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[var(--background)]/20 to-[var(--background)] z-10" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[var(--background)] via-[var(--background)]/60 to-transparent z-10" />
         </div>
 
         {/* Hero Content */}
@@ -40,11 +40,11 @@ export default function Home() {
             ОЛЕГ<br />ИВЧЕНКО
           </h1>
           
-          <p className="text-lg text-gray-300 font-medium mb-5 tracking-wide">
+          <p className="text-lg text-[var(--muted-foreground)] font-medium mb-5 tracking-wide">
             Предприниматель, инвестор, CEO
           </p>
 
-          <div className="inline-block px-6 py-2 rounded-full bg-[#C5A66F] text-[#0F0F0F] font-bold text-xs uppercase tracking-[0.15em] shadow-[0_0_20px_rgba(197,166,111,0.3)]">
+          <div className="inline-block px-6 py-2 rounded-full bg-[#C5A66F] text-white font-bold text-xs uppercase tracking-[0.15em] shadow-[0_0_20px_rgba(197,166,111,0.3)]">
             Official Profile
           </div>
         </div>
@@ -54,17 +54,17 @@ export default function Home() {
       <div className="px-5 space-y-10 relative z-20 -mt-4">
 
         {/* Digital Business Card */}
-        <div className="bg-gradient-to-br from-[#1A1A1A] to-[#121212] rounded-3xl p-6 border border-[#333] shadow-2xl relative overflow-hidden group">
+        <div className="bg-gradient-to-br from-[var(--card)] to-[var(--secondary)] rounded-3xl p-6 border border-[var(--border)] shadow-2xl relative overflow-hidden group">
           {/* Card Shine */}
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
           
           <div className="relative z-10">
             <div className="flex justify-between items-start mb-8">
               <div>
-                <h2 className="text-2xl font-bold text-white mb-1">Олег Ивченко</h2>
+                <h2 className="text-2xl font-bold text-[var(--foreground)] mb-1">Олег Ивченко</h2>
                 <p className="text-[#C5A66F] font-medium text-sm">Предприниматель, Инвестор</p>
               </div>
-              <div className="w-12 h-12 bg-[#2A2A2A] rounded-full flex items-center justify-center border border-[#333]">
+              <div className="w-12 h-12 bg-[var(--background)] rounded-full flex items-center justify-center border border-[var(--border)]">
                 <Send size={20} className="text-[#C5A66F]" />
               </div>
             </div>
@@ -190,12 +190,12 @@ interface ContactRowProps {
 
 function ContactRow({ icon, label, value, onCopy, isCopied, action }: ContactRowProps) {
   return (
-    <div className="flex items-center justify-between p-3 bg-[#121212] rounded-xl border border-[#333] group hover:border-[#C5A66F]/30 transition-colors">
+    <div className="flex items-center justify-between p-3 bg-[var(--background)] rounded-xl border border-[var(--border)] group hover:border-[#C5A66F]/30 transition-colors">
       <div className="flex items-center gap-3 cursor-pointer" onClick={action}>
         <div className="text-[#C5A66F]">{icon}</div>
         <div>
-          <div className="text-[10px] text-gray-500 uppercase tracking-wider">{label}</div>
-          <div className="text-white font-medium text-sm">{value}</div>
+          <div className="text-[10px] text-[var(--muted-foreground)] uppercase tracking-wider">{label}</div>
+          <div className="text-[var(--foreground)] font-medium text-sm">{value}</div>
         </div>
       </div>
       <button 
@@ -203,7 +203,7 @@ function ContactRow({ icon, label, value, onCopy, isCopied, action }: ContactRow
           e.stopPropagation();
           onCopy();
         }}
-        className="p-2 text-gray-500 hover:text-[#C5A66F] transition-colors"
+        className="p-2 text-[var(--muted-foreground)] hover:text-[#C5A66F] transition-colors"
       >
         {isCopied ? <Check size={16} /> : <Copy size={16} />}
       </button>
@@ -213,23 +213,23 @@ function ContactRow({ icon, label, value, onCopy, isCopied, action }: ContactRow
 
 function StatCard({ value, label, sub }: { value: string, label: string, sub: string }) {
   return (
-    <div className="bg-[#1A1A1A] p-3 rounded-2xl border border-[#333] flex flex-col items-center text-center hover:border-[#C5A66F]/50 transition-colors">
+    <div className="bg-[var(--card)] p-3 rounded-2xl border border-[var(--border)] flex flex-col items-center text-center hover:border-[#C5A66F]/50 transition-colors shadow-sm">
       <div className="text-[#C5A66F] font-bold text-lg mb-0.5">{value}</div>
-      <div className="text-gray-300 text-[10px] font-medium uppercase">{label}</div>
-      <div className="text-gray-600 text-[9px]">{sub}</div>
+      <div className="text-[var(--muted-foreground)] text-[10px] font-medium uppercase">{label}</div>
+      <div className="text-[var(--muted-foreground)] text-[9px]">{sub}</div>
     </div>
   );
 }
 
 function BlogCard({ title, category, image }: { title: string, category: string, image: string }) {
   return (
-    <div className="bg-[#1A1A1A] p-3 rounded-2xl border border-[#333] flex gap-4 items-center hover:border-[#C5A66F]/30 transition-colors group">
+    <div className="bg-[var(--card)] p-3 rounded-2xl border border-[var(--border)] flex gap-4 items-center hover:border-[#C5A66F]/30 transition-colors group shadow-sm">
       <div className="w-16 h-16 rounded-xl relative overflow-hidden flex-shrink-0">
         <Image src={image} alt={title} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
       </div>
       <div>
         <div className="text-[#C5A66F] text-[10px] font-bold uppercase tracking-wider mb-1">{category}</div>
-        <div className="text-white font-bold text-sm leading-tight">{title}</div>
+        <div className="text-[var(--foreground)] font-bold text-sm leading-tight">{title}</div>
       </div>
     </div>
   );

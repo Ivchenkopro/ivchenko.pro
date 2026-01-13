@@ -88,7 +88,7 @@ export default function Cases() {
       {/* Toast Notification */}
       {showToast && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-4 duration-300">
-          <div className="bg-[#1A1A1A]/90 backdrop-blur-md text-white px-6 py-3 rounded-full shadow-xl flex items-center gap-3 border border-[#333]">
+          <div className="bg-[var(--card)]/90 backdrop-blur-md text-[var(--foreground)] px-6 py-3 rounded-full shadow-xl flex items-center gap-3 border border-[var(--border)]">
             <div className="bg-[#C5A66F]/20 p-1 rounded-full">
               <Check size={16} className="text-[#C5A66F]" />
             </div>

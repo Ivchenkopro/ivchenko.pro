@@ -96,7 +96,7 @@ export default function Services() {
       <div className="fixed bottom-24 left-0 right-0 px-6 z-40 flex justify-center">
         <button 
           onClick={openModal}
-          className="bg-[#C5A66F] text-black font-bold py-4 px-8 rounded-full shadow-[0_0_20px_rgba(197,166,111,0.3)] flex items-center gap-2 active:scale-95 transition-transform border border-[#C5A66F]/50"
+          className="bg-[#C5A66F] text-white font-bold py-4 px-8 rounded-full shadow-[0_0_20px_rgba(197,166,111,0.3)] flex items-center gap-2 active:scale-95 transition-transform border border-[#C5A66F]/50"
         >
           <MessageSquare size={20} />
           Оставить заявку
@@ -105,8 +105,8 @@ export default function Services() {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-[#1A1A1A] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[#333] sm:border shadow-2xl">
+        <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[var(--card)] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[var(--border)] sm:border shadow-2xl">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-bold text-[var(--foreground)]">
                 {modalStep === "main" ? "Выберите формат" : "Выберите направление"}

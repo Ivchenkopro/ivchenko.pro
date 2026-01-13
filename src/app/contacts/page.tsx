@@ -24,9 +24,9 @@ export default function Contacts() {
         <p className="text-[var(--muted-foreground)] mb-8">Всегда на связи для партнеров</p>
 
         {/* Digital Business Card */}
-        <div className="bg-gradient-to-br from-[#1A1A1A] to-[#121212] rounded-3xl p-6 border border-[#333] shadow-2xl relative overflow-hidden mb-8 group">
+        <div className="bg-gradient-to-br from-[var(--card)] to-[var(--secondary)] rounded-3xl p-6 border border-[var(--border)] shadow-2xl relative overflow-hidden mb-8 group">
           {/* Card Shine */}
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
           
           <div className="relative z-10">
             <div className="flex justify-between items-start mb-8">
@@ -34,7 +34,7 @@ export default function Contacts() {
                 <h2 className="text-2xl font-bold text-[var(--foreground)] mb-1">Олег Ивченко</h2>
                 <p className="text-[#C5A66F] font-medium text-sm">Предприниматель, Инвестор</p>
               </div>
-              <div className="w-12 h-12 bg-[#2A2A2A] rounded-full flex items-center justify-center border border-[#333]">
+              <div className="w-12 h-12 bg-[var(--background)] rounded-full flex items-center justify-center border border-[var(--border)]">
                 <Send size={20} className="text-[#C5A66F]" />
               </div>
             </div>
@@ -65,19 +65,19 @@ export default function Contacts() {
         <div className="grid grid-cols-1 gap-4 mb-8">
           <button 
             onClick={() => window.open("https://t.me/Oleg_Ivchenko", "_blank")}
-            className="w-full bg-[#C5A66F] text-black font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(197,166,111,0.3)] flex items-center justify-center gap-2 active:scale-95 transition-transform"
+            className="w-full bg-[#C5A66F] text-white font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(197,166,111,0.3)] flex items-center justify-center gap-2 active:scale-95 transition-transform"
           >
             <Send size={20} />
             Написать в Telegram
           </button>
           
-          <button className="w-full bg-[#1A1A1A] text-[var(--foreground)] font-medium py-4 rounded-xl border border-[#333] flex items-center justify-center gap-2 active:scale-95 transition-transform hover:bg-[#222]">
+          <button className="w-full bg-[var(--card)] text-[var(--foreground)] font-medium py-4 rounded-xl border border-[var(--border)] flex items-center justify-center gap-2 active:scale-95 transition-transform hover:bg-[var(--secondary)]">
             Скачать визитку (vCard)
           </button>
         </div>
 
         {/* Office Location */}
-        <div className="bg-[#1A1A1A] rounded-2xl p-6 border border-[#333] shadow-lg">
+        <div className="bg-[var(--card)] rounded-2xl p-6 border border-[var(--border)] shadow-lg">
           <h3 className="text-[var(--foreground)] font-bold mb-4 flex items-center gap-2">
             <MapPin size={20} className="text-[#C5A66F]" />
             Офис
@@ -107,11 +107,11 @@ interface ContactRowProps {
 
 function ContactRow({ icon, label, value, onCopy, isCopied, action }: ContactRowProps) {
   return (
-    <div className="flex items-center justify-between p-3 bg-[#121212] rounded-xl border border-[#333] group hover:border-[#C5A66F]/30 transition-colors">
+    <div className="flex items-center justify-between p-3 bg-[var(--background)] rounded-xl border border-[var(--border)] group hover:border-[#C5A66F]/30 transition-colors">
       <div className="flex items-center gap-3 cursor-pointer" onClick={action}>
         <div className="text-[#C5A66F]">{icon}</div>
         <div>
-          <div className="text-[10px] text-gray-500 uppercase tracking-wider">{label}</div>
+          <div className="text-[10px] text-[var(--muted-foreground)] uppercase tracking-wider">{label}</div>
           <div className="text-[var(--foreground)] font-medium text-sm">{value}</div>
         </div>
       </div>
@@ -120,7 +120,7 @@ function ContactRow({ icon, label, value, onCopy, isCopied, action }: ContactRow
           e.stopPropagation();
           onCopy();
         }}
-        className="p-2 text-gray-500 hover:text-[#C5A66F] transition-colors"
+        className="p-2 text-[var(--muted-foreground)] hover:text-[#C5A66F] transition-colors"
       >
         {isCopied ? <Check size={16} /> : <Copy size={16} />}
       </button>

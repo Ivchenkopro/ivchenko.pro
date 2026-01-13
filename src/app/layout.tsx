@@ -26,9 +26,9 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[var(--background)] text-[var(--foreground)]`}
       >
-        <div className="max-w-md mx-auto bg-[#0F0F0F] min-h-screen relative shadow-2xl shadow-black overflow-hidden pb-32 border-x border-[#333]">
+        <div className="max-w-md mx-auto bg-[var(--background)] min-h-screen relative shadow-2xl shadow-[rgba(0,0,0,0.05)] overflow-hidden pb-32 border-x border-[var(--border)]">
           {children}
           <BottomNav />
         </div>

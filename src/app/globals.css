@@ -1,23 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  color-scheme: dark;
-  /* Dark Premium Palette */
-  --background: #0F0F0F; /* Deep Charcoal/Black */
-  --foreground: #FFFFFF; /* White */
-  --card: #1A1A1A; /* Dark Gray */
-  --card-foreground: #FFFFFF;
-  --popover: #1A1A1A;
-  --popover-foreground: #FFFFFF;
+  color-scheme: light;
+  /* Light Premium Palette */
+  --background: #F9FAFB; /* Very light gray */
+  --foreground: #111827; /* Very dark gray */
+  --card: #FFFFFF; /* White */
+  --card-foreground: #111827;
+  --popover: #FFFFFF;
+  --popover-foreground: #111827;
   --primary: #C5A66F; /* Oleg Gold */
-  --primary-foreground: #000000;
-  --secondary: #27272A; /* Zinc 800 */
-  --secondary-foreground: #FFFFFF;
-  --muted: #27272A;
-  --muted-foreground: #A1A1AA; /* Zinc 400 */
+  --primary-foreground: #FFFFFF;
+  --secondary: #F3F4F6; /* Gray 100 */
+  --secondary-foreground: #111827;
+  --muted: #F3F4F6;
+  --muted-foreground: #6B7280; /* Gray 500 */
   --accent: #C5A66F;
-  --accent-foreground: #000000;
-  --border: #333333;
+  --accent-foreground: #FFFFFF;
+  --border: #E5E7EB; /* Gray 200 */
 }
 
 @theme inline {
@@ -32,12 +32,12 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
     --background: #0F0F0F;
     --foreground: #FFFFFF;
   }
-}
+} */
 
 body {
   background: var(--background);

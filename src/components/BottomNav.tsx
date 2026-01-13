@@ -17,8 +17,8 @@ export default function BottomNav() {
 
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4 flex justify-center">
-      {/* Dark Premium Navigation */}
-      <nav className="bg-[#1A1A1A]/90 backdrop-blur-2xl border border-[#C5A66F]/30 rounded-[2rem] px-2 py-2 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] w-full relative overflow-hidden">
+      {/* Light Premium Navigation */}
+      <nav className="bg-[var(--card)]/90 backdrop-blur-2xl border border-[#C5A66F]/30 rounded-[2rem] px-2 py-2 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)] w-full relative overflow-hidden">
         
         {/* Shine effect on top border */}
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#C5A66F]/50 to-transparent" />
@@ -48,8 +48,8 @@ export default function BottomNav() {
                   {/* Icon */}
                   <div className={`relative z-10 transition-all duration-300 ${
                     isActive 
-                      ? "text-black scale-110" 
-                      : "text-gray-400 group-hover:text-white"
+                      ? "text-white scale-110" 
+                      : "text-[var(--muted-foreground)] group-hover:text-[var(--foreground)]"
                   }`}>
                     <Icon 
                       size={24} 

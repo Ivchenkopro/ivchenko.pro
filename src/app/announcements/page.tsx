@@ -64,7 +64,7 @@ export default function Announcements() {
           {announcements.map((item) => (
             <div 
               key={item.id}
-              className="bg-[var(--card)] rounded-2xl p-5 shadow-lg shadow-black/20 border border-[var(--border)] relative overflow-hidden group hover:border-[#C5A66F]/30 transition-all duration-300"
+              className="bg-[var(--card)] rounded-2xl p-5 shadow-sm border border-[var(--border)] relative overflow-hidden group hover:border-[#C5A66F]/30 transition-all duration-300"
             >
               {item.urgent && (
                 <div className="absolute top-0 right-0 px-3 py-1 bg-gradient-to-r from-red-600 to-red-500 text-white text-[10px] font-bold uppercase tracking-wider rounded-bl-xl shadow-lg shadow-red-500/20">
@@ -91,7 +91,7 @@ export default function Announcements() {
                 {item.description}
               </p>
 
-              <button className="w-full py-2.5 rounded-xl bg-[var(--secondary)] text-[var(--foreground)] font-medium text-sm border border-[var(--border)] hover:bg-[#C5A66F] hover:text-black hover:border-[#C5A66F] transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-[0_0_15px_rgba(197,166,111,0.3)]">
+              <button className="w-full py-2.5 rounded-xl bg-[var(--secondary)] text-[var(--foreground)] font-medium text-sm border border-[var(--border)] hover:bg-[#C5A66F] hover:text-white hover:border-[#C5A66F] transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-[0_0_15px_rgba(197,166,111,0.3)]">
                 Подробнее
                 <ArrowRight size={16} />
               </button>
