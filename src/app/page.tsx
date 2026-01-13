@@ -33,20 +33,8 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-t from-[var(--background)] via-transparent to-transparent z-10" />
         </div>
 
-        {/* Hero Content */}
+        {/* Hero Content - Removed Text as per request */}
         <div className="absolute bottom-0 left-0 w-full z-20 flex flex-col items-center justify-end pb-8 px-4 text-center">
-          
-          <h1 className="text-[3.5rem] leading-[0.9] font-bold text-[#C5A66F] mb-3 tracking-wide drop-shadow-2xl">
-            ОЛЕГ<br />ИВЧЕНКО
-          </h1>
-          
-          <p className="text-lg text-[var(--muted-foreground)] font-medium mb-5 tracking-wide">
-            Предприниматель, инвестор, CEO
-          </p>
-
-          <div className="inline-block px-6 py-2 rounded-full bg-[#C5A66F] text-white font-bold text-xs uppercase tracking-[0.15em] shadow-[0_0_20px_rgba(197,166,111,0.3)]">
-            Official Profile
-          </div>
         </div>
       </div>
 
