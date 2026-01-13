@@ -31,13 +31,13 @@ export default function Services() {
   const closeModal = () => setIsModalOpen(false);
 
   return (
-    <main className="min-h-screen bg-white text-black pb-32 relative overflow-hidden">
+    <main className="min-h-screen bg-[var(--background)] text-[var(--foreground)] pb-32 relative overflow-hidden">
       {/* Background Gradients */}
       <div className="absolute top-0 left-0 w-full h-96 bg-[#C5A66F]/10 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-full h-96 bg-[#C5A66F]/5 blur-[120px] rounded-full pointer-events-none" />
 
       <div className="px-6 py-8 space-y-8 relative z-10">
-        <h1 className="text-3xl font-bold text-black mb-6">Основные направления</h1>
+        <h1 className="text-3xl font-bold text-[var(--foreground)] mb-6">Основные направления</h1>
 
         {/* 1. Global Finance */}
         <ServiceCard 
@@ -73,12 +73,12 @@ export default function Services() {
         />
 
         {/* 5. Business Concierge Detailed */}
-        <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100">
-          <h2 className="text-xl font-bold text-black mb-4 flex items-center gap-2">
+        <div className="bg-[var(--card)] rounded-2xl p-6 shadow-xl border border-[var(--border)]">
+          <h2 className="text-xl font-bold text-[var(--foreground)] mb-4 flex items-center gap-2">
             <span className="w-1.5 h-6 bg-[#C5A66F] rounded-full shadow-[0_0_10px_#C5A66F]"></span>
             Бизнес-консьерж
           </h2>
-          <p className="text-sm text-gray-500 mb-6">Подробно с concierge.alun.ru</p>
+          <p className="text-sm text-[var(--muted-foreground)] mb-6">Подробно с concierge.alun.ru</p>
           
           <div className="space-y-5">
             <ConciergeItem icon={<Search size={20} />} text="Поиск закрытой информации по внутренним базам и рекомендациям" />
@@ -99,20 +99,20 @@ export default function Services() {
           className="bg-[#C5A66F] text-black font-bold py-4 px-8 rounded-full shadow-[0_0_20px_rgba(197,166,111,0.3)] flex items-center gap-2 active:scale-95 transition-transform border border-[#C5A66F]/50"
         >
           <MessageSquare size={20} />
-          Обсудить сделку
+          Оставить заявку
         </button>
       </div>
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-gray-100 sm:border shadow-2xl">
+        <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[#1A1A1A] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[#333] sm:border shadow-2xl">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold text-black">
+              <h3 className="text-xl font-bold text-[var(--foreground)]">
                 {modalStep === "main" ? "Выберите формат" : "Выберите направление"}
               </h3>
-              <button onClick={closeModal} className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
-                <X size={20} className="text-gray-500" />
+              <button onClick={closeModal} className="p-2 bg-[var(--secondary)] rounded-full hover:bg-[var(--border)] transition-colors">
+                <X size={20} className="text-[var(--muted-foreground)]" />
               </button>
             </div>
 
@@ -142,7 +142,7 @@ export default function Services() {
               <div className="space-y-3">
                 <button 
                   onClick={() => setModalStep("main")}
-                  className="text-sm text-gray-500 mb-2 flex items-center gap-1 hover:text-black transition-colors"
+                  className="text-sm text-[var(--muted-foreground)] mb-2 flex items-center gap-1 hover:text-[var(--foreground)] transition-colors"
                 >
                   ← Назад
                 </button>
@@ -182,22 +182,22 @@ interface ServiceCardProps {
 
 function ServiceCard({ icon, title, subtitle, description, details, isItalicDetails }: ServiceCardProps) {
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 relative overflow-hidden group">
+    <div className="bg-[var(--card)] rounded-2xl p-6 shadow-xl border border-[var(--border)] relative overflow-hidden group">
       <div className="absolute top-0 right-0 w-32 h-32 bg-[#C5A66F]/10 rounded-full blur-[40px] -mr-10 -mt-10 transition-transform group-hover:scale-150" />
       <div className="relative z-10">
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-3 bg-gray-50 rounded-xl border border-gray-100 shadow-sm">
+          <div className="p-3 bg-[var(--secondary)] rounded-xl border border-[var(--border)] shadow-sm">
             {icon}
           </div>
           <div>
-            <h3 className="text-lg font-bold text-black leading-tight">{title}</h3>
+            <h3 className="text-lg font-bold text-[var(--foreground)] leading-tight">{title}</h3>
             {subtitle && <p className="text-sm text-[#C5A66F] font-medium">{subtitle}</p>}
           </div>
         </div>
-        <p className="text-gray-600 font-medium mb-3 leading-relaxed">{description}</p>
+        <p className="text-[var(--muted-foreground)] font-medium mb-3 leading-relaxed">{description}</p>
         {details && (
-          <div className="pt-3 border-t border-gray-100">
-            <p className={`text-sm text-gray-500 leading-relaxed ${isItalicDetails ? "italic" : ""}`}>
+          <div className="pt-3 border-t border-[var(--border)]">
+            <p className={`text-sm text-[var(--muted-foreground)] leading-relaxed ${isItalicDetails ? "italic" : ""}`}>
               {details}
             </p>
           </div>
@@ -218,7 +218,7 @@ function ConciergeItem({ icon, text }: ConciergeItemProps) {
       <div className="mt-1 min-w-[20px] text-[#C5A66F] group-hover:scale-110 transition-transform duration-300">
         {icon}
       </div>
-      <p className="text-sm text-gray-600 leading-relaxed group-hover:text-black transition-colors">{text}</p>
+      <p className="text-sm text-[var(--muted-foreground)] leading-relaxed group-hover:text-[var(--foreground)] transition-colors">{text}</p>
     </div>
   );
 }
@@ -235,18 +235,18 @@ function ModalOption({ icon, title, subtitle, onClick, hasArrow }: ModalOptionPr
   return (
     <button 
       onClick={onClick}
-      className="w-full bg-gray-50 hover:bg-gray-100 p-4 rounded-xl flex items-center gap-4 transition-all border border-gray-100 hover:border-[#C5A66F]/30 text-left group"
+      className="w-full bg-[var(--secondary)] hover:bg-[#2A2A2A] p-4 rounded-xl flex items-center gap-4 transition-all border border-[var(--border)] hover:border-[#C5A66F]/30 text-left group"
     >
       {icon && (
-        <div className="p-2 bg-white rounded-lg shadow-sm group-hover:scale-110 transition-transform">
+        <div className="p-2 bg-[var(--card)] rounded-lg shadow-sm group-hover:scale-110 transition-transform border border-[var(--border)]">
           {icon}
         </div>
       )}
       <div className="flex-1">
-        <div className="font-bold text-black">{title}</div>
-        {subtitle && <div className="text-xs text-gray-500 group-hover:text-gray-700">{subtitle}</div>}
+        <div className="font-bold text-[var(--foreground)]">{title}</div>
+        {subtitle && <div className="text-xs text-[var(--muted-foreground)] group-hover:text-[var(--foreground)]">{subtitle}</div>}
       </div>
-      {hasArrow && <ChevronRight size={20} className="text-gray-400 group-hover:text-[#C5A66F]" />}
+      {hasArrow && <ChevronRight size={20} className="text-[var(--muted-foreground)] group-hover:text-[#C5A66F]" />}
     </button>
   );
 }

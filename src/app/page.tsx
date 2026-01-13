@@ -1,153 +1,156 @@
+"use client";
+
 import Image from "next/image";
-import { Building2, Handshake, TrendingUp, Wheat } from "lucide-react";
+import { Building2, TrendingUp, Users, ArrowRight, Wallet, Briefcase, FileText, ChevronRight } from "lucide-react";
+import { useState } from "react";
+import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-white text-black pb-32 relative overflow-hidden">
+    <main className="min-h-screen bg-[#0F0F0F] text-white pb-32 font-sans overflow-x-hidden">
       
-      {/* Background Gradients */}
-      <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-gray-100 to-white z-0" />
-      <div className="absolute top-20 right-[-20%] w-[60%] h-96 bg-[#C5A66F]/10 blur-[120px] rounded-full pointer-events-none" />
-
       {/* Hero Section */}
-      <div className="relative z-10">
-        <div className="w-full relative rounded-b-[3rem] overflow-hidden shadow-2xl shadow-[#C5A66F]/20">
-          <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent z-20 h-full opacity-50" />
+      <div className="relative w-full h-[65vh] min-h-[500px]">
+        {/* Main Image */}
+        <div className="absolute inset-0 z-0">
           <Image 
-            src="/ава.png" 
+            src="/олегив.jpg" 
             alt="Олег Ивченко" 
-            width={800}
-            height={800}
-            className="w-full h-auto object-cover"
+            fill
+            className="object-cover object-top opacity-90"
             priority
           />
+          {/* Gradient Overlay for seamless transition to dark bg */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0F0F0F]/20 to-[#0F0F0F] z-10" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0F0F0F] via-[#0F0F0F]/60 to-transparent z-10" />
         </div>
-        
-        <div className="px-6 mt-8 relative z-30">
-          <div className="inline-block px-4 py-1.5 rounded-full bg-[#C5A66F]/10 text-[#C5A66F] font-bold text-xs uppercase tracking-widest mb-4 border border-[#C5A66F]/20">
+
+        {/* Hero Content */}
+        <div className="absolute bottom-0 left-0 w-full z-20 flex flex-col items-center justify-end pb-8 px-4 text-center">
+          
+          <h1 className="text-[3.5rem] leading-[0.9] font-bold text-[#C5A66F] mb-3 tracking-wide drop-shadow-2xl">
+            ОЛЕГ<br />ИВЧЕНКО
+          </h1>
+          
+          <p className="text-lg text-gray-300 font-medium mb-5 tracking-wide">
+            Предприниматель, инвестор, CEO
+          </p>
+
+          <div className="inline-block px-6 py-2 rounded-full bg-[#C5A66F] text-[#0F0F0F] font-bold text-xs uppercase tracking-[0.15em] shadow-[0_0_20px_rgba(197,166,111,0.3)]">
             Official Profile
           </div>
-          <h1 className="text-3xl font-bold uppercase tracking-wider mb-4 leading-tight text-black">
-            Предприниматель,<br/>инвестор, CEO
-          </h1>
-          <p className="text-lg text-gray-600 font-medium mb-6 leading-relaxed">
-            Ваш проводник в мир <span className="text-[#C5A66F] font-bold">закрытых сделок</span> и больших возможностей
-          </p>
-          <div className="h-1.5 w-32 bg-gradient-to-r from-[#C5A66F] to-transparent rounded-full shadow-[0_0_15px_#C5A66F]"></div>
         </div>
       </div>
 
-      <div className="px-6 py-8 space-y-10 relative z-10">
-        {/* Intro */}
-        <div className="space-y-4 text-gray-600 text-[16px] leading-relaxed">
-          <p>
-            Я превращаю ваши контакты в многомиллионные сделки. За 8 лет организовал доступ к <span className="font-bold text-black">4000+</span> проверенным партнерам в <span className="font-bold text-black">50+</span> отраслях.
-          </p>
-        </div>
-
-        {/* Highlight Card */}
-        <div className="bg-[#1A1A1A] rounded-3xl p-8 text-center shadow-2xl shadow-[#C5A66F]/30 relative overflow-hidden group transform hover:scale-[1.02] transition-all duration-500">
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
-          
-          {/* Gold Glow Effects */}
-          <div className="absolute top-0 right-0 w-40 h-40 bg-[#C5A66F] rounded-full -mr-20 -mt-20 blur-[80px] opacity-40 animate-pulse"></div>
-          <div className="absolute bottom-0 left-0 w-40 h-40 bg-[#C5A66F] rounded-full -ml-20 -mb-20 blur-[80px] opacity-40 animate-pulse delay-700"></div>
-          
-          <div className="relative z-10 flex flex-col items-center gap-4">
-             <div className="w-12 h-12 bg-[#C5A66F]/20 rounded-full flex items-center justify-center border border-[#C5A66F]/50 text-[#C5A66F]">
-               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-             </div>
-             <p className="text-white text-xl font-medium leading-relaxed">
-               Ваша сделка от <span className="text-[#C5A66F] font-bold text-2xl">50 млн ₽</span> —<br/>моя специализация
-             </p>
+      {/* Content Container */}
+      <div className="px-5 space-y-10 relative z-20 -mt-4">
+        
+        {/* Zakrytye Sdelki (Closed Deals) */}
+        <section>
+          <div className="flex justify-between items-end mb-4 px-1">
+            <h2 className="text-sm font-bold text-[#C5A66F] uppercase tracking-wider">Закрытые сделки</h2>
+            <Link href="/cases" className="text-xs text-gray-500 flex items-center gap-1 hover:text-[#C5A66F] transition-colors">
+              Все кейсы <ChevronRight size={14} />
+            </Link>
           </div>
-        </div>
-
-        {/* About */}
-        <div className="space-y-4 text-gray-600 text-[16px] leading-relaxed">
-          <p>
-            Я — предприниматель с 20+ лет опыта в управлении бизнесом.
-          </p>
-          <p>
-            Моя уникальность — в постоянной воронке возможностей и умении работать в партнёрстве. Делаю бизнес «два в одном»: нанизываю на имеющиеся сервисы новые возможности, которые формирую сам.
-          </p>
-        </div>
-
-        {/* Focus Section */}
-        <div>
-          <h3 className="text-xl font-bold text-black mb-6 flex items-center gap-3">
-            <span className="w-1.5 h-8 bg-[#C5A66F] rounded-full shadow-[0_0_10px_#C5A66F]"></span>
-            Мой фокус:
-          </h3>
-          <ul className="grid grid-cols-1 gap-3">
-            {[
-              "M&A (слияния и поглощения)",
-              "Стратегические контракты",
-              "Финансовые операции",
-              "Налоговый консалтинг",
-              "GR (government relations) и инвестиции",
-              "Взаимовыгодные партнёрства"
-            ].map((item, index) => (
-              <li key={index} className="flex items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100 hover:bg-gray-100 transition-colors">
-                <div className="min-w-[6px] h-[6px] rounded-full bg-[#C5A66F] shadow-[0_0_5px_#C5A66F]"></div>
-                <span className="text-gray-800 font-medium">{item}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Values Section */}
-        <div className="bg-[#C5A66F]/10 p-6 rounded-2xl border-l-4 border-[#C5A66F] relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#C5A66F]/5 to-transparent pointer-events-none" />
-          <h3 className="text-lg font-bold text-black mb-3 relative z-10">Мои ценности:</h3>
-          <p className="text-gray-700 italic relative z-10 leading-relaxed">
-            «Репутация, слово и дело. Не бросаю слова на ветер. Работаю с теми, кто сам построил бизнес и реально делает.»
-          </p>
-        </div>
-
-        {/* Key Roles Section */}
-        <div>
-          <h3 className="text-xl font-bold text-black mb-6 flex items-center gap-3">
-            <span className="w-1.5 h-8 bg-[#C5A66F] rounded-full shadow-[0_0_10px_#C5A66F]"></span>
-            Ключевые роли:
-          </h3>
-          <div className="grid grid-cols-1 gap-4">
-            <RoleCard 
-              icon={<Building2 className="text-[#C5A66F]" />} 
-              title="CEO и Со-Founder" 
-              company="Global Finance" 
+          
+          <div className="flex gap-4 overflow-x-auto pb-4 -mx-5 px-5 scrollbar-hide">
+            <DealCard 
+              image="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=500&auto=format&fit=crop&q=60"
+              title="Инвестиции в недвижимость"
+              subtitle="ЖК Prime Park"
             />
-            <RoleCard 
-              icon={<Handshake className="text-[#C5A66F]" />} 
-              title="CEO и Со-Founder" 
-              company="Alun Partners" 
+            <DealCard 
+              image="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=500&auto=format&fit=crop&q=60"
+              title="Строительство завода"
+              subtitle="Промышленный сектор"
             />
-            <RoleCard 
-              icon={<TrendingUp className="text-[#C5A66F]" />} 
-              title="Со-Founder" 
-              company="инвестиционного фонда Alun Capital" 
-            />
-            <RoleCard 
-              icon={<Wheat className="text-[#C5A66F]" />} 
-              title="Со-Founder" 
-              company="международный трейдинг зерна" 
+            <DealCard 
+              image="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&auto=format&fit=crop&q=60"
+              title="IT Стартап"
+              subtitle="Финтех платформа"
             />
           </div>
+        </section>
+
+        {/* Moya Set (My Network) */}
+        <section>
+          <h2 className="text-sm font-bold text-[#C5A66F] uppercase tracking-wider mb-4 px-1">Моя сеть</h2>
+          <div className="grid grid-cols-3 gap-3">
+            <StatCard value="3 523" label="Контактов" sub="Подключение" />
+            <StatCard value="167" label="Партнеров" sub="Активные" />
+            <StatCard value="14.3B" label="Сделок" sub="Оборот" />
+          </div>
+        </section>
+
+        {/* Blog i Analitika */}
+        <section>
+          <div className="flex justify-between items-end mb-4 px-1">
+            <h2 className="text-sm font-bold text-[#C5A66F] uppercase tracking-wider">Блог и аналитика</h2>
+            <Link href="/blog" className="text-xs text-gray-500 flex items-center gap-1 hover:text-[#C5A66F] transition-colors">
+              Читать <ChevronRight size={14} />
+            </Link>
+          </div>
+
+          <div className="space-y-3">
+            <BlogCard 
+              title="Как масштабировать бизнес в 2024 году?"
+              category="Стратегия"
+              image="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=500&auto=format&fit=crop&q=60"
+            />
+            <BlogCard 
+              title="Инвестиционные тренды: куда вкладывать?"
+              category="Аналитика"
+              image="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&auto=format&fit=crop&q=60"
+            />
+          </div>
+        </section>
+
+        {/* CTA Button */}
+        <div className="pt-4 pb-8">
+           <button className="w-full bg-[#C5A66F] text-[#0F0F0F] font-bold py-4 rounded-xl shadow-[0_0_30px_rgba(197,166,111,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+             <Wallet size={20} />
+             Оставить заявку
+           </button>
         </div>
+
       </div>
     </main>
   );
 }
 
-function RoleCard({ icon, title, company }: { icon: React.ReactNode, title: string, company: string }) {
+function DealCard({ image, title, subtitle }: { image: string, title: string, subtitle: string }) {
   return (
-    <div className="bg-white p-5 rounded-2xl shadow-lg border border-gray-100 flex items-center gap-5 hover:shadow-xl transition-all group">
-      <div className="p-3 bg-gray-50 rounded-xl border border-gray-100 group-hover:scale-110 transition-transform">
-        {icon}
+    <div className="min-w-[200px] h-[140px] rounded-2xl relative overflow-hidden group">
+      <Image src={image} alt={title} fill className="object-cover transition-transform duration-500 group-hover:scale-110" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+      <div className="absolute bottom-3 left-3 right-3">
+        <div className="text-white font-bold text-sm leading-tight mb-0.5">{title}</div>
+        <div className="text-gray-400 text-[10px]">{subtitle}</div>
+      </div>
+    </div>
+  );
+}
+
+function StatCard({ value, label, sub }: { value: string, label: string, sub: string }) {
+  return (
+    <div className="bg-[#1A1A1A] p-3 rounded-2xl border border-[#333] flex flex-col items-center text-center hover:border-[#C5A66F]/50 transition-colors">
+      <div className="text-[#C5A66F] font-bold text-lg mb-0.5">{value}</div>
+      <div className="text-gray-300 text-[10px] font-medium uppercase">{label}</div>
+      <div className="text-gray-600 text-[9px]">{sub}</div>
+    </div>
+  );
+}
+
+function BlogCard({ title, category, image }: { title: string, category: string, image: string }) {
+  return (
+    <div className="bg-[#1A1A1A] p-3 rounded-2xl border border-[#333] flex gap-4 items-center hover:border-[#C5A66F]/30 transition-colors group">
+      <div className="w-16 h-16 rounded-xl relative overflow-hidden flex-shrink-0">
+        <Image src={image} alt={title} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
       </div>
       <div>
-        <div className="text-xs text-gray-500 font-medium uppercase tracking-wider mb-1">{title}</div>
-        <div className="text-black font-bold text-lg leading-tight">{company}</div>
+        <div className="text-[#C5A66F] text-[10px] font-bold uppercase tracking-wider mb-1">{category}</div>
+        <div className="text-white font-bold text-sm leading-tight">{title}</div>
       </div>
     </div>
   );

@@ -34,13 +34,13 @@ export default function Cases() {
   };
 
   return (
-    <main className="min-h-screen bg-white text-black pb-32 relative overflow-hidden">
+    <main className="min-h-screen bg-[var(--background)] text-[var(--foreground)] pb-32 relative overflow-hidden">
       {/* Background Gradients */}
       <div className="absolute top-20 left-[-20%] w-[60%] h-96 bg-[#C5A66F]/10 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-40 right-[-10%] w-[50%] h-80 bg-[#C5A66F]/5 blur-[100px] rounded-full pointer-events-none" />
 
       <div className="px-6 py-8 space-y-8 relative z-10">
-        <h1 className="text-3xl font-bold text-black mb-6">Примеры реализованных проектов</h1>
+        <h1 className="text-3xl font-bold text-[var(--foreground)] mb-6">Примеры реализованных проектов</h1>
 
         <div className="space-y-6">
           {/* 1. Hotel Complex */}
@@ -78,9 +78,9 @@ export default function Cases() {
       <div className="fixed bottom-24 left-0 right-0 px-6 z-40 flex justify-center">
         <button 
           onClick={handleShare}
-          className="bg-black text-white font-bold py-4 px-8 rounded-full shadow-[0_0_20px_rgba(0,0,0,0.2)] flex items-center gap-3 active:scale-95 transition-transform"
+          className="bg-[#C5A66F] text-black font-bold py-4 px-8 rounded-full shadow-[0_0_20px_rgba(197,166,111,0.3)] flex items-center gap-3 active:scale-95 transition-transform"
         >
-          <LinkIcon size={20} className="text-[#C5A66F]" />
+          <LinkIcon size={20} className="text-black" />
           Поделиться кейсом
         </button>
       </div>
@@ -88,9 +88,9 @@ export default function Cases() {
       {/* Toast Notification */}
       {showToast && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-4 duration-300">
-          <div className="bg-white/90 backdrop-blur-md text-black px-6 py-3 rounded-full shadow-xl flex items-center gap-3 border border-gray-100">
-            <div className="bg-green-500/10 p-1 rounded-full">
-              <Check size={16} className="text-green-600" />
+          <div className="bg-[#1A1A1A]/90 backdrop-blur-md text-white px-6 py-3 rounded-full shadow-xl flex items-center gap-3 border border-[#333]">
+            <div className="bg-[#C5A66F]/20 p-1 rounded-full">
+              <Check size={16} className="text-[#C5A66F]" />
             </div>
             <span className="text-sm font-medium">Скопировано! Открываем Telegram...</span>
           </div>
@@ -100,38 +100,19 @@ export default function Cases() {
   );
 }
 
-interface CaseCardProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  details?: string;
-}
-
-function CaseCard({ icon, title, description, details }: CaseCardProps) {
+function CaseCard({ icon, title, description, details }: { icon: React.ReactNode, title: string, description: string, details?: string }) {
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 relative overflow-hidden group hover:shadow-xl transition-all">
-      {/* Decorative background element */}
-      <div className="absolute -top-6 -right-6 w-32 h-32 bg-[#C5A66F]/10 rounded-full blur-[30px] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-      
-      <div className="relative z-10">
-        <div className="flex items-center gap-4 mb-4">
-          <div className="p-3 bg-gray-50 rounded-xl shadow-sm border border-gray-100">
-            {icon}
-          </div>
-          <h3 className="text-lg font-bold text-black leading-tight pr-2">{title}</h3>
-        </div>
-        
-        <div className="space-y-2">
-          <p className="text-gray-600 font-medium leading-relaxed">{description}</p>
-          {details && (
-            <div className="pt-3 mt-2 border-t border-gray-100">
-              <p className="text-sm text-gray-500 leading-relaxed italic">
-                {details}
-              </p>
-            </div>
-          )}
-        </div>
+    <div className="bg-[var(--card)] rounded-2xl p-6 shadow-xl border border-[var(--border)] hover:border-[#C5A66F]/30 transition-colors">
+      <div className="mb-4 bg-[#C5A66F]/10 w-14 h-14 rounded-full flex items-center justify-center border border-[#C5A66F]/20">
+        {icon}
       </div>
+      <h3 className="text-xl font-bold text-[var(--foreground)] mb-2">{title}</h3>
+      <p className="text-[var(--muted-foreground)] leading-relaxed mb-4">{description}</p>
+      {details && (
+        <div className="bg-[var(--secondary)]/50 rounded-xl p-4 border border-[var(--border)]">
+          <p className="text-sm text-[var(--foreground)] font-medium">{details}</p>
+        </div>
+      )}
     </div>
   );
 }
