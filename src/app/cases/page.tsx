@@ -106,7 +106,7 @@ function CaseCard({ icon, title, description, details }: { icon: React.ReactNode
       <div className="mb-4 bg-[#C5A66F]/10 w-14 h-14 rounded-full flex items-center justify-center border border-[#C5A66F]/20">
         {icon}
       </div>
-      <h3 className="text-xl font-bold text-[var(--foreground)] mb-2">{title}</h3>
+      <h3 className="text-xl font-bold text-[var(--card-foreground)] mb-2">{title}</h3>
       <p className="text-[var(--muted-foreground)] leading-relaxed mb-4">{description}</p>
       {details && (
         <div className="bg-[var(--secondary)]/50 rounded-xl p-4 border border-[var(--border)]">

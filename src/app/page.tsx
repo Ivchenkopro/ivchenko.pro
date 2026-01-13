@@ -29,7 +29,7 @@ export default function Home() {
             priority
           />
           {/* Gradient Overlay for seamless transition to bg */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[var(--background)] z-10" />
+          {/* <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[var(--background)] z-10" /> */}
           {/* <div className="absolute inset-0 bg-gradient-to-t from-[var(--background)] via-transparent to-transparent z-10" /> */}
         </div>
 
