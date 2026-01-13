@@ -2,31 +2,31 @@
 
 :root {
   color-scheme: light;
-  /* Hybrid Palette: White Background, Dark Elements */
-  --background: #FFFFFF; /* Pure White */
+  /* Hybrid Palette: Off-White Background, Lighter Dark Elements */
+  --background: #F4F4F5; /* Zinc 100 - Slightly darker than white */
   --foreground: #111827; /* Dark text for the background */
   
-  /* Revert Cards to Dark Mode */
-  --card: #18181B; /* Zinc 950 */
+  /* Revert Cards to Dark Mode - Less Black */
+  --card: #27272A; /* Zinc 800 - Lighter dark */
   --card-foreground: #FFFFFF; /* White text on cards */
   
-  --popover: #18181B;
+  --popover: #27272A;
   --popover-foreground: #FFFFFF;
   
   --primary: #C5A66F; /* Oleg Gold */
   --primary-foreground: #FFFFFF;
   
-  --secondary: #27272A; /* Zinc 800 - Dark */
+  --secondary: #3F3F46; /* Zinc 700 */
   --secondary-foreground: #FFFFFF;
   
-  --muted: #27272A;
-  --muted-foreground: #9CA3AF; /* Zinc 400 - Light Gray (for dark cards) */
+  --muted: #3F3F46;
+  --muted-foreground: #A1A1AA; /* Zinc 400 */
   /* Note: For text on white background, use text-gray-600 or specific overrides */
   
   --accent: #C5A66F;
   --accent-foreground: #FFFFFF;
   
-  --border: #333333; /* Dark border to match dark cards */
+  --border: #3F3F46; /* Zinc 700 - Lighter border for dark cards */
 }
 
 @theme inline {

@@ -218,7 +218,7 @@ function ConciergeItem({ icon, text }: ConciergeItemProps) {
       <div className="mt-1 min-w-[20px] text-[#C5A66F] group-hover:scale-110 transition-transform duration-300">
         {icon}
       </div>
-      <p className="text-sm text-[var(--muted-foreground)] leading-relaxed group-hover:text-[var(--foreground)] transition-colors">{text}</p>
+      <p className="text-sm text-[var(--muted-foreground)] leading-relaxed group-hover:text-[var(--card-foreground)] transition-colors">{text}</p>
     </div>
   );
 }

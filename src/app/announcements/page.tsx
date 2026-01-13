@@ -91,7 +91,7 @@ export default function Announcements() {
                 {item.description}
               </p>
 
-              <button className="w-full py-2.5 rounded-xl bg-[var(--secondary)] text-[var(--foreground)] font-medium text-sm border border-[var(--border)] hover:bg-[#C5A66F] hover:text-white hover:border-[#C5A66F] transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-[0_0_15px_rgba(197,166,111,0.3)]">
+              <button className="w-full py-2.5 rounded-xl bg-[var(--secondary)] text-[var(--secondary-foreground)] font-medium text-sm border border-[var(--border)] hover:bg-[#C5A66F] hover:text-white hover:border-[#C5A66F] transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-[0_0_15px_rgba(197,166,111,0.3)]">
                 Подробнее
                 <ArrowRight size={16} />
               </button>

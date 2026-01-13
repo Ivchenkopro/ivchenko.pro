@@ -71,14 +71,14 @@ export default function Contacts() {
             Написать в Telegram
           </button>
           
-          <button className="w-full bg-[var(--card)] text-[var(--foreground)] font-medium py-4 rounded-xl border border-[var(--border)] flex items-center justify-center gap-2 active:scale-95 transition-transform hover:bg-[var(--secondary)]">
+          <button className="w-full bg-[var(--card)] text-[var(--card-foreground)] font-medium py-4 rounded-xl border border-[var(--border)] flex items-center justify-center gap-2 active:scale-95 transition-transform hover:bg-[var(--secondary)]">
             Скачать визитку (vCard)
           </button>
         </div>
 
         {/* Office Location */}
         <div className="bg-[var(--card)] rounded-2xl p-6 border border-[var(--border)] shadow-lg">
-          <h3 className="text-[var(--foreground)] font-bold mb-4 flex items-center gap-2">
+          <h3 className="text-[var(--card-foreground)] font-bold mb-4 flex items-center gap-2">
             <MapPin size={20} className="text-[#C5A66F]" />
             Офис
           </h3>
