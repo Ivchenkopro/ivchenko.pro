@@ -1,11 +1,19 @@
 "use client";
 
 import Image from "next/image";
-import { Building2, TrendingUp, Users, ArrowRight, Wallet, Briefcase, FileText, ChevronRight } from "lucide-react";
+import { Building2, TrendingUp, Users, ArrowRight, Wallet, Briefcase, FileText, ChevronRight, Send, Mail, Copy, Check } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 
 export default function Home() {
+  const [copied, setCopied] = useState("");
+
+  const handleCopy = (text: string, type: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(type);
+    setTimeout(() => setCopied(""), 2000);
+  };
+
   return (
     <main className="min-h-screen bg-[#0F0F0F] text-white pb-32 font-sans overflow-x-hidden">
       
