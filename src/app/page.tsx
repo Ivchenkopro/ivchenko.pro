@@ -20,7 +20,7 @@ export default function Home() {
       {/* Hero Section */}
       <div className="relative w-full h-[65vh] min-h-[500px]">
         {/* Main Image */}
-        <div className="absolute inset-0 z-0 bg-black [mask-image:linear-gradient(to_bottom,black_75%,transparent_100%)]">
+        <div className="absolute inset-0 z-0 bg-black [mask-image:linear-gradient(to_bottom,black_80%,transparent_100%)]">
           <Image 
             src="/олегив.jpg" 
             alt="Олег Ивченко" 
