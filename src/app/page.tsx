@@ -73,8 +73,8 @@ export default function Home() {
         {/* Zakrytye Sdelki (Closed Deals) */}
         <section>
           <div className="flex justify-between items-end mb-4 px-1">
-            <h2 className="text-sm font-bold text-[#C5A66F] uppercase tracking-wider">Закрытые сделки</h2>
-            <Link href="/cases" className="text-xs text-gray-500 flex items-center gap-1 hover:text-[#C5A66F] transition-colors">
+            <h2 className="text-sm font-bold text-[#4A4A4A] uppercase tracking-wider">Закрытые сделки</h2>
+            <Link href="/cases" className="text-xs text-gray-500 flex items-center gap-1 hover:text-[#4A4A4A] transition-colors">
               Все кейсы <ChevronRight size={14} />
             </Link>
           </div>
@@ -100,7 +100,7 @@ export default function Home() {
 
         {/* Moya Set (My Network) */}
         <section>
-          <h2 className="text-sm font-bold text-[#C5A66F] uppercase tracking-wider mb-4 px-1">Моя сеть</h2>
+          <h2 className="text-sm font-bold text-[#4A4A4A] uppercase tracking-wider mb-4 px-1">Моя сеть</h2>
           <div className="grid grid-cols-3 gap-3">
             <StatCard value="3 523" label="Контактов" sub="Подключение" />
             <StatCard value="167" label="Партнеров" sub="Активные" />
@@ -111,8 +111,8 @@ export default function Home() {
         {/* Blog i Analitika */}
         <section>
           <div className="flex justify-between items-end mb-4 px-1">
-            <h2 className="text-sm font-bold text-[#C5A66F] uppercase tracking-wider">Блог и аналитика</h2>
-            <Link href="/blog" className="text-xs text-gray-500 flex items-center gap-1 hover:text-[#C5A66F] transition-colors">
+            <h2 className="text-sm font-bold text-[#4A4A4A] uppercase tracking-wider">Блог и аналитика</h2>
+            <Link href="/blog" className="text-xs text-gray-500 flex items-center gap-1 hover:text-[#4A4A4A] transition-colors">
               Читать <ChevronRight size={14} />
             </Link>
           </div>
@@ -150,7 +150,7 @@ function DealCard({ image, title, subtitle }: { image: string, title: string, su
       <Image src={image} alt={title} fill className="object-cover transition-transform duration-500 group-hover:scale-110" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 group-hover:opacity-90 transition-opacity" />
       <div className="absolute bottom-3 left-3 right-3 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-        <div className="text-[#C5A66F] text-[10px] font-bold uppercase tracking-wider mb-1">КАТЕГОРИЯ</div>
+        <div className="text-white/90 text-[10px] font-bold uppercase tracking-wider mb-1">КАТЕГОРИЯ</div>
         <div className="text-white font-bold text-sm leading-tight mb-0.5">{title}</div>
         <div className="text-gray-400 text-[10px]">{subtitle}</div>
       </div>
@@ -193,7 +193,7 @@ function ContactRow({ icon, label, value, onCopy, isCopied, action }: ContactRow
 function StatCard({ value, label, sub }: { value: string, label: string, sub: string }) {
   return (
     <div className="bg-[var(--card)] p-3 rounded-2xl border border-[var(--border)] flex flex-col items-center text-center hover:border-[#C5A66F]/50 transition-colors shadow-sm">
-      <div className="text-[#C5A66F] font-bold text-lg mb-0.5">{value}</div>
+      <div className="text-[var(--card-foreground)] font-bold text-lg mb-0.5">{value}</div>
       <div className="text-[var(--muted-foreground)] text-[10px] font-medium uppercase">{label}</div>
       <div className="text-[var(--muted-foreground)] text-[9px]">{sub}</div>
     </div>
@@ -207,7 +207,7 @@ function BlogCard({ title, category, image }: { title: string, category: string,
         <Image src={image} alt={title} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
       </div>
       <div>
-        <div className="text-[#C5A66F] text-[10px] font-bold uppercase tracking-wider mb-1">{category}</div>
+        <div className="text-[var(--muted-foreground)] text-[10px] font-bold uppercase tracking-wider mb-1">{category}</div>
         <div className="text-[var(--card-foreground)] font-bold text-sm leading-tight">{title}</div>
       </div>
     </div>

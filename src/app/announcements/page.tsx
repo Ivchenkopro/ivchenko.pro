@@ -48,7 +48,7 @@ export default function Announcements() {
 
       <div className="px-5 py-8 relative z-10 max-w-lg mx-auto">
         <header className="mb-8">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C5A66F]/10 border border-[#C5A66F]/20 text-[#C5A66F] text-[10px] font-bold uppercase tracking-widest mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-200 border border-zinc-300 text-[#4A4A4A] text-[10px] font-bold uppercase tracking-widest mb-3">
             <Megaphone size={12} />
             Bulletin Board
           </div>
@@ -73,7 +73,7 @@ export default function Announcements() {
               )}
               
               <div className="flex items-center gap-2 mb-3">
-                <span className="px-2.5 py-1 rounded-md bg-[var(--secondary)] text-[#C5A66F] text-[10px] font-bold uppercase tracking-wide flex items-center gap-1 border border-[var(--border)]">
+                <span className="px-2.5 py-1 rounded-md bg-[var(--secondary)] text-[var(--card-foreground)] text-[10px] font-bold uppercase tracking-wide flex items-center gap-1 border border-[var(--border)]">
                   <Tag size={10} />
                   {item.tag}
                 </span>
@@ -83,7 +83,7 @@ export default function Announcements() {
                 </span>
               </div>
 
-              <h3 className="text-lg font-bold text-[var(--card-foreground)] mb-2 leading-tight group-hover:text-[#C5A66F] transition-colors">
+              <h3 className="text-lg font-bold text-[var(--card-foreground)] mb-2 leading-tight group-hover:text-white transition-colors">
                 {item.title}
               </h3>
               

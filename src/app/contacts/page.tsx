@@ -32,7 +32,7 @@ export default function Contacts() {
             <div className="flex justify-between items-start mb-8">
               <div>
                 <h2 className="text-2xl font-bold text-[var(--card-foreground)] mb-1">Олег Ивченко</h2>
-                <p className="text-[#C5A66F] font-medium text-sm">Предприниматель, Инвестор</p>
+                <p className="text-[var(--muted-foreground)] font-medium text-sm">Предприниматель, Инвестор</p>
               </div>
               <div className="w-12 h-12 bg-[var(--background)] rounded-full flex items-center justify-center border border-[var(--border)]">
                 <Send size={20} className="text-[#C5A66F]" />
@@ -86,7 +86,7 @@ export default function Contacts() {
             Москва, Пресненская набережная 12,<br/>
             Башня «Федерация», офис 3402
           </p>
-          <button className="text-[#C5A66F] text-sm font-bold flex items-center gap-1 hover:underline">
+          <button className="text-[var(--card-foreground)] text-sm font-bold flex items-center gap-1 hover:underline">
             Показать на карте <ArrowUpRight size={16} />
           </button>
         </div>

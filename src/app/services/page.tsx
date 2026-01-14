@@ -191,7 +191,7 @@ function ServiceCard({ icon, title, subtitle, description, details, isItalicDeta
           </div>
           <div>
             <h3 className="text-lg font-bold text-[var(--card-foreground)] leading-tight">{title}</h3>
-            {subtitle && <p className="text-sm text-[#C5A66F] font-medium">{subtitle}</p>}
+            {subtitle && <p className="text-sm text-[var(--muted-foreground)] font-medium">{subtitle}</p>}
           </div>
         </div>
         <p className="text-[var(--muted-foreground)] font-medium mb-3 leading-relaxed">{description}</p>
