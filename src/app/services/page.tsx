@@ -37,59 +37,58 @@ export default function Services() {
       <div className="absolute bottom-0 right-0 w-full h-96 bg-[#C5A66F]/5 blur-[120px] rounded-full pointer-events-none" />
 
       <div className="px-6 py-8 space-y-8 relative z-10">
-        <h1 className="text-3xl font-bold text-[var(--foreground)] mb-6">Основные направления</h1>
+        <h1 className="text-3xl font-bold text-[var(--foreground)] mb-6">Вкладка «Услуги»</h1>
 
         {/* 1. Global Finance */}
         <ServiceCard 
           icon={<Globe className="text-[#C5A66F]" size={28} />}
           title="Global Finance"
-          description="Международные финансы, ВЭД платежи, частное кредитование, работа с валютой."
-          details="Банковское финансирование, операции с криптовалютой (USDT, BTC, ETH), трансграничные платежи для импортеров."
+          description="Частное и банковское финансирование для задач бизнеса: займы от частных инвесторов, банковские кредиты и гарантии. Платежный агент и сопровождение ВЭД на выгодных условиях (оплата инвойсов, международные переводы)."
+          links={[
+            { text: "ALUN Finance", url: "https://t.me/alun_finance" },
+            { text: "Банковские гарантии", url: "https://t.me/alun_bg" }
+          ]}
         />
 
-        {/* 2. Alun Partners */}
+        {/* 2. ALUN Estate */}
         <ServiceCard 
-          icon={<Handshake className="text-[#C5A66F]" size={28} />}
-          title="Alun Partners"
-          subtitle="(Бизнес-консьерж)"
-          description="Стратегический консалтинг, бизнес-консьерж, Alun Private."
-          details="Команда, которая больше 8 лет организует бизнес-взаимодействие в клубных сделках, требующих высокого уровня доверия Клиент - Исполнитель."
-          isItalicDetails
+          icon={<Landmark className="text-[#C5A66F]" size={28} />}
+          title="ALUN Estate"
+          description="Подбор и сопровождение сделок купля-продажи с премиальной жилой и коммерческой недвижимостью. Off-market объекты, преференции от застройщиков и безупречное юридическое сопровождение сделок."
+          links={[
+            { text: "@alun_estate", url: "https://t.me/alun_estate" }
+          ]}
         />
 
-        {/* 3. Alun Capital */}
+        {/* 3. Центр Девелоперских Решений */}
+        <ServiceCard 
+          icon={<Wheat className="text-[#C5A66F]" size={28} />}
+          title="Центр Девелоперских Решений"
+          description="Подбор и купля-продажа земельных участков под застройку. Комплексное сопровождение девелоперских проектов. Партнеры с опытом работы в Минстрое, Правительстве Москвы, усиленные ресурсами бизнес-сообщества ALUN."
+          links={[
+            { text: "@AleksanderZharkov", url: "https://t.me/AleksanderZharkov" }
+          ]}
+        />
+
+        {/* 4. Alun Capital */}
         <ServiceCard 
           icon={<TrendingUp className="text-[#C5A66F]" size={28} />}
           title="Alun Capital"
-          description="Инвестиционный фонд."
-          details="Поиск и продажа проектов по закрытым сделкам для среднего бизнеса, сотрудничество с фондами."
+          description="Помощь в решении инвестиционных задач: привлечение инвестиций, упаковка предложения. Поиск и подбор инвесторов под профиль проекта, организация переговоров и сопровождение сделки до закрытия."
+          links={[
+            { text: "@aluninvest", url: "https://t.me/aluninvest" }
+          ]}
         />
 
-        {/* 4. Grain Trading */}
+        {/* 5. Бизнес-консьерж */}
         <ServiceCard 
-          icon={<Wheat className="text-[#C5A66F]" size={28} />}
-          title="Трейдинг зерна"
-          description="Международный трейдинг зерна, участие в проекте управления международным портом."
+          icon={<Handshake className="text-[#C5A66F]" size={28} />}
+          title="Бизнес-консьерж"
+          description="Бизнес-консьерж для частных клиентов и компаний: сложные и срочные задачи в России и за рубежом. Медицина, визы и туризм, доставка редких препаратов и срочных грузов, VIP-логистика и билеты на закрытые события."
+          links={[
+            { text: "@ALUN_Concierge", url: "https://t.me/ALUN_Concierge" }
+          ]}
         />
-
-        {/* 5. Business Concierge Detailed */}
-        <div className="bg-[var(--card)] rounded-2xl p-6 shadow-xl border border-[var(--border)]">
-          <h2 className="text-xl font-bold text-[var(--card-foreground)] mb-4 flex items-center gap-2">
-            <span className="w-1.5 h-6 bg-[#C5A66F] rounded-full shadow-[0_0_10px_#C5A66F]"></span>
-            Бизнес-консьерж
-          </h2>
-          <p className="text-sm text-[var(--muted-foreground)] mb-6">Подробно с concierge.alun.ru</p>
-          
-          <div className="space-y-5">
-            <ConciergeItem icon={<Search size={20} />} text="Поиск закрытой информации по внутренним базам и рекомендациям" />
-            <ConciergeItem icon={<Landmark size={20} />} text="Организация помощи: финансовая, налоговая, медицинская" />
-            <ConciergeItem icon={<MessageCircle size={20} />} text="Организация деловых переговоров с ЛПР (лицами, принимающими решения)" />
-            <ConciergeItem icon={<Plane size={20} />} text="Помощь в оформлении иностранного подданства, ВНЖ, релокации бизнеса" />
-            <ConciergeItem icon={<Scale size={20} />} text="Решение НЕформальных юридических вопросов" />
-            <ConciergeItem icon={<Package size={20} />} text="Организация доставки лекарств, люкс-товаров из Европы" />
-            <ConciergeItem icon={<Handshake size={20} />} text="Организация Клубных займов и банковских гарантий, сделок M&A" />
-          </div>
-        </div>
       </div>
 
       {/* Floating Action Button */}
@@ -178,9 +177,10 @@ interface ServiceCardProps {
   description: string;
   details?: string;
   isItalicDetails?: boolean;
+  links?: { text: string; url: string }[];
 }
 
-function ServiceCard({ icon, title, subtitle, description, details, isItalicDetails }: ServiceCardProps) {
+function ServiceCard({ icon, title, subtitle, description, details, isItalicDetails, links }: ServiceCardProps) {
   return (
     <div className="bg-[var(--card)] rounded-2xl p-6 shadow-xl border border-[var(--border)] relative overflow-hidden group">
       <div className="absolute top-0 right-0 w-32 h-32 bg-[#C5A66F]/10 rounded-full blur-[40px] -mr-10 -mt-10 transition-transform group-hover:scale-150" />
@@ -200,6 +200,21 @@ function ServiceCard({ icon, title, subtitle, description, details, isItalicDeta
             <p className={`text-sm text-[var(--muted-foreground)] leading-relaxed ${isItalicDetails ? "italic" : ""}`}>
               {details}
             </p>
+          </div>
+        )}
+        {links && links.length > 0 && (
+          <div className="pt-3 mt-3 border-t border-[var(--border)] flex flex-wrap gap-2">
+            {links.map((link, index) => (
+              <a 
+                key={index}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-sm text-[#C5A66F] font-bold hover:underline"
+              >
+                {link.text} <ChevronRight size={14} />
+              </a>
+            ))}
           </div>
         )}
       </div>
