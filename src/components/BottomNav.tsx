@@ -15,6 +15,10 @@ export default function BottomNav() {
     { name: "Контакты", icon: User, href: "/contacts" },
   ];
 
+  const activeIndex = navItems.findIndex((item) =>
+    item.href === "/" ? pathname === "/" : pathname.startsWith(item.href)
+  );
+
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4 flex justify-center">
       {/* Dark Premium Navigation */}
@@ -23,28 +27,28 @@ export default function BottomNav() {
         {/* Shine effect on top border */}
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#C5A66F]/50 to-transparent" />
 
-        <ul className="flex justify-between items-center relative z-10">
-          {navItems.map((item) => {
+        <ul className="flex justify-between items-center relative z-10 w-full">
+          {/* Sliding Pill */}
+          <div 
+            className="absolute top-0 bottom-0 w-[20%] transition-all duration-300 ease-out z-0 pointer-events-none"
+            style={{ 
+              transform: `translateX(${activeIndex * 100}%)`,
+              opacity: activeIndex === -1 ? 0 : 1
+            }}
+          >
+             <div className="absolute inset-x-2 inset-y-1 bg-[#C5A66F] rounded-xl shadow-[0_0_15px_rgba(197,166,111,0.4)] h-[calc(100%-0.5rem)]" />
+          </div>
+
+          {navItems.map((item, index) => {
             const Icon = item.icon;
-            const isActive = item.href === "/" 
-              ? pathname === "/" 
-              : pathname.startsWith(item.href);
+            const isActive = index === activeIndex;
 
             return (
-              <li key={item.name} className="flex-1">
+              <li key={item.name} className="flex-1 relative z-10">
                 <Link
                   href={item.href}
-                  className="flex flex-col items-center justify-center gap-1 py-2 relative group"
+                  className="flex flex-col items-center justify-center gap-1 py-2 relative group w-full"
                 >
-                  {/* Gold Background Pill for Active State */}
-                  <div 
-                    className={`absolute inset-x-2 inset-y-1 bg-[#C5A66F] rounded-xl transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1) ${
-                      isActive 
-                        ? "opacity-100 scale-100 shadow-[0_0_15px_rgba(197,166,111,0.4)]" 
-                        : "opacity-0 scale-75"
-                    }`}
-                  />
-
                   {/* Icon */}
                   <div className={`relative z-10 transition-all duration-300 ${
                     isActive 

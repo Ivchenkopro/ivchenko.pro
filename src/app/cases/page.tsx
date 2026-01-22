@@ -1,8 +1,34 @@
 "use client";
 
-import { Building2, Anchor, Banknote, Users, ChevronRight } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ChevronRight, Loader2 } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import { Case } from "@/lib/data";
+import { ICON_MAP } from "@/lib/icons";
 
 export default function Cases() {
+  const [cases, setCases] = useState<Case[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchCases();
+  }, []);
+
+  const fetchCases = async () => {
+    try {
+      const { data } = await supabase
+        .from('cases')
+        .select('*')
+        .order('order', { ascending: true });
+        
+      if (data) setCases(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-[var(--background)] text-[var(--foreground)] pb-32 relative overflow-hidden">
       {/* Background Gradients */}
@@ -12,43 +38,32 @@ export default function Cases() {
       <div className="px-6 py-8 space-y-8 relative z-10">
         <h1 className="text-3xl font-bold text-[var(--foreground)] mb-6">Сделки и кейсы</h1>
 
-        <div className="space-y-6">
-          {/* 1. Hotel Complex */}
-          <CaseCard 
-            icon={<Building2 className="text-[#C5A66F]" size={28} />}
-            title="Продажа гостиничного комплекса"
-            description="Тихая сделка на 5 млрд ₽. Организация всей цепочки от поиска покупателя до закрытия сделки между резидентами сообщества."
-            link="#"
-          />
-
-          {/* 2. Port Infrastructure */}
-          <CaseCard 
-            icon={<Anchor className="text-[#C5A66F]" size={28} />}
-            title="Проекты портовой инфраструктуры"
-            description="Участие в проекте управления международным портом, организация поставок и логистики."
-            link="#"
-          />
-
-          {/* 3. Financing */}
-          <CaseCard 
-            icon={<Banknote className="text-[#C5A66F]" size={28} />}
-            title="Привлечение финансирования"
-            description="Более 1 млрд ₽ привлечено средств в проекты в 2024 году."
-            details="Система частного кредитования в клубной среде — 0,5 млрд ₽."
-            link="#"
-          />
-
-          {/* 4. Business Meetings */}
-          <CaseCard 
-            icon={<Users className="text-[#C5A66F]" size={28} />}
-            title="Организация деловых встреч"
-            description="Более 730 встреч организовано для решения задач бизнеса. Взаимодействие с топ-5 бизнес-клубов России."
-            link="#"
-          />
-        </div>
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin text-[#C5A66F]" />
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {cases.map((item) => (
+              <CaseCard 
+                key={item.id}
+                icon={<CaseIcon name={item.icon} />}
+                title={item.title}
+                description={item.description}
+                details={item.details}
+                link={item.link}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </main>
   );
+}
+
+function CaseIcon({ name }: { name: string }) {
+  const Icon = ICON_MAP[name] || ICON_MAP["building"];
+  return <Icon className="text-[#C5A66F]" size={28} />;
 }
 
 function CaseCard({ icon, title, description, details, link }: { icon: React.ReactNode, title: string, description: string, details?: string, link?: string }) {
@@ -65,15 +80,17 @@ function CaseCard({ icon, title, description, details, link }: { icon: React.Rea
         </div>
       )}
       
-      <a 
-        href={link || "#"} 
-        target="_blank" 
-        rel="noopener noreferrer"
-        className="w-full py-3 px-4 bg-[#C5A66F]/10 text-[#C5A66F] text-sm font-bold rounded-xl border border-[#C5A66F]/20 hover:bg-[#C5A66F] hover:text-white transition-all flex items-center justify-center gap-2 mt-auto"
-      >
-        Подробнее
-        <ChevronRight size={14} />
-      </a>
+      {link && (
+        <a 
+          href={link} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="w-full py-3 px-4 bg-[#C5A66F]/10 text-[#C5A66F] text-sm font-bold rounded-xl border border-[#C5A66F]/20 hover:bg-[#C5A66F] hover:text-white transition-all flex items-center justify-center gap-2 mt-auto"
+        >
+          Подробнее
+          <ChevronRight size={14} />
+        </a>
+      )}
     </div>
   );
 }
