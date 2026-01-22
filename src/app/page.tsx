@@ -39,15 +39,15 @@ export default function Home() {
       <div className="px-5 space-y-10 relative z-20 -mt-4">
 
         {/* New Share Card (Screenshot Style) */}
-        <div className="bg-[#18181B] text-white rounded-[2rem] p-8 border border-white/20 shadow-2xl relative overflow-hidden">
+        <div className="bg-[#1C1917] text-white rounded-[2rem] p-8 border border-white/20 shadow-2xl relative overflow-hidden">
           <div className="relative z-10 flex flex-col items-center text-center">
             
             <p className="text-gray-300 text-sm leading-relaxed mb-6">
-              Я предприниматель, который из возможностей делает работающие бизнесы. Я хаб, где сходятся идеи, ресурсы и люди. Я отбираю лучшие из множества проектов, анализирую их, привлекаю деньги, исполнителей и партнеров и вместе мы ставим бизнес на рельсы.
+              Я предприниматель и инвестор. Моя команда помогает масштабировать бизнес, находить точки роста и привлекать инвестиции.
             </p>
 
             <p className="text-gray-300 text-sm leading-relaxed mb-8">
-              Уникальность моей работы — постоянная воронка возможностей и умение реализовывать их в партнерстве. В этом приложении — мои действующие бизнесы и точка входа для новых совместных проектов.
+              Внедрение наших стратегий позволяет бизнесу кратно расти. Чтобы связаться со мной или обсудить партнерство, сохраните эту визитку.
             </p>
 
             <button 
@@ -69,88 +69,66 @@ export default function Home() {
           </div>
         </div>
         
-        {/* Moi Proekty (My Projects) */}
+        {/* Zakrytye Sdelki (Closed Deals) */}
         <section>
           <div className="flex justify-between items-end mb-4 px-1">
-            <h2 className="text-sm font-bold text-[#4A4A4A] uppercase tracking-wider">Мои проекты</h2>
+            <h2 className="text-sm font-bold text-[#4A4A4A] uppercase tracking-wider">Закрытые сделки</h2>
             <Link href="/cases" className="text-xs text-gray-500 flex items-center gap-1 hover:text-[#4A4A4A] transition-colors">
-              Все проекты <ChevronRight size={14} />
+              Все кейсы <ChevronRight size={14} />
             </Link>
           </div>
           
-          <div className="grid grid-cols-1 gap-3">
-            <ProjectCard 
-              title="ALUN Capital"
-              role="Co-Founder"
-              description="Привлечение инвестиций"
+          <div className="flex gap-4 overflow-x-auto pb-4 -mx-5 px-5 scrollbar-hide">
+            <DealCard 
+              image="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=500&auto=format&fit=crop&q=60"
+              title="Инвестиции в недвижимость"
+              subtitle="ЖК Prime Park"
             />
-            <ProjectCard 
-              title="Global Finance"
-              role="CEO & Co-Founder"
-              description="Кредиты, гарантии, ВЭД"
+            <DealCard 
+              image="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=500&auto=format&fit=crop&q=60"
+              title="Строительство завода"
+              subtitle="Промышленный сектор"
             />
-            <ProjectCard 
-              title="Центр девелоперских решений"
-              role="CEO & Co-Founder"
-              description="Земля под застройку и девелопмент"
-            />
-            <ProjectCard 
-              title="ALUN Estate"
-              role="CEO & Co-Founder"
-              description="Премиальная жилая и коммерческая недвижимость"
-            />
-            <ProjectCard 
-              title="Вице-президент ALUN"
-              role=""
-              description="Сообщество предпринимателей и инвесторов"
-            />
-            <ProjectCard 
-              title="Международный трейдинг зерна"
-              role="Co-Founder"
-              description=""
+            <DealCard 
+              image="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&auto=format&fit=crop&q=60"
+              title="IT Стартап"
+              subtitle="Финтех платформа"
             />
           </div>
         </section>
 
-        {/* Infographics Section */}
-        <section className="rounded-[2rem] bg-[#111111] text-white p-8 relative overflow-hidden border border-[#333]">
-            {/* Grid Background */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#333_1px,transparent_1px),linear-gradient(to_bottom,#333_1px,transparent_1px)] bg-[size:30px_30px] opacity-30 pointer-events-none" />
-            
-            {/* Central White Glow */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.15)_0%,transparent_60%)] pointer-events-none" />
-
-            {/* Gradient overlay for depth */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#111]/80 pointer-events-none" />
- 
-            <div className="relative z-10">
-             <h2 className="text-2xl font-bold text-center mb-1 uppercase tracking-wider">Масштаб в цифрах</h2>
-             
-             {/* Dotted separator */}
-             <div className="w-full border-t-2 border-dotted border-white/20 my-6" />
-
-             <div className="grid grid-cols-2 gap-y-10 gap-x-4 text-center">
-               <div className="flex flex-col items-center">
-                 <div className="text-3xl font-bold mb-2">9000+</div>
-                 <div className="text-[10px] text-gray-400 uppercase tracking-widest leading-tight">контактов<br/>в доступе</div>
-               </div>
-               <div className="flex flex-col items-center">
-                 <div className="text-3xl font-bold mb-2">40</div>
-                 <div className="text-[10px] text-gray-400 uppercase tracking-widest leading-tight">проектов<br/>в 2025 г.</div>
-               </div>
-               <div className="flex flex-col items-center">
-                 <div className="text-3xl font-bold mb-2">1300+</div>
-                 <div className="text-[10px] text-gray-400 uppercase tracking-widest leading-tight">сделок<br/>команды</div>
-               </div>
-               <div className="flex flex-col items-center">
-                 <div className="text-3xl font-bold mb-2">3.5 млрд</div>
-                 <div className="text-[10px] text-gray-400 uppercase tracking-widest leading-tight">годовой оборот<br/>проектов</div>
-               </div>
-             </div>
-           </div>
+        {/* Moya Set (My Network) */}
+        <section>
+          <h2 className="text-sm font-bold text-[#4A4A4A] uppercase tracking-wider mb-4 px-1">Моя сеть</h2>
+          <div className="grid grid-cols-3 gap-3">
+            <StatCard value="3 523" label="Контактов" sub="Подключение" />
+            <StatCard value="167" label="Партнеров" sub="Активные" />
+            <StatCard value="14.3B" label="Сделок" sub="Оборот" />
+          </div>
         </section>
 
+        {/* Blog i Analitika */}
+        <section>
+          <div className="flex justify-between items-end mb-4 px-1">
+            <h2 className="text-sm font-bold text-[#4A4A4A] uppercase tracking-wider">Блог и аналитика</h2>
+            <Link href="/blog" className="text-xs text-gray-500 flex items-center gap-1 hover:text-[#4A4A4A] transition-colors">
+              Читать <ChevronRight size={14} />
+            </Link>
+          </div>
 
+          <div className="space-y-3">
+            <BlogCard 
+              title="Как масштабировать бизнес в 2024 году?"
+              category="Стратегия"
+              image="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=500&auto=format&fit=crop&q=60"
+            />
+            <BlogCard 
+              title="Инвестиционные тренды: куда вкладывать?"
+              category="Аналитика"
+              image="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&auto=format&fit=crop&q=60"
+            />
+          </div>
+        </section>
 
         {/* CTA Button */}
         <div className="pt-4 pb-8">
@@ -162,18 +140,6 @@ export default function Home() {
 
       </div>
     </main>
-  );
-}
-
-function ProjectCard({ title, role, description }: { title: string, role: string, description: string }) {
-  return (
-    <div className="bg-[var(--card)] p-4 rounded-2xl border border-[var(--border)] hover:border-[#C5A66F]/30 transition-all active:scale-[0.99] cursor-pointer shadow-sm group">
-      <div className="flex justify-between items-start mb-1">
-        <h3 className="font-bold text-white text-lg leading-tight group-hover:text-[#C5A66F] transition-colors">{title}</h3>
-        {role && <span className="text-[10px] font-medium bg-[#C5A66F]/10 text-[#C5A66F] px-2 py-0.5 rounded-full whitespace-nowrap ml-2">{role}</span>}
-      </div>
-      {description && <div className="text-sm text-[var(--muted-foreground)]">{description}</div>}
-    </div>
   );
 }
 
@@ -235,16 +201,13 @@ function StatCard({ value, label, sub }: { value: string, label: string, sub: st
 
 function BlogCard({ title, category, image }: { title: string, category: string, image: string }) {
   return (
-    <div className="flex gap-4 p-3 rounded-2xl bg-[var(--card)] border border-[var(--border)] hover:border-[#C5A66F]/30 transition-colors cursor-pointer group">
-      <div className="relative w-24 h-24 flex-shrink-0 rounded-xl overflow-hidden">
+    <div className="bg-[var(--card)] p-3 rounded-2xl border border-[var(--border)] flex gap-4 items-center hover:border-[#C5A66F]/30 transition-colors group shadow-sm">
+      <div className="w-16 h-16 rounded-xl relative overflow-hidden flex-shrink-0">
         <Image src={image} alt={title} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
       </div>
-      <div className="flex flex-col justify-center">
-        <div className="text-[#C5A66F] text-xs font-bold uppercase tracking-wider mb-1">{category}</div>
-        <h3 className="font-bold text-sm leading-snug text-[var(--foreground)] line-clamp-2">{title}</h3>
-        <div className="mt-2 text-xs text-[var(--muted-foreground)] flex items-center gap-1 group-hover:text-[#C5A66F] transition-colors">
-          Читать статью <ArrowRight size={12} />
-        </div>
+      <div>
+        <div className="text-[var(--muted-foreground)] text-[10px] font-bold uppercase tracking-wider mb-1">{category}</div>
+        <div className="text-[var(--card-foreground)] font-bold text-sm leading-tight">{title}</div>
       </div>
     </div>
   );
