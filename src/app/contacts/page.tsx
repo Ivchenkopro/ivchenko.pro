@@ -1,15 +1,29 @@
 "use client";
 
-import { Phone, Mail, Send, MapPin, ArrowUpRight, Copy, Check } from "lucide-react";
+import { Mail, Send, ArrowUpRight, Share2, Check } from "lucide-react";
 import { useState } from "react";
 
 export default function Contacts() {
-  const [copied, setCopied] = useState("");
+  const [showToast, setShowToast] = useState(false);
 
-  const handleCopy = (text: string, type: string) => {
-    navigator.clipboard.writeText(text);
-    setCopied(type);
-    setTimeout(() => setCopied(""), 2000);
+  const handleShare = async () => {
+    const shareData = {
+      title: 'Олег Ивченко',
+      text: 'Предприниматель, Инвестор. Контакты и проекты.',
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 3000);
+      }
+    } catch (err) {
+      console.error('Error sharing:', err);
+    }
   };
 
   return (
@@ -23,107 +37,82 @@ export default function Contacts() {
         <h1 className="text-3xl font-bold text-[var(--foreground)] mb-2">Контакты</h1>
         <p className="text-[var(--muted-foreground)] mb-8">Всегда на связи для партнеров</p>
 
-        {/* Digital Business Card */}
-        <div className="bg-gradient-to-br from-[var(--card)] to-[var(--secondary)] rounded-3xl p-6 border border-[var(--border)] shadow-2xl relative overflow-hidden mb-8 group">
-          {/* Card Shine */}
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+        {/* Contact Links List */}
+        <div className="space-y-4">
           
-          <div className="relative z-10">
-            <div className="flex justify-between items-start mb-8">
-              <div>
-                <h2 className="text-2xl font-bold text-[var(--card-foreground)] mb-1">Олег Ивченко</h2>
-                <p className="text-[var(--muted-foreground)] font-medium text-sm">Предприниматель, Инвестор</p>
-              </div>
-              <div className="w-12 h-12 bg-[var(--background)] rounded-full flex items-center justify-center border border-[var(--border)]">
-                <Send size={20} className="text-[#C5A66F]" />
-              </div>
+          {/* Telegram Channel */}
+          <a 
+            href="https://t.me/ivchenkooleg" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center gap-4 p-5 bg-[var(--card)] rounded-2xl border border-[var(--border)] shadow-lg hover:border-[#2AABEE]/50 transition-all group active:scale-[0.98]"
+          >
+            <div className="w-12 h-12 bg-[#2AABEE]/10 rounded-full flex items-center justify-center shrink-0 group-hover:bg-[#2AABEE]/20 transition-colors">
+              <Send size={24} className="text-[#2AABEE]" />
             </div>
+            <div className="flex-grow">
+              <div className="text-xs text-[var(--muted-foreground)] uppercase tracking-wider mb-1">Telegram канал</div>
+              <div className="text-lg font-bold text-[var(--card-foreground)]">@ivchenkooleg</div>
+            </div>
+            <ArrowUpRight size={20} className="text-[var(--muted-foreground)] group-hover:text-[#2AABEE] transition-colors" />
+          </a>
 
-            <div className="space-y-4">
-              <ContactRow 
-                icon={<Send size={18} />}
-                label="Telegram"
-                value="@Oleg_Ivchenko"
-                onCopy={() => handleCopy("@Oleg_Ivchenko", "tg")}
-                isCopied={copied === "tg"}
-                action={() => window.open("https://t.me/Oleg_Ivchenko", "_blank")}
-              />
-              
-              <ContactRow 
-                icon={<Mail size={18} />}
-                label="Email"
-                value="oleg@alun.ru"
-                onCopy={() => handleCopy("oleg@alun.ru", "email")}
-                isCopied={copied === "email"}
-                action={() => window.location.href = "mailto:oleg@alun.ru"}
-              />
+          {/* Personal Telegram */}
+          <a 
+            href="https://t.me/oleg8383" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center gap-4 p-5 bg-[var(--card)] rounded-2xl border border-[var(--border)] shadow-lg hover:border-[#C5A66F]/50 transition-all group active:scale-[0.98]"
+          >
+            <div className="w-12 h-12 bg-[#C5A66F]/10 rounded-full flex items-center justify-center shrink-0 group-hover:bg-[#C5A66F]/20 transition-colors">
+              <Send size={24} className="text-[#C5A66F]" />
+            </div>
+            <div className="flex-grow">
+              <div className="text-xs text-[var(--muted-foreground)] uppercase tracking-wider mb-1">Связаться с Олегом</div>
+              <div className="text-lg font-bold text-[var(--card-foreground)]">@oleg8383</div>
+            </div>
+            <ArrowUpRight size={20} className="text-[var(--muted-foreground)] group-hover:text-[#C5A66F] transition-colors" />
+          </a>
+
+          {/* Email */}
+          <a 
+            href="mailto:oleg@ivchenko.pro" 
+            className="flex items-center gap-4 p-5 bg-[var(--card)] rounded-2xl border border-[var(--border)] shadow-lg hover:border-[#C5A66F]/50 transition-all group active:scale-[0.98]"
+          >
+            <div className="w-12 h-12 bg-[var(--card)] border border-[var(--border)] rounded-full flex items-center justify-center shrink-0 group-hover:border-[#C5A66F]/50 transition-colors">
+              <Mail size={24} className="text-[var(--foreground)]" />
+            </div>
+            <div className="flex-grow">
+              <div className="text-xs text-[var(--muted-foreground)] uppercase tracking-wider mb-1">Почта</div>
+              <div className="text-lg font-bold text-[var(--card-foreground)] break-all">oleg@ivchenko.pro</div>
+            </div>
+            <ArrowUpRight size={20} className="text-[var(--muted-foreground)] group-hover:text-[#C5A66F] transition-colors" />
+          </a>
+
+        </div>
+
+        {/* Share Button */}
+        <button 
+          onClick={handleShare}
+          className="mt-8 w-full bg-[#C5A66F] text-white font-bold py-4 px-8 rounded-xl shadow-[0_0_20px_rgba(197,166,111,0.3)] flex items-center justify-center gap-2 active:scale-95 transition-transform hover:bg-[#b8955a]"
+        >
+          <Share2 size={20} />
+          Поделиться визиткой
+        </button>
+
+        {/* Toast Notification */}
+        {showToast && (
+          <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="bg-[var(--card)]/90 backdrop-blur-md text-[var(--card-foreground)] px-6 py-3 rounded-full shadow-xl flex items-center gap-3 border border-[var(--border)]">
+              <div className="bg-[#C5A66F]/20 p-1 rounded-full">
+                <Check size={16} className="text-[#C5A66F]" />
+              </div>
+              <span className="text-sm font-medium">Ссылка скопирована!</span>
             </div>
           </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="grid grid-cols-1 gap-4 mb-8">
-          <button 
-            onClick={() => window.open("https://t.me/Oleg_Ivchenko", "_blank")}
-            className="w-full bg-[#C5A66F] text-white font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(197,166,111,0.3)] flex items-center justify-center gap-2 active:scale-95 transition-transform"
-          >
-            <Send size={20} />
-            Написать в Telegram
-          </button>
-          
-          <button className="w-full bg-[var(--card)] text-[var(--card-foreground)] font-medium py-4 rounded-xl border border-[var(--border)] flex items-center justify-center gap-2 active:scale-95 transition-transform hover:bg-[var(--secondary)]">
-            Скачать визитку (vCard)
-          </button>
-        </div>
-
-        {/* Office Location */}
-        <div className="bg-[var(--card)] rounded-2xl p-6 border border-[var(--border)] shadow-lg">
-          <h3 className="text-[var(--card-foreground)] font-bold mb-4 flex items-center gap-2">
-            <MapPin size={20} className="text-[#C5A66F]" />
-            Офис
-          </h3>
-          <p className="text-[var(--muted-foreground)] leading-relaxed mb-4">
-            Москва, Пресненская набережная 12,<br/>
-            Башня «Федерация», офис 3402
-          </p>
-          <button className="text-[var(--card-foreground)] text-sm font-bold flex items-center gap-1 hover:underline">
-            Показать на карте <ArrowUpRight size={16} />
-          </button>
-        </div>
+        )}
 
       </div>
     </main>
-  );
-}
-
-interface ContactRowProps {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  onCopy: () => void;
-  isCopied: boolean;
-  action: () => void;
-}
-
-function ContactRow({ icon, label, value, onCopy, isCopied, action }: ContactRowProps) {
-  return (
-    <div className="flex items-center justify-between p-3 bg-[var(--card)] rounded-xl border border-[var(--border)] group hover:border-[#C5A66F]/30 transition-colors">
-      <div className="flex items-center gap-3 cursor-pointer" onClick={action}>
-        <div className="text-[#C5A66F]">{icon}</div>
-        <div>
-          <div className="text-[10px] text-[var(--muted-foreground)] uppercase tracking-wider">{label}</div>
-          <div className="text-[var(--card-foreground)] font-medium text-sm">{value}</div>
-        </div>
-      </div>
-      <button 
-        onClick={(e) => {
-          e.stopPropagation();
-          onCopy();
-        }}
-        className="p-2 text-[var(--muted-foreground)] hover:text-[#C5A66F] transition-colors"
-      >
-        {isCopied ? <Check size={16} /> : <Copy size={16} />}
-      </button>
-    </div>
   );
 }
