@@ -1,7 +1,7 @@
 import { 
   Globe, Handshake, TrendingUp, Search, MessageCircle, Plane, 
   Scale, Package, Landmark, Building2, Anchor, Banknote, Users, 
-  Briefcase, Star, Award, Zap, LucideIcon
+  Briefcase, Star, Award, Zap, Wheat, LucideIcon
 } from "lucide-react";
 
 export const ICON_MAP: Record<string, LucideIcon> = {
@@ -22,4 +22,5 @@ export const ICON_MAP: Record<string, LucideIcon> = {
   "package": Package,
   "scale": Scale,
   "message-circle": MessageCircle,
+  "wheat": Wheat,
 };

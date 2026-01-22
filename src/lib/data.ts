@@ -73,33 +73,82 @@ export const FALLBACK_ANNOUNCEMENTS: Announcement[] = [
 export const FALLBACK_SERVICES: Service[] = [
   {
     id: 1,
-    title: "Привлечение инвестиций",
-    description: ["Помощь в упаковке проекта", "Поиск инвесторов", "Сопровождение сделки"],
-    icon: "briefcase",
-    action_type: "link",
-    action_text: "Подробнее",
-    action_url: "#",
+    title: "Global Finance",
+    description: [
+      "Международные финансы, ВЭД платежи, частное кредитование, работа с валютой.",
+      "Банковское финансирование, операции с криптовалютой (USDT, BTC, ETH), трансграничные платежи для импортеров."
+    ],
+    icon: "globe",
+    action_type: "modal",
+    action_text: "Связаться",
+    modal_id: "global_finance",
     order: 1
   },
   {
     id: 2,
-    title: "Стратегический консалтинг",
-    description: ["Анализ бизнес-модели", "Разработка стратегии роста", "Оптимизация процессов"],
-    icon: "trending-up",
+    title: "Alun Partners",
+    description: [
+      "Стратегический консалтинг, бизнес-консьерж, Alun Private.",
+      "Команда, которая больше 8 лет организует бизнес-взаимодействие в клубных сделках, требующих высокого уровня доверия."
+    ],
+    icon: "handshake",
     action_type: "link",
-    action_text: "Заказать",
+    action_text: "Подробнее",
     action_url: "#",
     order: 2
   },
   {
     id: 3,
-    title: "Упаковка франшиз",
-    description: ["Создание франчайзингового пакета", "Юридическая обвязка", "Маркетинг франшизы"],
-    icon: "package",
-    action_type: "link",
-    action_text: "Узнать больше",
-    action_url: "#",
+    title: "Alun Capital",
+    description: [
+      "Инвестиционный фонд.",
+      "Поиск и продажа проектов по закрытым сделкам для среднего бизнеса, сотрудничество с фондами."
+    ],
+    icon: "trending-up",
+    action_type: "modal",
+    action_text: "Обсудить проект",
     order: 3
+  },
+  {
+    id: 4,
+    title: "Трейдинг зерна",
+    description: [
+      "Международный трейдинг зерна, участие в проекте управления международным портом."
+    ],
+    icon: "wheat",
+    action_type: "modal",
+    action_text: "Подробнее",
+    order: 4
+  },
+  {
+    id: 5,
+    title: "Бизнес-консьерж",
+    description: [
+      "Поиск закрытой информации",
+      "Финансовая, налоговая, медицинская помощь",
+      "Переговоры с ЛПР",
+      "ВНЖ и релокация",
+      "Юридические вопросы",
+      "Доставка из Европы",
+      "Клубные займы и M&A"
+    ],
+    icon: "search",
+    action_type: "link",
+    action_text: "concierge.alun.ru",
+    action_url: "https://concierge.alun.ru",
+    order: 5
+  },
+  {
+    id: 6,
+    title: "Банковские гарантии",
+    description: [
+      "Оформление банковских гарантий для участников госзакупок (44-ФЗ, 223-ФЗ) и коммерческих контрактов."
+    ],
+    icon: "landmark",
+    action_type: "modal",
+    action_text: "Оформить",
+    modal_id: "bank_guarantees",
+    order: 6
   }
 ];
 
