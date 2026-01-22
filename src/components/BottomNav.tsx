@@ -17,8 +17,8 @@ export default function BottomNav() {
 
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4 flex justify-center">
-      {/* Light Premium Navigation */}
-      <nav className="bg-[var(--card)]/90 backdrop-blur-2xl border border-[#C5A66F]/30 rounded-[2rem] px-2 py-2 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)] w-full relative overflow-hidden">
+      {/* Dark Premium Navigation */}
+      <nav className="bg-[#171717]/90 backdrop-blur-2xl border border-[#C5A66F]/30 rounded-[2rem] px-2 py-2 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] w-full relative overflow-hidden">
         
         {/* Shine effect on top border */}
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#C5A66F]/50 to-transparent" />
@@ -34,7 +34,7 @@ export default function BottomNav() {
               <li key={item.name} className="flex-1">
                 <Link
                   href={item.href}
-                  className="flex flex-col items-center justify-center gap-1 py-3 relative group"
+                  className="flex flex-col items-center justify-center gap-1 py-2 relative group"
                 >
                   {/* Gold Background Pill for Active State */}
                   <div 
@@ -48,14 +48,21 @@ export default function BottomNav() {
                   {/* Icon */}
                   <div className={`relative z-10 transition-all duration-300 ${
                     isActive 
-                      ? "text-white scale-110" 
-                      : "text-[var(--muted-foreground)] group-hover:text-[var(--card-foreground)]"
+                      ? "text-white -translate-y-0.5" 
+                      : "text-[#a3a3a3] group-hover:text-white"
                   }`}>
                     <Icon 
-                      size={24} 
+                      size={isActive ? 20 : 24} 
                       strokeWidth={isActive ? 2 : 1.5} 
                     />
                   </div>
+                  
+                  {/* Label */}
+                  {isActive && (
+                    <span className="relative z-10 text-[10px] font-bold text-white leading-none animate-in fade-in slide-in-from-bottom-1 duration-200">
+                      {item.name}
+                    </span>
+                  )}
                 </Link>
               </li>
             );
