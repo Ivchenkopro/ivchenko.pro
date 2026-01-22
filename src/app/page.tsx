@@ -123,7 +123,7 @@ export default function Home() {
               <ProjectCard 
                 key={service.id}
                 title={service.title}
-                role={service.action_text || "Подробнее"} // Using action_text as a "role" or label if needed, or just remove role
+                role={service.role || ""}
                 description={Array.isArray(service.description) ? service.description[0] : service.description}
                 link={service.action_type === 'link' ? service.action_url : undefined}
               />

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronRight, Loader2 } from "lucide-react";
+import { Link as LinkIcon, Loader2, ChevronRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { Case, FALLBACK_CASES } from "@/lib/data";
 import { ICON_MAP } from "@/lib/icons";
@@ -22,7 +22,17 @@ export default function Cases() {
         .order('order', { ascending: true });
         
       if (data && data.length > 0) {
-        setCases(data);
+        // Merge with fallback to ensure links exist
+        const mergedData = data.map(item => {
+          const fallback = FALLBACK_CASES.find(f => f.id === item.id || f.title === item.title);
+          return {
+            ...item,
+            link: item.link || fallback?.link,
+            icon: item.icon || fallback?.icon,
+            details: item.details || fallback?.details
+          };
+        });
+        setCases(mergedData);
       } else {
         setCases(FALLBACK_CASES);
       }
@@ -41,7 +51,7 @@ export default function Cases() {
       <div className="absolute bottom-40 right-[-10%] w-[50%] h-80 bg-[#C5A66F]/5 blur-[100px] rounded-full pointer-events-none" />
 
       <div className="px-6 py-8 space-y-8 relative z-10">
-        <h1 className="text-3xl font-bold text-[var(--foreground)] mb-6">Сделки и кейсы</h1>
+        <h1 className="text-3xl font-bold text-[var(--foreground)] mb-6">Примеры реализованных проектов</h1>
 
         {loading ? (
           <div className="flex justify-center py-20">
@@ -62,6 +72,10 @@ export default function Cases() {
           </div>
         )}
       </div>
+
+      {/* Floating Action Button - Removed */}
+
+      {/* Toast Notification - Removed */}
     </main>
   );
 }
@@ -71,31 +85,52 @@ function CaseIcon({ name }: { name: string }) {
   return <Icon className="text-[#C5A66F]" size={28} />;
 }
 
-function CaseCard({ icon, title, description, details, link }: { icon: React.ReactNode, title: string, description: string, details?: string, link?: string }) {
+interface CaseCardProps {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  details?: string;
+  link?: string;
+}
+
+function CaseCard({ icon, title, description, details, link }: CaseCardProps) {
   return (
-    <div className="bg-[var(--card)] rounded-2xl p-6 shadow-xl border border-[var(--border)] hover:border-[#C5A66F]/30 transition-colors flex flex-col h-full">
-      <div className="mb-4 bg-[#C5A66F]/10 w-14 h-14 rounded-full flex items-center justify-center border border-[#C5A66F]/20">
-        {icon}
-      </div>
-      <h3 className="text-xl font-bold text-[var(--card-foreground)] mb-2">{title}</h3>
-      <p className="text-[var(--muted-foreground)] leading-relaxed mb-4 flex-grow">{description}</p>
-      {details && (
-        <div className="bg-[var(--secondary)]/50 rounded-xl p-4 border border-[var(--border)] mb-4">
-          <p className="text-sm text-[var(--card-foreground)] font-medium">{details}</p>
-        </div>
-      )}
+    <div className="bg-[var(--card)] rounded-2xl p-6 shadow-lg border border-[var(--border)] relative overflow-hidden group hover:border-[#C5A66F]/50 transition-all">
+      {/* Decorative background element */}
+      <div className="absolute -top-6 -right-6 w-32 h-32 bg-[#C5A66F]/10 rounded-full blur-[30px] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       
-      {link && (
-        <a 
-          href={link} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="w-full py-3 px-4 bg-[#C5A66F]/10 text-[#C5A66F] text-sm font-bold rounded-xl border border-[#C5A66F]/20 hover:bg-[#C5A66F] hover:text-white transition-all flex items-center justify-center gap-2 mt-auto"
-        >
-          Подробнее
-          <ChevronRight size={14} />
-        </a>
-      )}
+      <div className="relative z-10">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="p-3 bg-[#C5A66F]/10 rounded-xl border border-[#C5A66F]/20">
+            {icon}
+          </div>
+          <h3 className="text-lg font-bold text-white leading-tight pr-2">{title}</h3>
+        </div>
+        
+        <div className="space-y-2">
+          <p className="text-zinc-400 font-medium leading-relaxed">{description}</p>
+          {details && (
+            <div className="pt-3 mt-2 border-t border-white/10">
+              <p className="text-sm text-zinc-500 leading-relaxed italic">
+                {details}
+              </p>
+            </div>
+          )}
+          {link && (
+            <div className="pt-4 mt-2">
+              <a 
+                href={link} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="w-full bg-[#C5A66F] text-black font-bold py-3 px-6 rounded-full shadow-[0_0_15px_rgba(197,166,111,0.3)] flex items-center justify-center gap-2 active:scale-95 transition-transform hover:bg-[#b8955a]"
+              >
+                Подробнее
+                <ChevronRight size={18} />
+              </a>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

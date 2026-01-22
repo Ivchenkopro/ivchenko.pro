@@ -20,6 +20,11 @@ export type Service = {
   action_text: string;
   action_url?: string;
   modal_id?: string; // For special modals like "bank_guarantees"
+  role?: string;
+  secondary_action_text?: string;
+  secondary_action_type?: 'link' | 'modal';
+  secondary_action_url?: string;
+  secondary_modal_id?: string;
   order: number;
   created_at?: string;
 };
@@ -73,28 +78,32 @@ export const FALLBACK_ANNOUNCEMENTS: Announcement[] = [
 export const FALLBACK_SERVICES: Service[] = [
   {
     id: 1,
-    title: "Global Finance",
+    title: "ALUN Finance",
     description: [
-      "Международные финансы, ВЭД платежи, частное кредитование, работа с валютой.",
-      "Банковское финансирование, операции с криптовалютой (USDT, BTC, ETH), трансграничные платежи для импортеров."
+      "Частное финансирование: займы от частных инвесторов под задачи бизнеса",
+      "Банковское финансирование: кредиты и банковские гарантии"
     ],
-    icon: "globe",
+    icon: "landmark",
     action_type: "modal",
     action_text: "Связаться",
     modal_id: "global_finance",
+    role: "CEO и Со-Founder",
+    secondary_action_text: "Банковские гарантии",
+    secondary_action_type: "modal",
+    secondary_modal_id: "bank_guarantees",
     order: 1
   },
   {
     id: 2,
-    title: "Alun Partners",
+    title: "ALUN Estate",
     description: [
-      "Стратегический консалтинг, бизнес-консьерж, Alun Private.",
-      "Команда, которая больше 8 лет организует бизнес-взаимодействие в клубных сделках, требующих высокого уровня доверия."
+      "Подбор премиальной жилой и коммерческой недвижимости",
+      "Сопровождение сделок купли-продажи «под ключ»: от поиска объекта до закрытия сделок"
     ],
-    icon: "handshake",
-    action_type: "link",
-    action_text: "Подробнее",
-    action_url: "#",
+    icon: "building",
+    action_type: "modal",
+    action_text: "Оставить заявку",
+    role: "CEO и Со-Founder",
     order: 2
   },
   {
@@ -107,6 +116,7 @@ export const FALLBACK_SERVICES: Service[] = [
     icon: "trending-up",
     action_type: "modal",
     action_text: "Обсудить проект",
+    role: "Со-Founder",
     order: 3
   },
   {
@@ -118,6 +128,7 @@ export const FALLBACK_SERVICES: Service[] = [
     icon: "wheat",
     action_type: "modal",
     action_text: "Подробнее",
+    role: "Со-Founder",
     order: 4
   },
   {
@@ -133,22 +144,10 @@ export const FALLBACK_SERVICES: Service[] = [
       "Клубные займы и M&A"
     ],
     icon: "search",
-    action_type: "link",
-    action_text: "concierge.alun.ru",
-    action_url: "https://concierge.alun.ru",
-    order: 5
-  },
-  {
-    id: 6,
-    title: "Банковские гарантии",
-    description: [
-      "Оформление банковских гарантий для участников госзакупок (44-ФЗ, 223-ФЗ) и коммерческих контрактов."
-    ],
-    icon: "landmark",
     action_type: "modal",
-    action_text: "Оформить",
-    modal_id: "bank_guarantees",
-    order: 6
+    action_text: "Обсудить сделку",
+    modal_id: "concierge_modal",
+    order: 5
   }
 ];
 
@@ -158,6 +157,7 @@ export const FALLBACK_CASES: Case[] = [
     title: "Продажа гостиничного комплекса",
     description: "Тихая сделка на 5 млрд ₽. Организация всей цепочки от поиска покупателя до закрытия сделки между резидентами сообщества.",
     icon: "building",
+    link: "https://t.me/ivchenko_oleg",
     order: 1
   },
   {
@@ -165,6 +165,7 @@ export const FALLBACK_CASES: Case[] = [
     title: "Проекты портовой инфраструктуры",
     description: "Участие в проекте управления международным портом, организация поставок и логистики.",
     icon: "anchor",
+    link: "https://t.me/ivchenko_oleg",
     order: 2
   },
   {
@@ -173,6 +174,7 @@ export const FALLBACK_CASES: Case[] = [
     description: "Более 1 млрд ₽ привлечено средств в проекты в 2024 году.",
     details: "Система частного кредитования в клубной среде — 0,5 млрд ₽.",
     icon: "banknote",
+    link: "https://t.me/ivchenko_oleg",
     order: 3
   },
   {
@@ -180,6 +182,7 @@ export const FALLBACK_CASES: Case[] = [
     title: "Организация деловых встреч",
     description: "Более 730 встреч организовано для решения задач бизнеса. Взаимодействие с топ-5 бизнес-клубов России.",
     icon: "users",
+    link: "https://t.me/ivchenko_oleg",
     order: 4
   }
 ];
