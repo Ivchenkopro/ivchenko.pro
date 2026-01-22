@@ -9,7 +9,7 @@ import {
   Loader2
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { Service } from "@/lib/data";
+import { Service, FALLBACK_SERVICES } from "@/lib/data";
 import { ICON_MAP } from "@/lib/icons";
 
 export default function Services() {
@@ -33,9 +33,14 @@ export default function Services() {
         .select('*')
         .order('order', { ascending: true });
         
-      if (data) setServices(data);
+      if (data && data.length > 0) {
+        setServices(data);
+      } else {
+        setServices(FALLBACK_SERVICES);
+      }
     } catch (err) {
       console.error(err);
+      setServices(FALLBACK_SERVICES);
     } finally {
       setLoading(false);
     }

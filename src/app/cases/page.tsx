@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { ChevronRight, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { Case } from "@/lib/data";
+import { Case, FALLBACK_CASES } from "@/lib/data";
 import { ICON_MAP } from "@/lib/icons";
 
 export default function Cases() {
@@ -21,9 +21,14 @@ export default function Cases() {
         .select('*')
         .order('order', { ascending: true });
         
-      if (data) setCases(data);
+      if (data && data.length > 0) {
+        setCases(data);
+      } else {
+        setCases(FALLBACK_CASES);
+      }
     } catch (err) {
       console.error(err);
+      setCases(FALLBACK_CASES);
     } finally {
       setLoading(false);
     }
