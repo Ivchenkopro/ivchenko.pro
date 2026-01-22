@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { getSettings, DEFAULT_SETTINGS } from "@/lib/settings";
-import { Service } from "@/lib/data";
+import { Service, FALLBACK_SERVICES } from "@/lib/data";
 
 export default function Home() {
   const [copied, setCopied] = useState("");
@@ -28,9 +28,14 @@ export default function Home() {
           .order('order', { ascending: true })
           .limit(6);
         
-        if (data) setServices(data);
+        if (data && data.length > 0) {
+          setServices(data);
+        } else {
+          setServices(FALLBACK_SERVICES);
+        }
       } catch (e) {
         console.error("Error loading services", e);
+        setServices(FALLBACK_SERVICES);
       } finally {
         setLoading(false);
       }

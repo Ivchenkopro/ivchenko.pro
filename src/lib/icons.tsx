@@ -1,11 +1,10 @@
 import { 
-  Globe, Handshake, TrendingUp, Wheat, Search, MessageCircle, Plane, 
+  Globe, Handshake, TrendingUp, Search, MessageCircle, Plane, 
   Scale, Package, Landmark, Building2, Anchor, Banknote, Users, 
-  Briefcase, Star, Home, Award, User, Megaphone, Zap, Link as LinkIcon,
-  ChevronRight, ArrowRight
+  Briefcase, Star, Award, Zap, LucideIcon
 } from "lucide-react";
 
-export const ICON_MAP: Record<string, any> = {
+export const ICON_MAP: Record<string, LucideIcon> = {
   "landmark": Landmark,
   "building": Building2,
   "anchor": Anchor,

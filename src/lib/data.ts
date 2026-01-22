@@ -69,3 +69,36 @@ export const FALLBACK_ANNOUNCEMENTS: Announcement[] = [
     urgent: false
   }
 ];
+
+export const FALLBACK_SERVICES: Service[] = [
+  {
+    id: 1,
+    title: "Привлечение инвестиций",
+    description: ["Помощь в упаковке проекта", "Поиск инвесторов", "Сопровождение сделки"],
+    icon: "briefcase",
+    action_type: "link",
+    action_text: "Подробнее",
+    action_url: "#",
+    order: 1
+  },
+  {
+    id: 2,
+    title: "Стратегический консалтинг",
+    description: ["Анализ бизнес-модели", "Разработка стратегии роста", "Оптимизация процессов"],
+    icon: "trending-up",
+    action_type: "link",
+    action_text: "Заказать",
+    action_url: "#",
+    order: 2
+  },
+  {
+    id: 3,
+    title: "Упаковка франшиз",
+    description: ["Создание франчайзингового пакета", "Юридическая обвязка", "Маркетинг франшизы"],
+    icon: "package",
+    action_type: "link",
+    action_text: "Узнать больше",
+    action_url: "#",
+    order: 3
+  }
+];

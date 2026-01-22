@@ -65,7 +65,7 @@ export async function getSettings() {
 
     // Merge DB settings with defaults
     const settings = { ...DEFAULT_SETTINGS };
-    data?.forEach((item: any) => {
+    data?.forEach((item: { key: string; value: string }) => {
       if (item.value) {
         settings[item.key] = item.value;
       }
