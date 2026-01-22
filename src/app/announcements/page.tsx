@@ -1,42 +1,80 @@
 "use client";
 
 import { Megaphone, ArrowRight, Clock, Tag } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+
+type Announcement = {
+  id: number;
+  tag: string;
+  title: string;
+  description: string;
+  date: string;
+  urgent: boolean;
+};
+
+const FALLBACK_ANNOUNCEMENTS: Announcement[] = [
+  {
+    id: 1,
+    tag: "Инвестиции",
+    title: "Привлекаем раунд А в Fintech-стартап",
+    description: "Ищем стратегического инвестора для масштабирования на рынок MENA. Оценка $15M, чек от $500k.",
+    date: "2 часа назад",
+    urgent: true
+  },
+  {
+    id: 2,
+    tag: "Партнерство",
+    title: "Нужен партнер в строительный проект",
+    description: "Застройка коттеджного поселка бизнес-класса в Подмосковье. Требуется компетенция в генподряде.",
+    date: "Вчера",
+    urgent: false
+  },
+  {
+    id: 3,
+    tag: "Покупка бизнеса",
+    title: "Куплю действующее производство",
+    description: "Интересует пищевая промышленность или упаковка. Оборот от 300 млн руб/год. Москва/МО.",
+    date: "3 дня назад",
+    urgent: false
+  },
+  {
+    id: 4,
+    tag: "Мероприятие",
+    title: "Закрытый ужин инвесторов",
+    description: "25 октября, Москва Сити. Только для членов клуба. Обсуждаем тренды 2025 года.",
+    date: "Неделю назад",
+    urgent: false
+  }
+];
 
 export default function Announcements() {
-  const announcements = [
-    {
-      id: 1,
-      tag: "Инвестиции",
-      title: "Привлекаем раунд А в Fintech-стартап",
-      description: "Ищем стратегического инвестора для масштабирования на рынок MENA. Оценка $15M, чек от $500k.",
-      date: "2 часа назад",
-      urgent: true
-    },
-    {
-      id: 2,
-      tag: "Партнерство",
-      title: "Нужен партнер в строительный проект",
-      description: "Застройка коттеджного поселка бизнес-класса в Подмосковье. Требуется компетенция в генподряде.",
-      date: "Вчера",
-      urgent: false
-    },
-    {
-      id: 3,
-      tag: "Покупка бизнеса",
-      title: "Куплю действующее производство",
-      description: "Интересует пищевая промышленность или упаковка. Оборот от 300 млн руб/год. Москва/МО.",
-      date: "3 дня назад",
-      urgent: false
-    },
-    {
-      id: 4,
-      tag: "Мероприятие",
-      title: "Закрытый ужин инвесторов",
-      description: "25 октября, Москва Сити. Только для членов клуба. Обсуждаем тренды 2025 года.",
-      date: "Неделю назад",
-      urgent: false
-    }
-  ];
+  const router = useRouter();
+  const [announcements, setAnnouncements] = useState<Announcement[]>(FALLBACK_ANNOUNCEMENTS);
+
+  useEffect(() => {
+    const fetchAnnouncements = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('announcements')
+          .select('*')
+          .order('id', { ascending: false });
+
+        if (!error && data && data.length > 0) {
+          setAnnouncements(data);
+        }
+      } catch (err) {
+        console.error("Supabase fetch error, using fallback data");
+      }
+    };
+
+    fetchAnnouncements();
+  }, []);
+
+  const handleAdminAccess = () => {
+    router.push("/admin");
+  };
 
   return (
     <main className="min-h-screen bg-[var(--background)] text-[var(--foreground)] pb-32 relative overflow-hidden">
@@ -52,7 +90,10 @@ export default function Announcements() {
             <Megaphone size={12} />
             Bulletin Board
           </div>
-          <h1 className="text-3xl font-bold text-[var(--foreground)] mb-2 tracking-tight">
+          <h1 
+            onClick={handleAdminAccess}
+            className="text-3xl font-bold text-[var(--foreground)] mb-2 tracking-tight cursor-pointer hover:text-[#C5A66F] transition-colors"
+          >
             Объявления
           </h1>
           <p className="text-[var(--muted-foreground)] text-sm leading-relaxed max-w-[90%]">
