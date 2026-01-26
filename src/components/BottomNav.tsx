@@ -28,17 +28,6 @@ export default function BottomNav() {
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#C5A66F]/50 to-transparent" />
 
         <ul className="flex justify-between items-center relative z-10 w-full">
-          {/* Sliding Pill */}
-          <div 
-            className="absolute top-0 bottom-0 w-[20%] transition-all duration-300 ease-out z-0 pointer-events-none"
-            style={{ 
-              transform: `translateX(${activeIndex * 100}%)`,
-              opacity: activeIndex === -1 ? 0 : 1
-            }}
-          >
-             <div className="absolute inset-x-2 inset-y-1 bg-[#C5A66F] rounded-xl shadow-[0_0_15px_rgba(197,166,111,0.4)] h-[calc(100%-0.5rem)]" />
-          </div>
-
           {navItems.map((item, index) => {
             const Icon = item.icon;
             const isActive = index === activeIndex;
@@ -47,26 +36,28 @@ export default function BottomNav() {
               <li key={item.name} className="flex-1 relative z-10">
                 <Link
                   href={item.href}
-                  className="flex flex-col items-center justify-center gap-1 py-2 relative group w-full"
+                  className="flex flex-col items-center justify-center gap-1 py-3 relative group w-full"
                 >
+                  {/* Animated Background Pill for Active State */}
+                  <div 
+                    className={`absolute inset-x-2 inset-y-1 bg-[#C5A66F] rounded-xl shadow-[0_0_15px_rgba(197,166,111,0.4)] transition-all duration-300 ease-out ${
+                      isActive 
+                        ? "opacity-100 scale-100" 
+                        : "opacity-0 scale-75 group-hover:opacity-10"
+                    }`}
+                  />
+
                   {/* Icon */}
                   <div className={`relative z-10 transition-all duration-300 ${
                     isActive 
-                      ? "text-white -translate-y-0.5" 
+                      ? "text-[#121212]" 
                       : "text-[#a3a3a3] group-hover:text-white"
                   }`}>
                     <Icon 
-                      size={isActive ? 20 : 24} 
+                      size={24} 
                       strokeWidth={isActive ? 2 : 1.5} 
                     />
                   </div>
-                  
-                  {/* Label */}
-                  {isActive && (
-                    <span className="relative z-10 text-[10px] font-bold text-white leading-none animate-in fade-in slide-in-from-bottom-1 duration-200">
-                      {item.name}
-                    </span>
-                  )}
                 </Link>
               </li>
             );
