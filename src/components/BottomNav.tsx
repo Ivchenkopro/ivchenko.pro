@@ -40,7 +40,7 @@ export default function BottomNav() {
                 >
                   {/* Animated Background Pill for Active State */}
                   <div 
-                    className={`absolute inset-x-2 inset-y-1 bg-[#C5A66F] rounded-xl shadow-[0_0_15px_rgba(197,166,111,0.4)] transition-all duration-300 ease-out ${
+                    className={`absolute inset-x-2 inset-y-1 bg-[#C5A66F] rounded-xl shadow-[0_0_15px_rgba(197,166,111,0.4)] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${
                       isActive 
                         ? "opacity-100 scale-100" 
                         : "opacity-0 scale-75 group-hover:opacity-10"
@@ -48,7 +48,7 @@ export default function BottomNav() {
                   />
 
                   {/* Icon */}
-                  <div className={`relative z-10 transition-all duration-300 ${
+                  <div className={`relative z-10 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${
                     isActive 
                       ? "text-[#121212]" 
                       : "text-[#a3a3a3] group-hover:text-white"

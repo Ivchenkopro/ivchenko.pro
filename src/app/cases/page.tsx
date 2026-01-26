@@ -122,7 +122,7 @@ function CaseCard({ icon, title, description, details, link }: CaseCardProps) {
                 href={link} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-full bg-[#C5A66F] text-black font-bold py-3 px-6 rounded-full shadow-[0_0_15px_rgba(197,166,111,0.3)] flex items-center justify-center gap-2 active:scale-95 transition-transform hover:bg-[#b8955a]"
+                className="w-full bg-[#2A241F] text-[#C5A66F] font-bold py-3 px-6 rounded-2xl border border-[#C5A66F]/20 shadow-lg flex items-center justify-center gap-2 active:scale-95 transition-all hover:bg-[#383028] hover:border-[#C5A66F]/50"
               >
                 Подробнее
                 <ChevronRight size={18} />
