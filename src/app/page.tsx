@@ -4,38 +4,54 @@ import Image from "next/image";
 import { Building2, TrendingUp, Users, ArrowRight, Wallet, Briefcase, FileText, ChevronRight, Send, Mail, Copy, Check, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
 import { getSettings, DEFAULT_SETTINGS } from "@/lib/settings";
-import { Service, FALLBACK_SERVICES } from "@/lib/data";
+
+const PROJECTS = [
+  {
+    title: "ALUN Capital",
+    role: "Co-Founder",
+    description: "Привлечение инвестиций",
+  },
+  {
+    title: "Global Finance",
+    role: "CEO и Co-Founder",
+    description: "Кредиты, банковские гарантии, ВЭД",
+  },
+  {
+    title: "Центр девелоперских решений",
+    role: "CEO и Co-Founder",
+    description: "Земля под застройку и девелопмент",
+  },
+  {
+    title: "ALUN Estate",
+    role: "CEO и Co-Founder",
+    description: "Премиальная жилая и коммерческая недвижимость",
+  },
+  {
+    title: "Вице-президент ALUN",
+    role: "",
+    description: "Сообщество предпринимателей и инвесторов",
+  },
+  {
+    title: "Международный трейдинг зерна",
+    role: "Co-Founder",
+    description: "Международный трейдинг зерна и связанные проекты",
+  },
+];
 
 export default function Home() {
   const [copied, setCopied] = useState("");
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
-  const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
-      // Load Settings
-      const fetchedSettings = await getSettings();
-      setSettings(fetchedSettings);
-
-      // Load Services (Projects)
       try {
-        const { data } = await supabase
-          .from('services')
-          .select('*')
-          .order('order', { ascending: true })
-          .limit(6);
-        
-        if (data && data.length > 0) {
-          setServices(data);
-        } else {
-          setServices(FALLBACK_SERVICES);
-        }
+        const fetchedSettings = await getSettings();
+        setSettings(fetchedSettings);
       } catch (e) {
-        console.error("Error loading services", e);
-        setServices(FALLBACK_SERVICES);
+        console.error("Error loading settings", e);
+        setSettings(DEFAULT_SETTINGS);
       } finally {
         setLoading(false);
       }
@@ -119,18 +135,14 @@ export default function Home() {
           </div>
           
           <div className="grid grid-cols-1 gap-3">
-            {services.map((service) => (
+            {PROJECTS.map((project) => (
               <ProjectCard 
-                key={service.id}
-                title={service.title}
-                role={service.role || ""}
-                description={Array.isArray(service.description) ? service.description[0] : service.description}
-                link={service.action_type === 'link' ? service.action_url : undefined}
+                key={project.title}
+                title={project.title}
+                role={project.role}
+                description={project.description}
               />
             ))}
-            {services.length === 0 && (
-              <div className="text-center py-8 text-gray-500">Проекты загружаются...</div>
-            )}
           </div>
         </section>
 
