@@ -5,20 +5,13 @@ import {
   ChevronRight,
   MessageCircle,
   X,
-  Check,
   Loader2,
-  Globe, 
-  Handshake, 
-  TrendingUp, 
-  Wheat, 
   Search, 
   Plane, 
   Scale, 
   Package, 
   Landmark,
   MessageSquare,
-  Settings,
-  UserCheck,
   FileText,
   Briefcase,
   CheckCircle
@@ -30,11 +23,16 @@ import { ICON_MAP } from "@/lib/icons";
 export default function Services() {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
-  
-  // Modals
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isBankGuaranteesModalOpen, setIsBankGuaranteesModalOpen] = useState(false);
-  const [modalStep, setModalStep] = useState<"main" | "standard">("main");
+  const [activeModal, setActiveModal] = useState<
+    | null
+    | "alun_finance_loans"
+    | "bank_guarantees"
+    | "alun_estate"
+    | "developer_center"
+    | "alun_capital"
+    | "global_finance"
+    | "concierge"
+  >(null);
 
   useEffect(() => {
     fetchServices();
@@ -50,11 +48,9 @@ export default function Services() {
       if (data && data.length > 0) {
         // Merge with fallback to ensure buttons/actions exist
         const mergedData = data.map(item => {
-          // Robust matching: ID, Title, or "Global Finance" alias
           const fallback = FALLBACK_SERVICES.find(f => 
             f.id === item.id || 
-            f.title === item.title || 
-            (item.title === "Global Finance" && f.title === "ALUN Finance")
+            f.title === item.title
           );
           
           return {
@@ -71,9 +67,17 @@ export default function Services() {
             description: item.description && item.description.length > 0 ? item.description : fallback?.description || []
           };
         });
-        setServices(mergedData);
+        const sorted = [...mergedData].sort((a, b) => {
+          if (a.order !== b.order) return a.order - b.order;
+          return a.id - b.id;
+        });
+        setServices(sorted);
       } else {
-        setServices(FALLBACK_SERVICES);
+        const sorted = [...FALLBACK_SERVICES].sort((a, b) => {
+          if (a.order !== b.order) return a.order - b.order;
+          return a.id - b.id;
+        });
+        setServices(sorted);
       }
     } catch (err) {
       console.error(err);
@@ -83,36 +87,45 @@ export default function Services() {
     }
   };
 
-  const openModal = () => {
-    setModalStep("main");
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => setIsModalOpen(false);
-
   const handleAction = (service: Service) => {
+    if (service.title === "ALUN Finance") {
+      setActiveModal("alun_finance_loans");
+      return;
+    }
+    if (service.title === "ALUN Estate") {
+      setActiveModal("alun_estate");
+      return;
+    }
+    if (service.title === "Центр девелоперских решений") {
+      setActiveModal("developer_center");
+      return;
+    }
+    if (service.title === "ALUN Capital") {
+      setActiveModal("alun_capital");
+      return;
+    }
+    if (service.title === "Global Finance") {
+      setActiveModal("global_finance");
+      return;
+    }
+    if (service.title === "Бизнес-консьерж") {
+      setActiveModal("concierge");
+      return;
+    }
+
     if (service.action_type === 'link' && service.action_url) {
       window.open(service.action_url, '_blank');
-    } else if (service.action_type === 'modal') {
-      openModal();
     }
   };
 
   const handleSecondaryAction = (service: Service) => {
+    if (service.title === "ALUN Finance") {
+      setActiveModal("bank_guarantees");
+      return;
+    }
+
     if (service.secondary_action_type === 'link' && service.secondary_action_url) {
       window.open(service.secondary_action_url, '_blank');
-    } else if (service.secondary_action_type === 'modal') {
-      // Robust check for Bank Guarantees modal
-      if (
-        service.secondary_modal_id === 'bank_guarantees' || 
-        service.title === 'ALUN Finance' || 
-        service.title === 'Global Finance' ||
-        service.id === 1
-      ) {
-        setIsBankGuaranteesModalOpen(true);
-      } else {
-        openModal();
-      }
     }
   };
 
@@ -123,8 +136,7 @@ export default function Services() {
     <MessageCircle size={20} key="message" />,
     <Plane size={20} key="plane" />,
     <Scale size={20} key="scale" />,
-    <Package size={20} key="package" />,
-    <Handshake size={20} key="handshake" />
+    <Package size={20} key="package" />
   ];
 
   return (
@@ -143,14 +155,13 @@ export default function Services() {
         ) : (
           services.map((service) => {
             // Special rendering for Business Concierge
-            if (service.title === "Бизнес-консьерж" || service.id === 5) {
+            if (service.title === "Бизнес-консьерж") {
               return (
                 <div key={service.id} className="bg-[var(--card)] rounded-2xl p-6 shadow-xl border border-[var(--border)]">
                   <h2 className="text-xl font-bold text-[var(--card-foreground)] mb-4 flex items-center gap-2">
                     <span className="w-1.5 h-6 bg-[#C5A66F] rounded-full shadow-[0_0_10px_#C5A66F]"></span>
                     {service.title}
                   </h2>
-                  <p className="text-sm text-[var(--muted-foreground)] mb-6">Подробно с concierge.alun.ru</p>
                   
                   <div className="space-y-5 mb-8">
                     {service.description.map((item, i) => (
@@ -164,7 +175,7 @@ export default function Services() {
 
                   <button 
                     onClick={() => handleAction(service)}
-                    className="w-full bg-[#C5A66F] text-black font-bold py-4 px-8 rounded-full shadow-[0_0_20px_rgba(197,166,111,0.3)] flex items-center justify-center gap-2 active:scale-95 transition-transform border border-[#C5A66F]/50 hover:bg-[#b8955a]"
+                    className="w-full py-3 px-4 bg-[#C5A66F] text-white text-sm font-bold rounded-xl shadow-lg shadow-[#C5A66F]/20 hover:bg-[#b8955a] active:scale-95 transition-all flex items-center justify-center gap-2"
                   >
                     <MessageSquare size={20} />
                     {service.action_text || "Обсудить сделку"}
@@ -206,79 +217,16 @@ export default function Services() {
         )}
       </div>
 
-      {/* Modal - Restored from backup */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-gray-100 sm:border shadow-2xl">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold text-black">
-                {modalStep === "main" ? "Выберите формат" : "Выберите направление"}
-              </h3>
-              <button onClick={closeModal} className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
-                <X size={20} className="text-gray-500" />
-              </button>
-            </div>
-
-            {modalStep === "main" ? (
-              <div className="space-y-3">
-                <ModalOption 
-                  icon={<UserCheck className="text-[#C5A66F]" />}
-                  title="Крупная сделка (50+ млн ₽)"
-                  subtitle="Личный чат с Олегом"
-                  onClick={() => window.open("https://t.me/ivchenko_oleg", "_blank")}
-                />
-                <ModalOption 
-                  icon={<Settings className="text-[#C5A66F]" />}
-                  title="Стандартная услуга"
-                  subtitle="Выбор направления"
-                  onClick={() => setModalStep("standard")}
-                  hasArrow
-                />
-                <ModalOption 
-                  icon={<UserCheck className="text-[#C5A66F]" />}
-                  title="Бизнес-консьерж"
-                  subtitle="Информация + @ALUN_Concierge"
-                  onClick={() => window.open("https://t.me/ALUN_Concierge", "_blank")}
-                />
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <button 
-                  onClick={() => setModalStep("main")}
-                  className="text-sm text-gray-500 mb-2 flex items-center gap-1 hover:text-black transition-colors"
-                >
-                  ← Назад
-                </button>
-                <ModalOption 
-                  title="Global Finance" 
-                  onClick={() => window.open("https://t.me/ivchenko_oleg", "_blank")} 
-                />
-                <ModalOption 
-                  title="Alun Partners" 
-                  onClick={() => window.open("https://t.me/ivchenko_oleg", "_blank")} 
-                />
-                <ModalOption 
-                  title="Alun Capital" 
-                  onClick={() => window.open("https://t.me/ivchenko_oleg", "_blank")} 
-                />
-                <ModalOption 
-                  title="Трейдинг зерна" 
-                  onClick={() => window.open("https://t.me/ivchenko_oleg", "_blank")} 
-                />
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Bank Guarantees Modal */}
-      {isBankGuaranteesModalOpen && (
+      {activeModal === "alun_finance_loans" && (
         <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-[#18181B] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[var(--border)] sm:border shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6 sticky top-0 bg-[#18181B] z-10 pb-4 border-b border-[var(--border)]">
-              <h3 className="text-xl font-bold text-white">Банковские гарантии</h3>
+              <div>
+                <h3 className="text-xl font-bold text-white">Займы ALUN Finance</h3>
+                <div className="text-xs text-[#C5A66F] mt-1">@alun_finance</div>
+              </div>
               <button 
-                onClick={() => setIsBankGuaranteesModalOpen(false)} 
+                onClick={() => setActiveModal(null)} 
                 className="p-2 bg-[#27272A] rounded-full hover:bg-[#3F3F46] transition-colors text-white"
               >
                 <X size={20} />
@@ -286,7 +234,87 @@ export default function Services() {
             </div>
 
             <div className="space-y-8">
-              {/* Description */}
+              <div>
+                <div className="flex items-center gap-2 mb-3 text-[#C5A66F]">
+                  <FileText size={20} />
+                  <h4 className="font-bold text-lg">Описание услуги</h4>
+                </div>
+                <p className="text-zinc-400 text-sm leading-relaxed">
+                  Организуем займы от частных инвесторов для компаний реального сектора с выручкой от 300 млн ₽ в год. 
+                  Работаем только с обеспеченными сделками — под залог имущества и поручительство собственников. 
+                  Все сделки проходят многоэтапную проверку и сопровождаются юридическим оформлением.
+                </p>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2 mb-3 text-[#C5A66F]">
+                  <CheckCircle size={20} />
+                  <h4 className="font-bold text-lg">Критерии и условия</h4>
+                </div>
+                <ul className="space-y-3">
+                  {[
+                    "Оборот компании: от 300 млн ₽ в год.",
+                    "Сектор: понятный, действующий бизнес в реальном секторе.",
+                    "Обеспечение: залог имущества и поручительство собственников.",
+                    "Срок займа: 3–12 месяцев.",
+                    "Ставка: 2,5–4% в месяц.",
+                    "Сумма: от 5 млн ₽."
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-start gap-3 text-zinc-300 text-sm">
+                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#C5A66F] shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2 mb-3 text-[#C5A66F]">
+                  <Briefcase size={20} />
+                  <h4 className="font-bold text-lg">Частые цели</h4>
+                </div>
+                <ul className="space-y-3">
+                  {[
+                    "Исполнение госконтрактов.",
+                    "Пополнение оборотных средств.",
+                    "Масштабирование производства."
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-start gap-3 text-zinc-300 text-sm">
+                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#C5A66F] shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <button 
+                onClick={() => window.open("https://t.me/alun_finance", "_blank")}
+                className="w-full bg-[#C5A66F] text-black font-bold py-4 px-8 rounded-xl shadow-[0_0_20px_rgba(197,166,111,0.3)] hover:bg-[#b8955a] active:scale-95 transition-all"
+              >
+                Написать в Telegram
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeModal === "bank_guarantees" && (
+        <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[#18181B] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[var(--border)] sm:border shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6 sticky top-0 bg-[#18181B] z-10 pb-4 border-b border-[var(--border)]">
+              <div>
+                <h3 className="text-xl font-bold text-white">Банковские гарантии ALUN Finance</h3>
+                <div className="text-xs text-[#C5A66F] mt-1">@alun_bg</div>
+              </div>
+              <button 
+                onClick={() => setActiveModal(null)} 
+                className="p-2 bg-[#27272A] rounded-full hover:bg-[#3F3F46] transition-colors text-white"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-8">
               <div>
                 <div className="flex items-center gap-2 mb-3 text-[#C5A66F]">
                   <FileText size={20} />
@@ -297,19 +325,19 @@ export default function Services() {
                 </p>
               </div>
 
-              {/* Advantages */}
               <div>
                 <div className="flex items-center gap-2 mb-3 text-[#C5A66F]">
                   <CheckCircle size={20} />
-                  <h4 className="font-bold text-lg">Преимущества</h4>
+                  <h4 className="font-bold text-lg">Наиболее востребованные решения</h4>
                 </div>
                 <ul className="space-y-3">
                   {[
-                    "Одобрение от 1 часа",
-                    "Лимиты до 1 млрд рублей",
-                    "Без залога и поручительства",
-                    "Минимальный пакет документов",
-                    "Работаем со всеми регионами РФ"
+                    "Кредитование под контракт.",
+                    "Возобновляемая кредитная линия.",
+                    "Пополнение оборотных средств.",
+                    "Возвратный лизинг.",
+                    "Кредит физических лиц под залог недвижимости для директора или акционера бизнеса.",
+                    "Факторинг."
                   ].map((item, i) => (
                     <li key={i} className="flex items-start gap-3 text-zinc-300 text-sm">
                       <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#C5A66F] shrink-0" />
@@ -319,7 +347,6 @@ export default function Services() {
                 </ul>
               </div>
 
-              {/* Use Cases */}
               <div>
                 <div className="flex items-center gap-2 mb-3 text-[#C5A66F]">
                   <Briefcase size={20} />
@@ -340,12 +367,339 @@ export default function Services() {
                 </div>
               </div>
 
-              {/* Action Button */}
               <button 
-                onClick={() => window.open("https://t.me/ivchenko_oleg", "_blank")}
+                onClick={() => window.open("https://t.me/alun_bg", "_blank")}
                 className="w-full bg-[#C5A66F] text-black font-bold py-4 px-8 rounded-xl shadow-[0_0_20px_rgba(197,166,111,0.3)] hover:bg-[#b8955a] active:scale-95 transition-all"
               >
-                Оставить заявку
+                Написать в Telegram
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeModal === "alun_estate" && (
+        <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[#18181B] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[var(--border)] sm:border shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6 sticky top-0 bg-[#18181B] z-10 pb-4 border-b border-[var(--border)]">
+              <div>
+                <h3 className="text-xl font-bold text-white">ALUN Estate</h3>
+                <div className="text-xs text-[#C5A66F] mt-1">@alun_estate</div>
+              </div>
+              <button 
+                onClick={() => setActiveModal(null)} 
+                className="p-2 bg-[#27272A] rounded-full hover:bg-[#3F3F46] transition-colors text-white"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-8">
+              <div>
+                <div className="flex items-center gap-2 mb-3 text-[#C5A66F]">
+                  <FileText size={20} />
+                  <h4 className="font-bold text-lg">Описание услуги</h4>
+                </div>
+                <p className="text-zinc-400 text-sm leading-relaxed">
+                  ALUN Estate сопровождает сделки купли-продажи премиальной жилой и коммерческой недвижимости «под ключ». 
+                  Работаем как с объектами для жизни, так и с коммерческими активами: готовыми арендными бизнесами, коммерческими помещениями и другими доходными объектами. 
+                  Работаем с открытыми и закрытыми off-market предложениями, согласовываем условия с застройщиками и собственниками, координируем всех участников сделки и отвечаем за юридическую чистоту.
+                </p>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2 mb-3 text-[#C5A66F]">
+                  <CheckCircle size={20} />
+                  <h4 className="font-bold text-lg">Основные решения</h4>
+                </div>
+                <ul className="space-y-3">
+                  {[
+                    "Купля-продажа премиальной жилой недвижимости (квартиры, апартаменты, дома).",
+                    "Купля-продажа коммерческих объектов (готовые арендные бизнесы, офисы, склады и другие активы).",
+                    "Анализ доходности и рисков.",
+                    "Доступ к off-market предложениям и спецусловиям от застройщиков.",
+                    "Полное юридическое сопровождение до регистрации права собственности."
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-start gap-3 text-zinc-300 text-sm">
+                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#C5A66F] shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <button 
+                onClick={() => window.open("https://t.me/alun_estate", "_blank")}
+                className="w-full bg-[#C5A66F] text-black font-bold py-4 px-8 rounded-xl shadow-[0_0_20px_rgba(197,166,111,0.3)] hover:bg-[#b8955a] active:scale-95 transition-all"
+              >
+                Написать в Telegram
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeModal === "developer_center" && (
+        <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[#18181B] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[var(--border)] sm:border shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6 sticky top-0 bg-[#18181B] z-10 pb-4 border-b border-[var(--border)]">
+              <div>
+                <h3 className="text-xl font-bold text-white">Центр девелоперских решений</h3>
+                <div className="text-xs text-[#C5A66F] mt-1">@AleksanderZharkov</div>
+              </div>
+              <button 
+                onClick={() => setActiveModal(null)} 
+                className="p-2 bg-[#27272A] rounded-full hover:bg-[#3F3F46] transition-colors text-white"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-8">
+              <div>
+                <div className="flex items-center gap-2 mb-3 text-[#C5A66F]">
+                  <FileText size={20} />
+                  <h4 className="font-bold text-lg">Описание услуги</h4>
+                </div>
+                <p className="text-zinc-400 text-sm leading-relaxed">
+                  Центр девелоперских решений занимается подбором и куплей-продажей земельных участков под застройку и полным сопровождением девелоперских проектов. 
+                  Команда и партнёры имеют опыт работы в Минстрое, Правительстве Москвы и крупных девелоперских структурах, что позволяет учитывать как рыночные, так и регуляторные нюансы. 
+                  Проекты усиливаются ресурсами бизнес-сообщества ALUN: экспертизой, партнёрами и доступом к финансированию.
+                </p>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2 mb-3 text-[#C5A66F]">
+                  <CheckCircle size={20} />
+                  <h4 className="font-bold text-lg">Как мы работаем</h4>
+                </div>
+                <ul className="space-y-3">
+                  {[
+                    "Формируем воронку подходящих участков под задачу клиента.",
+                    "Проверяем градостроительные ограничения и экономику проекта.",
+                    "Помогаем договориться между собственниками земли, девелопером и инвестором.",
+                    "Поддерживаем коммуникацию с органами власти и профильными структурами.",
+                    "Собираем партнёрский пул вокруг проекта: девелопер, подрядчики, инвесторы."
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-start gap-3 text-zinc-300 text-sm">
+                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#C5A66F] shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2 mb-3 text-[#C5A66F]">
+                  <Briefcase size={20} />
+                  <h4 className="font-bold text-lg">Что мы делаем</h4>
+                </div>
+                <ul className="space-y-3">
+                  {[
+                    "Подбор и анализ земельных участков под жилую и коммерческую застройку.",
+                    "Сопровождение сделок купли-продажи участков.",
+                    "Комплексное сопровождение девелоперских проектов.",
+                    "Взаимодействие с органами власти и профильными структурами.",
+                    "Привлечение партнёров и ресурсов сообщества ALUN для реализации проектов."
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-start gap-3 text-zinc-300 text-sm">
+                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#C5A66F] shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <button 
+                onClick={() => window.open("https://t.me/AleksanderZharkov", "_blank")}
+                className="w-full bg-[#C5A66F] text-black font-bold py-4 px-8 rounded-xl shadow-[0_0_20px_rgba(197,166,111,0.3)] hover:bg-[#b8955a] active:scale-95 transition-all"
+              >
+                Написать в Telegram
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeModal === "alun_capital" && (
+        <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[#18181B] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[var(--border)] sm:border shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6 sticky top-0 bg-[#18181B] z-10 pb-4 border-b border-[var(--border)]">
+              <div>
+                <h3 className="text-xl font-bold text-white">ALUN Capital</h3>
+                <div className="text-xs text-[#C5A66F] mt-1">@lucky6409</div>
+              </div>
+              <button 
+                onClick={() => setActiveModal(null)} 
+                className="p-2 bg-[#27272A] rounded-full hover:bg-[#3F3F46] transition-colors text-white"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-8">
+              <div>
+                <div className="flex items-center gap-2 mb-3 text-[#C5A66F]">
+                  <FileText size={20} />
+                  <h4 className="font-bold text-lg">Описание услуги</h4>
+                </div>
+                <p className="text-zinc-400 text-sm leading-relaxed">
+                  ALUN Capital помогает решать инвестиционные задачи: привлечение капитала под рост, новые проекты и сделки M&amp;A. 
+                  Команда подбирает инвесторов под профиль конкретного проекта, упаковывает предложение на понятном для них языке 
+                  и сопровождает переговоры до подписания документов и фактического закрытия сделки.
+                </p>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2 mb-3 text-[#C5A66F]">
+                  <CheckCircle size={20} />
+                  <h4 className="font-bold text-lg">Формат работы</h4>
+                </div>
+                <ul className="space-y-3">
+                  {[
+                    "Анализ проекта и формулировка инвестиционной задачи.",
+                    "Подготовка материалов для инвесторов: тизер, презентация, ключевые цифры.",
+                    "Формирование short list инвесторов под профиль проекта.",
+                    "Организация встреч и переговоров с потенциальными инвесторами.",
+                    "Согласование ключевых условий и сопровождение сделки до закрытия."
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-start gap-3 text-zinc-300 text-sm">
+                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#C5A66F] shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <button 
+                onClick={() => window.open("https://t.me/lucky6409", "_blank")}
+                className="w-full bg-[#C5A66F] text-black font-bold py-4 px-8 rounded-xl shadow-[0_0_20px_rgba(197,166,111,0.3)] hover:bg-[#b8955a] active:scale-95 transition-all"
+              >
+                Написать в Telegram
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeModal === "global_finance" && (
+        <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[#18181B] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[var(--border)] sm:border shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6 sticky top-0 bg-[#18181B] z-10 pb-4 border-b border-[var(--border)]">
+              <div>
+                <h3 className="text-xl font-bold text-white">Global Finance</h3>
+                <div className="text-xs text-[#C5A66F] mt-1">@Igor_GF_001</div>
+              </div>
+              <button 
+                onClick={() => setActiveModal(null)} 
+                className="p-2 bg-[#27272A] rounded-full hover:bg-[#3F3F46] transition-colors text-white"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-8">
+              <div>
+                <div className="flex items-center gap-2 mb-3 text-[#C5A66F]">
+                  <FileText size={20} />
+                  <h4 className="font-bold text-lg">Описание услуги</h4>
+                </div>
+                <p className="text-zinc-400 text-sm leading-relaxed">
+                  Платежный агент и партнёр по сопровождению внешнеэкономической деятельности. 
+                  Global Finance помогает выстроить понятную и безопасную схему расчётов: оплата инвойсов, международные переводы, 
+                  координация взаимодействия с банками и платёжными провайдерами, контроль соответствия документов требованиям контрагентов.
+                </p>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2 mb-3 text-[#C5A66F]">
+                  <CheckCircle size={20} />
+                  <h4 className="font-bold text-lg">Наиболее востребованные решения</h4>
+                </div>
+                <ul className="space-y-3">
+                  {[
+                    "Оплата инвойсов поставщикам за рубежом.",
+                    "SWIFT-переводы контрагентам в разных юрисдикциях.",
+                    "Расчёты в разных валютах по согласованной схеме.",
+                    "Координация взаимодействия с банками и платёжными провайдерами.",
+                    "Сопровождение платежей пакетами необходимых документов."
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-start gap-3 text-zinc-300 text-sm">
+                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#C5A66F] shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <button 
+                onClick={() => window.open("https://t.me/Igor_GF_001", "_blank")}
+                className="w-full bg-[#C5A66F] text-black font-bold py-4 px-8 rounded-xl shadow-[0_0_20px_rgba(197,166,111,0.3)] hover:bg-[#b8955a] active:scale-95 transition-all"
+              >
+                Написать в Telegram
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeModal === "concierge" && (
+        <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[#18181B] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[var(--border)] sm:border shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6 sticky top-0 bg-[#18181B] z-10 pb-4 border-b border-[var(--border)]">
+              <div>
+                <h3 className="text-xl font-bold text-white">Бизнес-консьерж ALUN</h3>
+                <div className="text-xs text-[#C5A66F] mt-1">@ALUN_Concierge</div>
+              </div>
+              <button 
+                onClick={() => setActiveModal(null)} 
+                className="p-2 bg-[#27272A] rounded-full hover:bg-[#3F3F46] transition-colors text-white"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-8">
+              <div>
+                <div className="flex items-center gap-2 mb-3 text-[#C5A66F]">
+                  <FileText size={20} />
+                  <h4 className="font-bold text-lg">Описание услуги</h4>
+                </div>
+                <p className="text-zinc-400 text-sm leading-relaxed">
+                  Бизнес-консьерж ALUN — единая точка входа для сложных и срочных задач частных клиентов и компаний в России и за рубежом. 
+                  Закрываем вопросы медицины, документов, поездок, логистики, премиальных сервисов и юридического сопровождения, подключая проверенных партнёров.
+                </p>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2 mb-3 text-[#C5A66F]">
+                  <CheckCircle size={20} />
+                  <h4 className="font-bold text-lg">Что можно решить через консьерж</h4>
+                </div>
+                <ul className="space-y-3">
+                  {[
+                    "Медицинский консьерж: от постановки диагноза до реабилитации, премиальные клиники (GMS, EMC, «Хадасса» и др.).",
+                    "Визовый сервис и документы: загранпаспорта, визы, приглашения, переводы и апостиль, справки ЗАГС и МВД.",
+                    "Доставка редких лекарств и срочных грузов из Европы.",
+                    "Туристический сервис: туры, авиабилеты, отели, трансферы, аренда авто, вертолётов и яхт.",
+                    "Премиальный алкоголь и сигары: подбор и доставка, клубные скидки на редкий виски и коньяк.",
+                    "Билеты: поезда, ВИП-РЖД, театр, уникальные и закрытые мероприятия.",
+                    "Бизнес-авиация и VIP-перелёты.",
+                    "Юридическое сопровождение и разрешительная документация."
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-start gap-3 text-zinc-300 text-sm">
+                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#C5A66F] shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <button 
+                onClick={() => window.open("https://t.me/ALUN_Concierge", "_blank")}
+                className="w-full bg-[#C5A66F] text-black font-bold py-4 px-8 rounded-xl shadow-[0_0_20px_rgba(197,166,111,0.3)] hover:bg-[#b8955a] active:scale-95 transition-all"
+              >
+                Написать в Telegram
               </button>
             </div>
           </div>
@@ -363,7 +717,7 @@ function ServiceIcon({ name }: { name: string }) {
 
 function ServiceCard({ icon, title, description, actions }: { icon: React.ReactNode, title: string, description: string[], actions: React.ReactNode }) {
   return (
-    <div className="bg-[#18181B] rounded-2xl p-6 shadow-xl border border-[var(--border)] hover:border-[#C5A66F]/30 transition-colors">
+    <div className="bg-[var(--card)] rounded-2xl p-6 shadow-xl border border-[var(--border)] hover:border-[#C5A66F]/30 transition-colors">
       <div className="flex items-start justify-between mb-4">
         <div className="bg-[#C5A66F]/10 w-14 h-14 rounded-full flex items-center justify-center border border-[#C5A66F]/20">
           {icon}
@@ -401,33 +755,5 @@ function ConciergeItem({ icon, text }: ConciergeItemProps) {
       </div>
       <p className="text-sm text-[var(--muted-foreground)] leading-relaxed group-hover:text-[var(--foreground)] transition-colors">{text}</p>
     </div>
-  );
-}
-
-interface ModalOptionProps {
-  icon?: React.ReactNode;
-  title: string;
-  subtitle?: string;
-  onClick: () => void;
-  hasArrow?: boolean;
-}
-
-function ModalOption({ icon, title, subtitle, onClick, hasArrow }: ModalOptionProps) {
-  return (
-    <button 
-      onClick={onClick}
-      className="w-full bg-gray-50 hover:bg-gray-100 p-4 rounded-xl flex items-center gap-4 transition-all border border-gray-100 hover:border-[#C5A66F]/30 text-left group"
-    >
-      {icon && (
-        <div className="p-2 bg-white rounded-lg shadow-sm group-hover:scale-110 transition-transform">
-          {icon}
-        </div>
-      )}
-      <div className="flex-1">
-        <div className="font-bold text-black">{title}</div>
-        {subtitle && <div className="text-xs text-gray-500 group-hover:text-gray-700">{subtitle}</div>}
-      </div>
-      {hasArrow && <ChevronRight size={20} className="text-gray-400 group-hover:text-[#C5A66F]" />}
-    </button>
   );
 }

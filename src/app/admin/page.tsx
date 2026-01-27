@@ -117,7 +117,7 @@ export default function AdminPanel() {
       <Sidebar currentTab={currentTab} onTabChange={setCurrentTab} />
       
       <main className="flex-1 p-4 md:p-8 overflow-y-auto h-screen">
-        <div className="max-w-5xl mx-auto">
+        <div className="w-full mx-auto">
           <header className="flex justify-between items-center mb-8">
             <h1 className="text-2xl md:text-3xl font-bold">
               {currentTab === "announcements" && "Объявления"}
