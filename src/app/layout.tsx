@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Montserrat } from "next/font/google";
 import "./globals.css";
-import BottomNav from "@/components/BottomNav";
-import { ThemeProvider } from "@/components/ThemeProvider";
-import { supabase } from "@/lib/supabase";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,10 +32,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} antialiased bg-[var(--background)] text-[var(--foreground)]`}
       >
-        <div className="max-w-md mx-auto bg-[var(--background)] min-h-screen relative shadow-2xl shadow-[rgba(0,0,0,0.05)] overflow-hidden pb-32 border-x border-[var(--border)]">
-          {children}
-          <BottomNav />
-        </div>
+        {children}
       </body>
     </html>
   );
