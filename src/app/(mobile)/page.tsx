@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Building2, TrendingUp, Users, ArrowRight, Wallet, Briefcase, FileText, ChevronRight, Send, Mail, Copy, Check, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { getSettings, DEFAULT_SETTINGS } from "@/lib/settings";
 
 const PROJECTS = [
@@ -40,6 +41,7 @@ const PROJECTS = [
 ];
 
 export default function Home() {
+  const router = useRouter();
   const [copied, setCopied] = useState("");
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [loading, setLoading] = useState(true);
@@ -184,7 +186,7 @@ export default function Home() {
         {/* CTA Button */}
         <div className="pt-4 pb-8">
            <button 
-             onClick={() => window.open('https://t.me/oleg8383', '_blank')}
+             onClick={() => router.push('/services')}
              className="w-full bg-[#C5A66F] text-white font-bold py-4 rounded-xl shadow-[0_0_30px_rgba(197,166,111,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
            >
              <Wallet size={20} />
