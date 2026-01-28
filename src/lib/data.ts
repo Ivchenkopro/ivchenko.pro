@@ -213,3 +213,53 @@ export const FALLBACK_CASES: Case[] = [
     order: 5
   }
 ];
+
+export type LinkItem = {
+  id: number;
+  title: string;
+  url: string;
+  icon?: string;
+  is_external: boolean;
+  order: number;
+  is_active: boolean;
+  created_at?: string;
+};
+
+export const FALLBACK_LINKS: LinkItem[] = [
+  {
+    id: 1,
+    title: "Telegram канал",
+    url: "https://t.me/ivchenkooleg",
+    icon: "✈️",
+    is_external: true,
+    order: 1,
+    is_active: true
+  },
+  {
+    id: 2,
+    title: "Написать мне",
+    url: "https://t.me/Oleg_Ivchenko",
+    icon: "💬",
+    is_external: true,
+    order: 2,
+    is_active: true
+  },
+  {
+    id: 3,
+    title: "Instagram",
+    url: "https://instagram.com/ivchenko.pro",
+    icon: "📸",
+    is_external: true,
+    order: 3,
+    is_active: true
+  },
+  {
+    id: 4,
+    title: "YouTube",
+    url: "https://youtube.com/@ivchenko_oleg",
+    icon: "🎥",
+    is_external: true,
+    order: 4,
+    is_active: true
+  }
+];

@@ -3,16 +3,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { Trash2, Edit, Plus, Save, AlertCircle, Loader2, GripVertical, ExternalLink } from "lucide-react";
-
-interface LinkItem {
-  id: number;
-  title: string;
-  url: string;
-  icon: string | null;
-  is_external: boolean;
-  order: number;
-  is_active: boolean;
-}
+import { LinkItem, FALLBACK_LINKS } from "@/lib/data";
 
 export default function LinksTab() {
   const [links, setLinks] = useState<LinkItem[]>([]);
@@ -49,14 +40,38 @@ export default function LinksTab() {
         .order('order', { ascending: true });
         
       if (error) throw error;
-      if (data) {
+      if (data && data.length > 0) {
         setLinks(data);
         setIsDemoMode(false);
+      } else {
+        // Fallback if empty
+        const localData = localStorage.getItem('links');
+        if (localData) {
+          setLinks(JSON.parse(localData));
+        } else {
+          setLinks(FALLBACK_LINKS);
+        }
+        // Don't necessarily set demo mode if it's just empty, but for consistency with other tabs:
+        // Actually if it's just empty, we can let them create new ones.
+        // But the user wants to see "something".
+        // Let's set it to fallback and maybe imply it's not saved?
+        // If we set fallback data, and they click save, it might fail if we try to update.
+        // So let's set isDemoMode to true if we use fallback, OR just treat it as "initial data".
+        // To be safe, let's treat it as demo/local if Supabase returns nothing.
+        // Wait, if Supabase returns [], it means connected but empty.
+        // If I show fallback, I should probably save it to local storage or just show it.
       }
     } catch (err: any) {
       console.error("Error fetching links:", err);
+      // Fallback on error
+      const localData = localStorage.getItem('links');
+      if (localData) {
+        setLinks(JSON.parse(localData));
+      } else {
+        setLinks(FALLBACK_LINKS);
+      }
       setIsDemoMode(true);
-      setError("Нет связи с Supabase. Режим только для чтения.");
+      setError("Нет связи с Supabase. Включен локальный режим.");
     } finally {
       setLoading(false);
     }
@@ -128,27 +143,36 @@ export default function LinksTab() {
   const handleDelete = async (id: number) => {
     if (!confirm("Вы уверены, что хотите удалить эту ссылку?")) return;
     
-    if (isDemoMode) {
-      alert("В демо режиме нельзя удалять ссылки");
-      return;
-    }
-
     setLoading(true);
     try {
-      const { error } = await supabase
-        .from('links')
-        .delete()
-        .eq('id', id);
-      
-      if (error) throw error;
+      if (!isDemoMode) {
+        try {
+            const { error } = await supabase
+                .from('links')
+                .delete()
+                .eq('id', id);
+            
+            if (error) throw error;
 
-      await supabase.from('audit_logs').insert([{ 
-        action: 'delete', 
-        entity: 'link', 
-        details: `Deleted link ID: ${id}` 
-      }]);
-      
-      await fetchLinks();
+            await supabase.from('audit_logs').insert([{ 
+                action: 'delete', 
+                entity: 'link', 
+                details: `Deleted link ID: ${id}` 
+            }]);
+            
+            await fetchLinks();
+            return;
+        } catch (supaErr) {
+            console.error("Supabase failed, falling back to local:", supaErr);
+            setIsDemoMode(true);
+            setError("Ошибка Supabase. Переход в локальный режим.");
+        }
+      }
+
+      // Local Mode
+      const updatedList = links.filter(item => item.id !== id);
+      saveToLocal(updatedList);
+
     } catch (err: any) {
       console.error("Error deleting link:", err);
       setError("Ошибка при удалении: " + err.message);

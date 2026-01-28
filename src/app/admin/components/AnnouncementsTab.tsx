@@ -36,9 +36,17 @@ export default function AnnouncementsTab() {
         .order('id', { ascending: false });
         
       if (error) throw error;
-      if (data) {
+      if (data && data.length > 0) {
         setAnnouncements(data);
         setIsDemoMode(false);
+      } else {
+        // Fallback if empty
+        const localData = localStorage.getItem('announcements');
+        if (localData) {
+          setAnnouncements(JSON.parse(localData));
+        } else {
+          setAnnouncements(FALLBACK_ANNOUNCEMENTS);
+        }
       }
     } catch (err: any) {
       console.error("Error fetching data:", err);

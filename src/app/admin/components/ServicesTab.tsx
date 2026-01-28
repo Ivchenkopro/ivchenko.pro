@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { Trash2, Edit, Plus, Save, AlertCircle, Loader2, WifiOff } from "lucide-react";
-import { Service } from "@/lib/data";
+import { Service, FALLBACK_SERVICES } from "@/lib/data";
 import IconSelector from "./IconSelector";
 import { ICON_MAP } from "@/lib/icons";
 
@@ -11,6 +11,7 @@ export default function ServicesTab() {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isDemoMode, setIsDemoMode] = useState(false);
   const [view, setView] = useState<"list" | "edit" | "create">("list");
   const [currentItem, setCurrentItem] = useState<Service | null>(null);
   const [formData, setFormData] = useState<Service>({
@@ -62,6 +63,11 @@ export default function ServicesTab() {
     }
   };
 
+  const saveToLocal = (newServices: Service[]) => {
+    localStorage.setItem('services', JSON.stringify(newServices));
+    setServices(newServices);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -73,16 +79,46 @@ export default function ServicesTab() {
         description: Array.isArray(formData.description) ? formData.description : [formData.description]
       };
 
+      if (!isDemoMode) {
+        try {
+          if (view === "create") {
+            const { error } = await supabase.from('services').insert([dataToSave]);
+            if (error) throw error;
+            await supabase.from('audit_logs').insert([{ action: 'create', entity: 'service', details: `Created: ${formData.title}` }]);
+          } else if (view === "edit" && currentItem) {
+            const { error, data } = await supabase.from('services').update(dataToSave).eq('id', currentItem.id).select();
+            if (error) throw error;
+            // If no rows updated (e.g. ID from fallback doesn't exist), try insert
+            if (!data || data.length === 0) {
+               const { error: insertError } = await supabase.from('services').insert([dataToSave]);
+               if (insertError) throw insertError;
+            }
+            await supabase.from('audit_logs').insert([{ action: 'update', entity: 'service', details: `Updated: ${formData.title}` }]);
+          }
+          await fetchServices();
+          setView("list");
+          return;
+        } catch (supaErr) {
+          console.error("Supabase failed, falling back to local:", supaErr);
+          setIsDemoMode(true);
+          setError("Ошибка Supabase. Переход в локальный режим.");
+        }
+      }
+
+      // Local Mode
+      let updatedList = [...services];
       if (view === "create") {
-        await supabase.from('services').insert([dataToSave]);
-        await supabase.from('audit_logs').insert([{ action: 'create', entity: 'service', details: `Created: ${formData.title}` }]);
+        const newId = Math.max(0, ...updatedList.map(s => s.id)) + 1;
+        updatedList.push({ ...formData, id: newId, description: Array.isArray(formData.description) ? formData.description : [formData.description] });
       } else if (view === "edit" && currentItem) {
-        await supabase.from('services').update(dataToSave).eq('id', currentItem.id);
-        await supabase.from('audit_logs').insert([{ action: 'update', entity: 'service', details: `Updated: ${formData.title}` }]);
+        updatedList = updatedList.map(item => 
+          item.id === currentItem.id ? { ...formData, description: Array.isArray(formData.description) ? formData.description : [formData.description] } : item
+        );
       }
       
+      saveToLocal(updatedList);
       setView("list");
-      fetchServices();
+
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -115,6 +151,20 @@ export default function ServicesTab() {
           Добавить
         </button>
       </div>
+
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-xl flex items-center gap-2">
+          <AlertCircle size={20} />
+          {error}
+        </div>
+      )}
+      
+      {isDemoMode && (
+        <div className="bg-orange-500/10 text-orange-500 p-4 rounded-xl flex items-center gap-2">
+          <WifiOff size={20} />
+          <span>Локальный режим: изменения сохраняются только в браузере</span>
+        </div>
+      )}
 
       {view === "list" ? (
         <div className="grid gap-4">
