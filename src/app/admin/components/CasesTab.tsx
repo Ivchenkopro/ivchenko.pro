@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { Trash2, Edit, Plus, Loader2 } from "lucide-react";
-import { Case } from "@/lib/data";
+import { Trash2, Edit, Plus, Loader2, WifiOff } from "lucide-react";
+import { Case, FALLBACK_CASES } from "@/lib/data";
 import IconSelector from "./IconSelector";
 import { ICON_MAP } from "@/lib/icons";
 
@@ -11,6 +11,7 @@ export default function CasesTab() {
   const [cases, setCases] = useState<Case[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isDemoMode, setIsDemoMode] = useState(false);
   const [view, setView] = useState<"list" | "edit" | "create">("list");
   const [currentItem, setCurrentItem] = useState<Case | null>(null);
   const [formData, setFormData] = useState<Case>({

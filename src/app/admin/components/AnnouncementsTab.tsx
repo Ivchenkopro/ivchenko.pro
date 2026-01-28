@@ -208,9 +208,18 @@ export default function AnnouncementsTab() {
                 announcements.map((item) => (
                   <div key={item.id} className="bg-[var(--background)] p-6 rounded-2xl border border-[var(--border)] shadow-sm flex flex-col sm:flex-row justify-between gap-4">
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
+                      <div className="flex items-center gap-2 mb-3">
                         {item.urgent && <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Hot</span>}
-                        <span className="text-xs font-bold text-[#C5A66F] uppercase border border-[#C5A66F]/30 px-2 py-0.5 rounded-md">{item.tag}</span>
+                        <span className="px-2.5 py-1 rounded-md bg-[var(--secondary)] text-[var(--card-foreground)] text-[10px] font-bold uppercase tracking-wide flex items-center gap-1 border border-[var(--border)]">
+                          <Tag size={10} />
+                          {item.tag}
+                        </span>
+                        {item.link && (
+                          <span className="px-2.5 py-1 rounded-md bg-[var(--secondary)] text-[#C5A66F] text-[10px] font-bold uppercase tracking-wide flex items-center gap-1 border border-[#C5A66F]/30">
+                            <LinkIcon size={10} />
+                            Есть ссылка
+                          </span>
+                        )}
                         <span className="text-xs text-[var(--muted-foreground)]">{item.date}</span>
                       </div>
                       <h3 className="text-lg font-bold text-[var(--foreground)] mb-1">{item.title}</h3>
@@ -243,35 +252,35 @@ export default function AnnouncementsTab() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-bold text-[var(--foreground)]">Заголовок</label>
-                <input type="text" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className={`w-full p-3 bg-[var(--card)] border rounded-xl focus:outline-none transition-colors ${formErrors.title ? "border-red-500" : "border-[var(--border)] focus:border-[#C5A66F]"}`} />
+                <input type="text" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className={`w-full p-3 bg-white text-black border rounded-xl focus:outline-none transition-colors ${formErrors.title ? "border-red-500" : "border-[var(--border)] focus:border-[#C5A66F]"}`} />
                 {formErrors.title && <p className="text-xs text-red-500">{formErrors.title}</p>}
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-bold text-[var(--foreground)]">Тег</label>
-                <input type="text" value={formData.tag} onChange={(e) => setFormData({ ...formData, tag: e.target.value })} className={`w-full p-3 bg-[var(--card)] border rounded-xl focus:outline-none transition-colors ${formErrors.tag ? "border-red-500" : "border-[var(--border)] focus:border-[#C5A66F]"}`} />
+                <input type="text" value={formData.tag} onChange={(e) => setFormData({ ...formData, tag: e.target.value })} className={`w-full p-3 bg-white text-black border rounded-xl focus:outline-none transition-colors ${formErrors.tag ? "border-red-500" : "border-[var(--border)] focus:border-[#C5A66F]"}`} />
                 {formErrors.tag && <p className="text-xs text-red-500">{formErrors.tag}</p>}
               </div>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-bold text-[var(--foreground)]">Описание</label>
-              <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={4} className={`w-full p-3 bg-[var(--card)] border rounded-xl focus:outline-none transition-colors resize-none ${formErrors.description ? "border-red-500" : "border-[var(--border)] focus:border-[#C5A66F]"}`} />
+              <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={4} className={`w-full p-3 bg-white text-black border rounded-xl focus:outline-none transition-colors resize-none ${formErrors.description ? "border-red-500" : "border-[var(--border)] focus:border-[#C5A66F]"}`} />
               {formErrors.description && <p className="text-xs text-red-500">{formErrors.description}</p>}
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-bold text-[var(--foreground)]">Дата</label>
-                <input type="text" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} className={`w-full p-3 bg-[var(--card)] border rounded-xl focus:outline-none transition-colors ${formErrors.date ? "border-red-500" : "border-[var(--border)] focus:border-[#C5A66F]"}`} />
+                <input type="text" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} className={`w-full p-3 bg-white text-black border rounded-xl focus:outline-none transition-colors ${formErrors.date ? "border-red-500" : "border-[var(--border)] focus:border-[#C5A66F]"}`} />
                 {formErrors.date && <p className="text-xs text-red-500">{formErrors.date}</p>}
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-bold text-[var(--foreground)]">Текст кнопки</label>
-                <input type="text" value={formData.button_text || ""} onChange={(e) => setFormData({ ...formData, button_text: e.target.value })} className="w-full p-3 bg-[var(--card)] border border-[var(--border)] rounded-xl focus:outline-none focus:border-[#C5A66F] transition-colors" placeholder="Подробнее" />
+                <input type="text" value={formData.button_text || ""} onChange={(e) => setFormData({ ...formData, button_text: e.target.value })} className="w-full p-3 bg-white text-black border border-[var(--border)] rounded-xl focus:outline-none focus:border-[#C5A66F] transition-colors" placeholder="Подробнее" />
               </div>
             </div>
 
             <div className="space-y-2">
               <label className="text-sm font-bold text-[var(--foreground)]">Ссылка (необязательно)</label>
-              <input type="text" value={formData.link || ""} onChange={(e) => setFormData({ ...formData, link: e.target.value })} className="w-full p-3 bg-[var(--card)] border border-[var(--border)] rounded-xl focus:outline-none focus:border-[#C5A66F] transition-colors" placeholder="https://..." />
+              <input type="text" value={formData.link || ""} onChange={(e) => setFormData({ ...formData, link: e.target.value })} className="w-full p-3 bg-white text-black border border-[var(--border)] rounded-xl focus:outline-none focus:border-[#C5A66F] transition-colors" placeholder="https://..." />
             </div>
 
             <div className="flex items-center gap-2 pt-2">

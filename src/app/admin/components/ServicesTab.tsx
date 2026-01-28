@@ -157,7 +157,7 @@ export default function ServicesTab() {
                 required
                 value={formData.title}
                 onChange={(e) => setFormData({...formData, title: e.target.value})}
-                className="w-full p-2 border rounded-lg"
+                className="w-full p-2 border rounded-lg bg-white text-black"
               />
             </div>
 
@@ -168,7 +168,7 @@ export default function ServicesTab() {
                 rows={5}
                 value={Array.isArray(formData.description) ? formData.description.join("\n") : formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value.split("\n")})}
-                className="w-full p-2 border rounded-lg"
+                className="w-full p-2 border rounded-lg bg-white text-black"
               />
             </div>
 
@@ -178,7 +178,7 @@ export default function ServicesTab() {
                 <select
                   value={formData.action_type}
                   onChange={(e) => setFormData({...formData, action_type: e.target.value as any})}
-                  className="w-full p-2 border rounded-lg"
+                  className="w-full p-2 border rounded-lg bg-white text-black"
                 >
                   <option value="link">Ссылка</option>
                   <option value="modal">Модальное окно</option>
@@ -189,7 +189,7 @@ export default function ServicesTab() {
                 <input
                   value={formData.action_text}
                   onChange={(e) => setFormData({...formData, action_text: e.target.value})}
-                  className="w-full p-2 border rounded-lg"
+                  className="w-full p-2 border rounded-lg bg-white text-black"
                 />
               </div>
             </div>
@@ -200,7 +200,7 @@ export default function ServicesTab() {
                 <input
                   value={formData.action_url || ""}
                   onChange={(e) => setFormData({...formData, action_url: e.target.value})}
-                  className="w-full p-2 border rounded-lg"
+                  className="w-full p-2 border rounded-lg bg-white text-black"
                 />
               </div>
             )}
