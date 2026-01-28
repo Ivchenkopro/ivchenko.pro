@@ -3,13 +3,13 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --card: #333338;
+  --card: #18181B;
   --card-foreground: #ffffff;
-  --secondary: #3F3F46;
+  --secondary: #27272A;
   --secondary-foreground: #ffffff;
-  --muted: #3F3F46;
+  --muted: #27272A;
   --muted-foreground: #a1a1aa;
-  --border: #3F3F46;
+  --border: #27272A;
 }
 
 @theme inline {

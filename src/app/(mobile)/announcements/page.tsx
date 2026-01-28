@@ -53,7 +53,7 @@ export default function Announcements() {
 
       <div className="px-5 py-8 relative z-10 max-w-lg mx-auto">
         <header className="mb-8">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-200 border border-zinc-300 text-[#4A4A4A] text-[10px] font-bold uppercase tracking-widest mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--secondary)] border border-[var(--border)] text-[var(--secondary-foreground)] text-[10px] font-bold uppercase tracking-widest mb-3">
             <Megaphone size={12} />
             Bulletin Board
           </div>

@@ -138,7 +138,7 @@ export default function Contacts() {
           {/* Dynamic Links */}
           {loading ? (
             <div className="flex justify-center py-4">
-              <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+              <Loader2 className="w-6 h-6 animate-spin text-[var(--muted-foreground)]" />
             </div>
           ) : (
             links.map((link) => (

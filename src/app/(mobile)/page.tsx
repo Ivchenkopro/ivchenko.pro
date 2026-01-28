@@ -95,14 +95,14 @@ export default function Home() {
       <div className="px-5 space-y-10 relative z-20 -mt-2">
 
         {/* Share Card (Dark Theme) */}
-        <div className="bg-[#18181B] text-white rounded-[2rem] p-8 border border-white/10 shadow-2xl relative overflow-hidden">
+        <div className="bg-[var(--card)] text-[var(--card-foreground)] rounded-[2rem] p-8 border border-[var(--border)] shadow-2xl relative overflow-hidden">
           <div className="relative z-10 flex flex-col items-center text-center">
             
-            <p className="text-gray-300 text-sm leading-relaxed mb-6 font-[family-name:var(--font-montserrat)]">
+            <p className="text-[var(--muted-foreground)] text-sm leading-relaxed mb-6 font-[family-name:var(--font-montserrat)]">
               {settings["home_bio_1"]}
             </p>
 
-            <p className="text-gray-300 text-sm leading-relaxed mb-8 font-[family-name:var(--font-montserrat)]">
+            <p className="text-[var(--muted-foreground)] text-sm leading-relaxed mb-8 font-[family-name:var(--font-montserrat)]">
               {settings["home_bio_2"]}
             </p>
 
@@ -118,7 +118,7 @@ export default function Home() {
                   handleCopy(window.location.href, "share");
                 }
               }}
-              className="w-full bg-white text-black font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+              className="w-full bg-[var(--background)] text-[var(--foreground)] font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
             >
                {copied === "share" ? "Ссылка скопирована!" : settings["btn_share"]}
             </button>
@@ -128,8 +128,8 @@ export default function Home() {
         {/* My Projects */}
         <section>
           <div className="flex justify-between items-end mb-4 px-1">
-            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Мои проекты</h2>
-            <Link href="/services" className="text-xs text-gray-500 flex items-center gap-1 hover:text-black transition-colors">
+            <h2 className="text-sm font-bold text-[var(--foreground)] uppercase tracking-wider">Мои проекты</h2>
+            <Link href="/services" className="text-xs text-[var(--muted-foreground)] flex items-center gap-1 hover:text-[var(--foreground)] transition-colors">
               Все проекты <ChevronRight size={14} />
             </Link>
           </div>
@@ -147,7 +147,7 @@ export default function Home() {
         </section>
 
         {/* Infographics Section (Dark Accent) */}
-        <section className="rounded-[2rem] bg-[#111111] text-white p-8 relative overflow-hidden border border-gray-800">
+        <section className="rounded-[2rem] bg-[var(--card)] text-[var(--card-foreground)] p-8 relative overflow-hidden border border-[var(--border)]">
             {/* Grid Background */}
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#333_1px,transparent_1px),linear-gradient(to_bottom,#333_1px,transparent_1px)] bg-[size:30px_30px] opacity-30 pointer-events-none" />
             
@@ -158,24 +158,24 @@ export default function Home() {
              <h2 className="text-2xl font-bold text-center mb-1 uppercase tracking-wider">Масштаб в цифрах</h2>
              
              {/* Dotted separator */}
-             <div className="w-full border-t-2 border-dotted border-white/20 my-6" />
+             <div className="w-full border-t-2 border-dotted border-[var(--border)] my-6" />
 
              <div className="grid grid-cols-2 gap-y-10 gap-x-4 text-center">
                <div className="flex flex-col items-center">
                  <div className="text-3xl font-bold mb-2">{settings["stat_contacts"]}</div>
-                 <div className="text-[10px] text-gray-400 uppercase tracking-widest leading-tight">контактов<br/>в доступе</div>
+                 <div className="text-[10px] text-[var(--muted-foreground)] uppercase tracking-widest leading-tight">контактов<br/>в доступе</div>
                </div>
                <div className="flex flex-col items-center">
                  <div className="text-3xl font-bold mb-2">{settings["stat_projects"]}</div>
-                 <div className="text-[10px] text-gray-400 uppercase tracking-widest leading-tight">проектов<br/>в 2025 г.</div>
+                 <div className="text-[10px] text-[var(--muted-foreground)] uppercase tracking-widest leading-tight">проектов<br/>в 2025 г.</div>
                </div>
                <div className="flex flex-col items-center">
                  <div className="text-3xl font-bold mb-2">{settings["stat_deals"]}</div>
-                 <div className="text-[10px] text-gray-400 uppercase tracking-widest leading-tight">сделок<br/>команды</div>
+                 <div className="text-[10px] text-[var(--muted-foreground)] uppercase tracking-widest leading-tight">сделок<br/>команды</div>
                </div>
                <div className="flex flex-col items-center">
                  <div className="text-3xl font-bold mb-2">{settings["stat_turnover"]}</div>
-                 <div className="text-[10px] text-gray-400 uppercase tracking-widest leading-tight">годовой оборот<br/>проектов</div>
+                 <div className="text-[10px] text-[var(--muted-foreground)] uppercase tracking-widest leading-tight">годовой оборот<br/>проектов</div>
                </div>
              </div>
            </div>
@@ -196,12 +196,12 @@ export default function Home() {
 
 function ProjectCard({ title, role, description, link }: { title: string, role: string, description: string, link?: string }) {
   const CardContent = () => (
-    <div className="bg-[#27272A] p-4 rounded-2xl border border-[#3F3F46] hover:border-[#C5A66F]/50 transition-all active:scale-[0.99] cursor-pointer shadow-sm group h-full">
+    <div className="bg-[var(--secondary)] p-4 rounded-2xl border border-[var(--border)] hover:border-[#C5A66F]/50 transition-all active:scale-[0.99] cursor-pointer shadow-sm group h-full">
       <div className="flex justify-between items-start mb-1">
-        <h3 className="font-bold text-white text-lg leading-tight group-hover:text-[#C5A66F] transition-colors">{title}</h3>
+        <h3 className="font-bold text-[var(--card-foreground)] text-lg leading-tight group-hover:text-[#C5A66F] transition-colors">{title}</h3>
         {role && <span className="text-[10px] font-medium bg-[#C5A66F]/10 text-[#C5A66F] px-2 py-0.5 rounded-full whitespace-nowrap ml-2">{role}</span>}
       </div>
-      {description && <div className="text-sm text-gray-400 line-clamp-2">{description}</div>}
+      {description && <div className="text-sm text-[var(--muted-foreground)] line-clamp-2">{description}</div>}
     </div>
   );
 
@@ -218,24 +218,24 @@ function ProjectCard({ title, role, description, link }: { title: string, role: 
 
 function StatCard({ value, label, sub }: { value: string, label: string, sub: string }) {
   return (
-    <div className="bg-[#27272A] p-3 rounded-2xl border border-[#3F3F46] flex flex-col items-center text-center hover:border-[#C5A66F]/50 transition-colors shadow-sm">
-      <div className="text-white font-bold text-lg mb-0.5">{value}</div>
-      <div className="text-gray-400 text-[10px] font-medium uppercase">{label}</div>
-      <div className="text-gray-500 text-[9px]">{sub}</div>
+    <div className="bg-[var(--secondary)] p-3 rounded-2xl border border-[var(--border)] flex flex-col items-center text-center hover:border-[#C5A66F]/50 transition-colors shadow-sm">
+      <div className="text-[var(--card-foreground)] font-bold text-lg mb-0.5">{value}</div>
+      <div className="text-[var(--muted-foreground)] text-[10px] font-medium uppercase">{label}</div>
+      <div className="text-[var(--muted-foreground)] text-[9px]">{sub}</div>
     </div>
   );
 }
 
 function BlogCard({ title, category, image }: { title: string, category: string, image: string }) {
   return (
-    <div className="flex gap-4 p-3 rounded-2xl bg-[#27272A] border border-[#3F3F46] hover:border-[#C5A66F]/30 transition-colors cursor-pointer group shadow-sm">
+    <div className="flex gap-4 p-3 rounded-2xl bg-[var(--secondary)] border border-[var(--border)] hover:border-[#C5A66F]/30 transition-colors cursor-pointer group shadow-sm">
       <div className="relative w-24 h-24 flex-shrink-0 rounded-xl overflow-hidden">
         <Image src={image} alt={title} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
       </div>
       <div className="flex flex-col justify-center">
         <div className="text-[#C5A66F] text-xs font-bold uppercase tracking-wider mb-1">{category}</div>
-        <h3 className="font-bold text-sm leading-snug text-white line-clamp-2">{title}</h3>
-        <div className="mt-2 text-xs text-gray-400 flex items-center gap-1 group-hover:text-[#C5A66F] transition-colors">
+        <h3 className="font-bold text-sm leading-snug text-[var(--card-foreground)] line-clamp-2">{title}</h3>
+        <div className="mt-2 text-xs text-[var(--muted-foreground)] flex items-center gap-1 group-hover:text-[#C5A66F] transition-colors">
           Читать статью <ArrowRight size={12} />
         </div>
       </div>

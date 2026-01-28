@@ -20,6 +20,51 @@ import { supabase } from "@/lib/supabase";
 import { Service, FALLBACK_SERVICES } from "@/lib/data";
 import { ICON_MAP } from "@/lib/icons";
 
+function ServiceIcon({ name }: { name: string }) {
+  const Icon = ICON_MAP[name] || Landmark;
+  return <Icon size={24} />;
+}
+
+function ConciergeItem({ icon, text }: { icon: React.ReactNode, text: string }) {
+  return (
+    <div className="flex items-center gap-4 p-3 rounded-xl bg-[var(--background)] border border-[var(--border)]">
+      <div className="w-10 h-10 rounded-full bg-[var(--card)] flex items-center justify-center text-[#C5A66F] shadow-sm">
+        {icon}
+      </div>
+      <span className="text-sm font-medium text-[var(--foreground)]">{text}</span>
+    </div>
+  );
+}
+
+function ServiceCard({ icon, title, description, actions }: { icon: React.ReactNode, title: string, description: string[], actions: React.ReactNode }) {
+  return (
+    <div className="bg-[var(--card)] rounded-2xl p-6 shadow-xl border border-[var(--border)] hover:border-[#C5A66F]/30 transition-colors">
+      <div className="flex items-start justify-between mb-4">
+        <div className="w-12 h-12 rounded-xl bg-[var(--secondary)] flex items-center justify-center border border-[var(--border)] shadow-sm">
+          {icon}
+        </div>
+      </div>
+      
+      <h3 className="text-lg font-bold text-[var(--card-foreground)] mb-3 leading-tight">
+        {title}
+      </h3>
+      
+      <div className="space-y-3 mb-6">
+        {description.slice(0, 2).map((item, i) => (
+          <div key={i} className="flex items-start gap-3">
+            <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#C5A66F] shrink-0" />
+            <p className="text-sm text-[var(--muted-foreground)] leading-tight line-clamp-2">
+              {item}
+            </p>
+          </div>
+        ))}
+      </div>
+      
+      {actions}
+    </div>
+  );
+}
+
 export default function Services() {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
@@ -47,7 +92,7 @@ export default function Services() {
         
       if (data && data.length > 0) {
         // Merge with fallback to ensure buttons/actions exist
-        const mergedData = data.map(item => {
+        const mergedData = data.map((item: any) => {
           const fallback = FALLBACK_SERVICES.find(f => 
             f.id === item.id || 
             f.title === item.title
@@ -56,28 +101,21 @@ export default function Services() {
           return {
             ...item,
             title: fallback ? fallback.title : item.title, // Ensure new title is used if matched
-            // Ensure secondary actions are present (e.g. for ALUN Finance)
+            description: Array.isArray(item.description) ? item.description : (fallback?.description || []),
+            action_type: item.action_type || fallback?.action_type || 'link',
+            action_text: item.action_text || fallback?.action_text || 'Подробнее',
+            action_url: item.action_url || fallback?.action_url,
+            modal_id: item.modal_id || fallback?.modal_id,
+            role: item.role || fallback?.role,
             secondary_action_text: item.secondary_action_text || fallback?.secondary_action_text,
             secondary_action_type: item.secondary_action_type || fallback?.secondary_action_type,
             secondary_modal_id: item.secondary_modal_id || fallback?.secondary_modal_id,
-            // Ensure primary actions
-            action_text: item.action_text || fallback?.action_text,
-            action_type: item.action_type || fallback?.action_type,
-            modal_id: item.modal_id || fallback?.modal_id,
-            description: item.description && item.description.length > 0 ? item.description : fallback?.description || []
-          };
+          } as Service;
         });
-        const sorted = [...mergedData].sort((a, b) => {
-          if (a.order !== b.order) return a.order - b.order;
-          return a.id - b.id;
-        });
-        setServices(sorted);
+        
+        setServices(mergedData);
       } else {
-        const sorted = [...FALLBACK_SERVICES].sort((a, b) => {
-          if (a.order !== b.order) return a.order - b.order;
-          return a.id - b.id;
-        });
-        setServices(sorted);
+        setServices(FALLBACK_SERVICES);
       }
     } catch (err) {
       console.error(err);
@@ -157,29 +195,33 @@ export default function Services() {
             // Special rendering for Business Concierge
             if (service.title === "Бизнес-консьерж") {
               return (
-                <div key={service.id} className="bg-[var(--card)] rounded-2xl p-6 shadow-xl border border-[var(--border)]">
-                  <h2 className="text-xl font-bold text-[var(--card-foreground)] mb-4 flex items-center gap-2">
-                    <span className="w-1.5 h-6 bg-[#C5A66F] rounded-full shadow-[0_0_10px_#C5A66F]"></span>
-                    {service.title}
-                  </h2>
-                  
-                  <div className="space-y-5 mb-8">
-                    {service.description.map((item, i) => (
-                      <ConciergeItem 
-                        key={i} 
-                        icon={CONCIERGE_ICONS[i % CONCIERGE_ICONS.length]} 
-                        text={item} 
-                      />
-                    ))}
+                <div key={service.id} className="bg-[var(--card)] rounded-2xl p-6 shadow-xl border border-[var(--border)] hover:border-[#C5A66F]/30 transition-colors">
+                <div className="w-12 h-12 rounded-xl bg-[var(--secondary)] flex items-center justify-center border border-[var(--border)] shadow-sm">
+                  <div className="text-[#C5A66F]">
+                    {ICON_MAP[service.icon] ? <ServiceIcon name={service.icon} /> : <Search size={24} />}
                   </div>
+                </div>
+              
+              <h3 className="text-lg font-bold text-[var(--card-foreground)] mb-3 leading-tight">
+                {service.title}
+              </h3>
+                  
+              <div className="space-y-4 mb-8">
+                {service.description.map((item, i) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#C5A66F] shrink-0" />
+                    <span className="text-sm text-[var(--muted-foreground)] leading-tight">{item}</span>
+                  </div>
+                ))}
+              </div>
 
-                  <button 
-                    onClick={() => handleAction(service)}
-                    className="w-full py-3 px-4 bg-[#C5A66F] text-white text-sm font-bold rounded-xl shadow-lg shadow-[#C5A66F]/20 hover:bg-[#b8955a] active:scale-95 transition-all flex items-center justify-center gap-2"
-                  >
-                    <MessageSquare size={20} />
-                    {service.action_text || "Обсудить сделку"}
-                  </button>
+              <button 
+                onClick={() => handleAction(service)}
+                className="w-full py-3 px-4 bg-[#2A241F] text-[#C5A66F] text-sm font-bold rounded-xl border border-[#C5A66F]/20 shadow-lg hover:bg-[#383028] hover:border-[#C5A66F]/50 active:scale-95 transition-all flex items-center justify-center gap-2"
+              >
+                {service.action_text || "Обсудить сделку"}
+                <ChevronRight size={14} />
+              </button>
                 </div>
               );
             }
@@ -196,7 +238,7 @@ export default function Services() {
                     {service.secondary_action_text && (
                       <button 
                         onClick={() => handleSecondaryAction(service)}
-                        className="flex-1 py-3 px-4 bg-transparent border border-[#C5A66F] text-[#C5A66F] text-sm font-bold rounded-xl hover:bg-[#C5A66F]/10 active:scale-95 transition-all flex items-center justify-center gap-2"
+                        className="flex-1 py-3 px-4 bg-[#2A241F] text-[#C5A66F] text-sm font-bold rounded-xl border border-[#C5A66F]/20 shadow-lg hover:bg-[#383028] hover:border-[#C5A66F]/50 active:scale-95 transition-all flex items-center justify-center gap-2"
                       >
                         {service.secondary_action_text}
                         <ChevronRight size={14} />
@@ -204,10 +246,10 @@ export default function Services() {
                     )}
                     <button 
                       onClick={() => handleAction(service)}
-                      className="flex-1 py-3 px-4 bg-[#C5A66F] text-white text-sm font-bold rounded-xl shadow-lg shadow-[#C5A66F]/20 hover:bg-[#b8955a] active:scale-95 transition-all flex items-center justify-center gap-2"
+                      className="flex-1 py-3 px-4 bg-[#2A241F] text-[#C5A66F] text-sm font-bold rounded-xl border border-[#C5A66F]/20 shadow-lg hover:bg-[#383028] hover:border-[#C5A66F]/50 active:scale-95 transition-all flex items-center justify-center gap-2"
                     >
                       {service.action_text}
-                      {service.action_type === 'link' ? <ChevronRight size={14} /> : <MessageCircle size={14} />}
+                      <ChevronRight size={14} />
                     </button>
                   </div>
                 }
@@ -219,15 +261,14 @@ export default function Services() {
 
       {activeModal === "alun_finance_loans" && (
         <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-[#18181B] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[var(--border)] sm:border shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6 sticky top-0 bg-[#18181B] z-10 pb-4 border-b border-[var(--border)]">
+          <div className="bg-[var(--card)] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[var(--border)] sm:border shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6 sticky top-0 bg-[var(--card)] z-10 pb-4 border-b border-[var(--border)]">
               <div>
                 <h3 className="text-xl font-bold text-white">Займы ALUN Finance</h3>
-                <div className="text-xs text-[#C5A66F] mt-1">@alun_finance</div>
               </div>
               <button 
                 onClick={() => setActiveModal(null)} 
-                className="p-2 bg-[#27272A] rounded-full hover:bg-[#3F3F46] transition-colors text-white"
+                className="p-2 bg-[var(--secondary)] rounded-full hover:bg-[var(--muted)] transition-colors text-white"
               >
                 <X size={20} />
               </button>
@@ -300,15 +341,14 @@ export default function Services() {
 
       {activeModal === "bank_guarantees" && (
         <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-[#18181B] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[var(--border)] sm:border shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6 sticky top-0 bg-[#18181B] z-10 pb-4 border-b border-[var(--border)]">
+          <div className="bg-[var(--card)] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[var(--border)] sm:border shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6 sticky top-0 bg-[var(--card)] z-10 pb-4 border-b border-[var(--border)]">
               <div>
                 <h3 className="text-xl font-bold text-white">Банковские гарантии ALUN Finance</h3>
-                <div className="text-xs text-[#C5A66F] mt-1">@alun_bg</div>
               </div>
               <button 
                 onClick={() => setActiveModal(null)} 
-                className="p-2 bg-[#27272A] rounded-full hover:bg-[#3F3F46] transition-colors text-white"
+                className="p-2 bg-[var(--secondary)] rounded-full hover:bg-[var(--muted)] transition-colors text-white"
               >
                 <X size={20} />
               </button>
@@ -359,7 +399,7 @@ export default function Services() {
                     { title: "615-ПП", subtitle: "Капремонт" },
                     { title: "Коммерческие", subtitle: "Контракты" }
                   ].map((item, i) => (
-                    <div key={i} className="bg-[#27272A] p-3 rounded-xl border border-[var(--border)]">
+                    <div key={i} className="bg-[var(--secondary)] p-3 rounded-xl border border-[var(--border)]">
                       <div className="font-bold text-white">{item.title}</div>
                       <div className="text-xs text-zinc-500">{item.subtitle}</div>
                     </div>
@@ -380,15 +420,14 @@ export default function Services() {
 
       {activeModal === "alun_estate" && (
         <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-[#18181B] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[var(--border)] sm:border shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6 sticky top-0 bg-[#18181B] z-10 pb-4 border-b border-[var(--border)]">
+          <div className="bg-[var(--card)] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[var(--border)] sm:border shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6 sticky top-0 bg-[var(--card)] z-10 pb-4 border-b border-[var(--border)]">
               <div>
                 <h3 className="text-xl font-bold text-white">ALUN Estate</h3>
-                <div className="text-xs text-[#C5A66F] mt-1">@alun_estate</div>
               </div>
               <button 
                 onClick={() => setActiveModal(null)} 
-                className="p-2 bg-[#27272A] rounded-full hover:bg-[#3F3F46] transition-colors text-white"
+                className="p-2 bg-[var(--secondary)] rounded-full hover:bg-[var(--muted)] transition-colors text-white"
               >
                 <X size={20} />
               </button>
@@ -441,15 +480,14 @@ export default function Services() {
 
       {activeModal === "developer_center" && (
         <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-[#18181B] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[var(--border)] sm:border shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6 sticky top-0 bg-[#18181B] z-10 pb-4 border-b border-[var(--border)]">
+          <div className="bg-[var(--card)] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[var(--border)] sm:border shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6 sticky top-0 bg-[var(--card)] z-10 pb-4 border-b border-[var(--border)]">
               <div>
                 <h3 className="text-xl font-bold text-white">Центр девелоперских решений</h3>
-                <div className="text-xs text-[#C5A66F] mt-1">@AleksanderZharkov</div>
               </div>
               <button 
                 onClick={() => setActiveModal(null)} 
-                className="p-2 bg-[#27272A] rounded-full hover:bg-[#3F3F46] transition-colors text-white"
+                className="p-2 bg-[var(--secondary)] rounded-full hover:bg-[var(--muted)] transition-colors text-white"
               >
                 <X size={20} />
               </button>
@@ -466,27 +504,6 @@ export default function Services() {
                   Команда и партнёры имеют опыт работы в Минстрое, Правительстве Москвы и крупных девелоперских структурах, что позволяет учитывать как рыночные, так и регуляторные нюансы. 
                   Проекты усиливаются ресурсами бизнес-сообщества ALUN: экспертизой, партнёрами и доступом к финансированию.
                 </p>
-              </div>
-
-              <div>
-                <div className="flex items-center gap-2 mb-3 text-[#C5A66F]">
-                  <CheckCircle size={20} />
-                  <h4 className="font-bold text-lg">Как мы работаем</h4>
-                </div>
-                <ul className="space-y-3">
-                  {[
-                    "Формируем воронку подходящих участков под задачу клиента.",
-                    "Проверяем градостроительные ограничения и экономику проекта.",
-                    "Помогаем договориться между собственниками земли, девелопером и инвестором.",
-                    "Поддерживаем коммуникацию с органами власти и профильными структурами.",
-                    "Собираем партнёрский пул вокруг проекта: девелопер, подрядчики, инвесторы."
-                  ].map((item, i) => (
-                    <li key={i} className="flex items-start gap-3 text-zinc-300 text-sm">
-                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#C5A66F] shrink-0" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
               </div>
 
               <div>
@@ -510,6 +527,27 @@ export default function Services() {
                 </ul>
               </div>
 
+              <div>
+                <div className="flex items-center gap-2 mb-3 text-[#C5A66F]">
+                  <CheckCircle size={20} />
+                  <h4 className="font-bold text-lg">Как мы работаем</h4>
+                </div>
+                <ul className="space-y-3">
+                  {[
+                    "Формируем воронку подходящих участков под задачу клиента.",
+                    "Проверяем градостроительные ограничения и экономику проекта.",
+                    "Помогаем договориться между собственниками земли, девелопером и инвестором.",
+                    "Поддерживаем коммуникацию с органами власти и профильными структурами.",
+                    "Собираем партнёрский пул вокруг проекта: девелопер, подрядчики, инвесторы."
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-start gap-3 text-zinc-300 text-sm">
+                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#C5A66F] shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
               <button 
                 onClick={() => window.open("https://t.me/AleksanderZharkov", "_blank")}
                 className="w-full bg-[#C5A66F] text-black font-bold py-4 px-8 rounded-xl shadow-[0_0_20px_rgba(197,166,111,0.3)] hover:bg-[#b8955a] active:scale-95 transition-all"
@@ -523,15 +561,14 @@ export default function Services() {
 
       {activeModal === "alun_capital" && (
         <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-[#18181B] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[var(--border)] sm:border shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6 sticky top-0 bg-[#18181B] z-10 pb-4 border-b border-[var(--border)]">
+          <div className="bg-[var(--card)] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[var(--border)] sm:border shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6 sticky top-0 bg-[var(--card)] z-10 pb-4 border-b border-[var(--border)]">
               <div>
                 <h3 className="text-xl font-bold text-white">ALUN Capital</h3>
-                <div className="text-xs text-[#C5A66F] mt-1">@lucky6409</div>
               </div>
               <button 
                 onClick={() => setActiveModal(null)} 
-                className="p-2 bg-[#27272A] rounded-full hover:bg-[#3F3F46] transition-colors text-white"
+                className="p-2 bg-[var(--secondary)] rounded-full hover:bg-[var(--muted)] transition-colors text-white"
               >
                 <X size={20} />
               </button>
@@ -584,15 +621,14 @@ export default function Services() {
 
       {activeModal === "global_finance" && (
         <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-[#18181B] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[var(--border)] sm:border shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6 sticky top-0 bg-[#18181B] z-10 pb-4 border-b border-[var(--border)]">
+          <div className="bg-[var(--card)] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[var(--border)] sm:border shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6 sticky top-0 bg-[var(--card)] z-10 pb-4 border-b border-[var(--border)]">
               <div>
                 <h3 className="text-xl font-bold text-white">Global Finance</h3>
-                <div className="text-xs text-[#C5A66F] mt-1">@Igor_GF_001</div>
               </div>
               <button 
                 onClick={() => setActiveModal(null)} 
-                className="p-2 bg-[#27272A] rounded-full hover:bg-[#3F3F46] transition-colors text-white"
+                className="p-2 bg-[var(--secondary)] rounded-full hover:bg-[var(--muted)] transition-colors text-white"
               >
                 <X size={20} />
               </button>
@@ -645,15 +681,14 @@ export default function Services() {
 
       {activeModal === "concierge" && (
         <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-[#18181B] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[var(--border)] sm:border shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6 sticky top-0 bg-[#18181B] z-10 pb-4 border-b border-[var(--border)]">
+          <div className="bg-[var(--card)] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[var(--border)] sm:border shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6 sticky top-0 bg-[var(--card)] z-10 pb-4 border-b border-[var(--border)]">
               <div>
                 <h3 className="text-xl font-bold text-white">Бизнес-консьерж ALUN</h3>
-                <div className="text-xs text-[#C5A66F] mt-1">@ALUN_Concierge</div>
               </div>
               <button 
                 onClick={() => setActiveModal(null)} 
-                className="p-2 bg-[#27272A] rounded-full hover:bg-[#3F3F46] transition-colors text-white"
+                className="p-2 bg-[var(--secondary)] rounded-full hover:bg-[var(--muted)] transition-colors text-white"
               >
                 <X size={20} />
               </button>
@@ -707,53 +742,5 @@ export default function Services() {
       )}
 
     </main>
-  );
-}
-
-function ServiceIcon({ name }: { name: string }) {
-  const Icon = ICON_MAP[name] || ICON_MAP["landmark"];
-  return <Icon size={28} />;
-}
-
-function ServiceCard({ icon, title, description, actions }: { icon: React.ReactNode, title: string, description: string[], actions: React.ReactNode }) {
-  return (
-    <div className="bg-[var(--card)] rounded-2xl p-6 shadow-xl border border-[var(--border)] hover:border-[#C5A66F]/30 transition-colors">
-      <div className="flex items-start justify-between mb-4">
-        <div className="bg-[#C5A66F]/10 w-14 h-14 rounded-full flex items-center justify-center border border-[#C5A66F]/20">
-          {icon}
-        </div>
-      </div>
-      
-      <h3 className="text-xl font-bold text-white mb-3">{title}</h3>
-      
-      <ul className="space-y-2 mb-6">
-        {description.map((item, i) => (
-          <li key={i} className="flex items-start gap-2 text-zinc-400 text-sm leading-relaxed">
-            <span className="mt-1.5 w-1 h-1 rounded-full bg-[#C5A66F] shrink-0" />
-            {item}
-          </li>
-        ))}
-      </ul>
-
-      <div className="mt-auto">
-        {actions}
-      </div>
-    </div>
-  );
-}
-
-interface ConciergeItemProps {
-  icon: React.ReactNode;
-  text: string;
-}
-
-function ConciergeItem({ icon, text }: ConciergeItemProps) {
-  return (
-    <div className="flex items-start gap-4 group">
-      <div className="mt-1 min-w-[20px] text-[#C5A66F] group-hover:scale-110 transition-transform duration-300">
-        {icon}
-      </div>
-      <p className="text-sm text-[var(--muted-foreground)] leading-relaxed group-hover:text-[var(--foreground)] transition-colors">{text}</p>
-    </div>
   );
 }
