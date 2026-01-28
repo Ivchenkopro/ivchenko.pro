@@ -95,17 +95,13 @@ export default function Announcements() {
                 {item.description}
               </p>
               
-              {item.link && (
-                <a 
-                  href={item.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm font-bold text-[#C5A66F] hover:text-white transition-colors"
-                >
-                  {item.button_text || "Подробнее"}
-                  <ArrowRight size={14} />
-                </a>
-              )}
+              <button 
+                className="w-full bg-[#2A241F] text-[#C5A66F] text-sm font-bold py-3 px-4 rounded-xl border border-[#C5A66F]/20 shadow-lg hover:bg-[#383028] hover:border-[#C5A66F]/50 active:scale-95 transition-all flex items-center justify-center gap-2"
+                onClick={() => item.link ? window.open(item.link, '_blank') : null}
+              >
+                {item.button_text || "Подробнее"}
+                <ArrowRight size={14} />
+              </button>
             </div>
           ))}
         </div>
