@@ -138,7 +138,7 @@ export default function Contacts() {
               className="flex items-center gap-4 p-5 bg-[var(--card)] rounded-2xl border border-[var(--border)] shadow-lg hover:border-[#C5A66F]/50 transition-all group active:scale-[0.98]"
             >
               <div className="w-12 h-12 bg-[var(--card)] border border-[var(--border)] rounded-full flex items-center justify-center shrink-0 group-hover:border-[#C5A66F]/50 transition-colors">
-                <Mail size={24} className="text-[var(--foreground)]" />
+                <Mail size={24} className="text-[#C5A66F]" />
               </div>
               <div className="flex-grow">
                 <div className="text-xs text-[var(--muted-foreground)] uppercase tracking-wider mb-1">Почта</div>
