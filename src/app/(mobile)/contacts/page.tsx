@@ -57,12 +57,25 @@ export default function Contacts() {
       if (navigator.share) {
         await navigator.share(shareData);
       } else {
+        // Fallback to Telegram share or Clipboard
+        const tgShareUrl = `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(settings["share_message"] || "")}`;
+        window.open(tgShareUrl, '_blank');
+        
+        // Also copy to clipboard for good measure
         await navigator.clipboard.writeText(window.location.href);
         setShowToast(true);
         setTimeout(() => setShowToast(false), 3000);
       }
     } catch (err) {
       console.error('Error sharing:', err);
+      // If share fails, try clipboard
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 3000);
+      } catch (clipboardErr) {
+        console.error('Clipboard failed:', clipboardErr);
+      }
     }
   };
 

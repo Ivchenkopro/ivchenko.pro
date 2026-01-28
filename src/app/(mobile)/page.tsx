@@ -98,11 +98,11 @@ export default function Home() {
         <div className="bg-[var(--card)] text-[var(--card-foreground)] rounded-[2rem] p-8 border border-[var(--border)] shadow-2xl relative overflow-hidden">
           <div className="relative z-10 flex flex-col items-center text-center">
             
-            <p className="text-[var(--muted-foreground)] text-sm leading-relaxed mb-6 font-[family-name:var(--font-montserrat)]">
+            <p className="text-[var(--card-foreground)] text-base leading-relaxed mb-6 font-[family-name:var(--font-montserrat)]">
               {settings["home_bio_1"]}
             </p>
 
-            <p className="text-[var(--muted-foreground)] text-sm leading-relaxed mb-8 font-[family-name:var(--font-montserrat)]">
+            <p className="text-[var(--card-foreground)] text-base leading-relaxed mb-8 font-[family-name:var(--font-montserrat)]">
               {settings["home_bio_2"]}
             </p>
 

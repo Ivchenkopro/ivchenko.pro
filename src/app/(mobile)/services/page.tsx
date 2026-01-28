@@ -196,7 +196,7 @@ export default function Services() {
             if (service.title === "Бизнес-консьерж") {
               return (
                 <div key={service.id} className="bg-[var(--card)] rounded-2xl p-6 shadow-xl border border-[var(--border)] hover:border-[#C5A66F]/30 transition-colors">
-                <div className="w-12 h-12 rounded-xl bg-[var(--secondary)] flex items-center justify-center border border-[var(--border)] shadow-sm">
+                <div className="w-12 h-12 rounded-xl bg-[var(--secondary)] flex items-center justify-center border border-[var(--border)] shadow-sm mb-4">
                   <div className="text-[#C5A66F]">
                     {ICON_MAP[service.icon] ? <ServiceIcon name={service.icon} /> : <Search size={24} />}
                   </div>
