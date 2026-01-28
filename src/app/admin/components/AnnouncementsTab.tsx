@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { Trash2, Edit, Plus, Save, AlertCircle, Loader2, WifiOff } from "lucide-react";
+import { Trash2, Edit, Plus, Save, AlertCircle, Loader2, WifiOff, Tag, Link as LinkIcon } from "lucide-react";
 import { Announcement, FALLBACK_ANNOUNCEMENTS } from "@/lib/data";
 
 export default function AnnouncementsTab() {
