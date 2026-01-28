@@ -4,21 +4,17 @@ import { Mail, Send, ArrowUpRight, Share2, Check, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { getSettings, DEFAULT_SETTINGS } from "@/lib/settings";
+import { LinkItem, FALLBACK_LINKS } from "@/lib/data";
 
-interface LinkItem {
-  id: number;
-  title: string;
-  url: string;
-  icon: string | null;
-  is_external: boolean;
-  order: number;
-}
+import { useRouter } from "next/navigation";
 
 export default function Contacts() {
-  const [showToast, setShowToast] = useState(false);
+  const router = useRouter();
+  const [settings, setSettings] = useState<Record<string, string>>({});
   const [links, setLinks] = useState<LinkItem[]>([]);
-  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState<string | null>(null);
+  const [showToast, setShowToast] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -34,11 +30,25 @@ export default function Contacts() {
           .eq('is_active', true)
           .order('order', { ascending: true });
         
-        if (data) {
+        if (data && data.length > 0) {
           setLinks(data);
+        } else {
+            // Fallback to local storage or constants
+            const localData = localStorage.getItem('links');
+            if (localData) {
+                const parsed = JSON.parse(localData);
+                if (parsed.length > 0) {
+                    setLinks(parsed.filter((l: LinkItem) => l.is_active));
+                } else {
+                    setLinks(FALLBACK_LINKS);
+                }
+            } else {
+                setLinks(FALLBACK_LINKS);
+            }
         }
       } catch (error) {
         console.error("Error fetching links:", error);
+        setLinks(FALLBACK_LINKS);
       } finally {
         setLoading(false);
       }
@@ -180,7 +190,7 @@ export default function Contacts() {
 
         {/* Share Button */}
         <button 
-          onClick={handleShare}
+          onClick={() => router.push('/services')}
           className="mt-8 w-full bg-[#C5A66F] text-white font-bold py-4 px-8 rounded-xl shadow-[0_0_20px_rgba(197,166,111,0.3)] flex items-center justify-center gap-2 active:scale-95 transition-transform hover:bg-[#b8955a]"
         >
           <Share2 size={20} />

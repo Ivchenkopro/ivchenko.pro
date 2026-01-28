@@ -48,12 +48,30 @@ export default function SettingsTab() {
       }
     } catch (err: any) {
       console.error("Error fetching settings:", err);
-      // Fallback for demo/offline
       setIsDemoMode(true);
-      setError("Нет связи с Supabase. Режим только для чтения.");
+      setError("Нет связи с Supabase. Работа в локальном режиме.");
+      
+      // Fallback logic
+      const saved = localStorage.getItem('app_settings');
+      if (saved) {
+        setSettings(JSON.parse(saved));
+      } else {
+        const fallbackSettings: AppSetting[] = Object.entries(DEFAULT_SETTINGS).map(([key, value]) => ({
+            key,
+            value,
+            description: SETTING_DESCRIPTIONS[key] || ""
+        }));
+        setSettings(fallbackSettings);
+        localStorage.setItem('app_settings', JSON.stringify(fallbackSettings));
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  const saveToLocal = (newSettings: AppSetting[]) => {
+    localStorage.setItem('app_settings', JSON.stringify(newSettings));
+    setSettings(newSettings);
   };
 
   const handleBackup = async () => {
@@ -101,35 +119,57 @@ export default function SettingsTab() {
     
     try {
       if (!isDemoMode) {
-        if (view === "create") {
-          const { error } = await supabase
-            .from('app_settings')
-            .insert([formData]);
-          if (error) throw error;
-          
-          await supabase.from('audit_logs').insert([{ 
-            action: 'create', 
-            entity: 'settings', 
-            details: `Created setting: ${formData.key}` 
-          }]);
-        } else if (view === "edit" && currentKey) {
-          const { error } = await supabase
-            .from('app_settings')
-            .update(formData)
-            .eq('key', currentKey);
-          if (error) throw error;
-          
-          await supabase.from('audit_logs').insert([{ 
-            action: 'update', 
-            entity: 'settings', 
-            details: `Updated setting: ${formData.key}` 
-          }]);
+        try {
+            if (view === "create") {
+            const { error } = await supabase
+                .from('app_settings')
+                .insert([formData]);
+            if (error) throw error;
+            
+            await supabase.from('audit_logs').insert([{ 
+                action: 'create', 
+                entity: 'settings', 
+                details: `Created setting: ${formData.key}` 
+            }]);
+            } else if (view === "edit" && currentKey) {
+            const { error } = await supabase
+                .from('app_settings')
+                .update(formData)
+                .eq('key', currentKey);
+            if (error) throw error;
+            
+            await supabase.from('audit_logs').insert([{ 
+                action: 'update', 
+                entity: 'settings', 
+                details: `Updated setting: ${formData.key}` 
+            }]);
+            }
+            await fetchSettings();
+            setView("list");
+            return;
+        } catch (supaErr) {
+             console.error("Supabase failed, falling back to local:", supaErr);
+             setIsDemoMode(true);
+             setError("Ошибка Supabase. Переход в локальный режим.");
         }
-        await fetchSettings();
-        setView("list");
-      } else {
-        alert("В демо режиме нельзя сохранять настройки");
       }
+      
+      // Local mode logic
+      let updatedList = [...settings];
+      if (view === "create") {
+          // Check for duplicate key
+          if (updatedList.some(s => s.key === formData.key)) {
+              throw new Error("Настройка с таким ключом уже существует");
+          }
+          updatedList.push(formData);
+      } else if (view === "edit" && currentKey) {
+          updatedList = updatedList.map(item => 
+              item.key === currentKey ? formData : item
+          );
+      }
+      saveToLocal(updatedList);
+      setView("list");
+
     } catch (err: any) {
       console.error("Error saving setting:", err);
       setError("Ошибка при сохранении: " + err.message);
@@ -141,27 +181,36 @@ export default function SettingsTab() {
   const handleDelete = async (key: string) => {
     if (!confirm("Вы уверены, что хотите удалить эту настройку?")) return;
     
-    if (isDemoMode) {
-      alert("В демо режиме нельзя удалять настройки");
-      return;
-    }
-
     setLoading(true);
     try {
-      const { error } = await supabase
-        .from('app_settings')
-        .delete()
-        .eq('key', key);
-      
-      if (error) throw error;
+      if (!isDemoMode) {
+          try {
+            const { error } = await supabase
+                .from('app_settings')
+                .delete()
+                .eq('key', key);
+            
+            if (error) throw error;
 
-      await supabase.from('audit_logs').insert([{ 
-        action: 'delete', 
-        entity: 'settings', 
-        details: `Deleted setting: ${key}` 
-      }]);
-      
-      await fetchSettings();
+            await supabase.from('audit_logs').insert([{ 
+                action: 'delete', 
+                entity: 'settings', 
+                details: `Deleted setting: ${key}` 
+            }]);
+            
+            await fetchSettings();
+            return;
+          } catch (supaErr) {
+            console.error("Supabase failed, falling back to local:", supaErr);
+            setIsDemoMode(true);
+            setError("Ошибка Supabase. Переход в локальный режим.");
+          }
+      }
+
+      // Local mode logic
+      const updatedList = settings.filter(s => s.key !== key);
+      saveToLocal(updatedList);
+
     } catch (err: any) {
       console.error("Error deleting setting:", err);
       setError("Ошибка при удалении: " + err.message);
@@ -220,7 +269,7 @@ export default function SettingsTab() {
               value={formData.key}
               onChange={(e) => setFormData({ ...formData, key: e.target.value })}
               disabled={view === "edit"} // Prevent changing key on edit
-              className={`w-full p-2 rounded-lg border bg-[var(--card)] ${
+              className={`w-full p-2 rounded-lg border bg-white text-black ${
                 formErrors.key ? "border-red-500" : "border-[var(--border)]"
               }`}
               placeholder="site_title"
@@ -234,7 +283,7 @@ export default function SettingsTab() {
             <textarea
               value={formData.value}
               onChange={(e) => setFormData({ ...formData, value: e.target.value })}
-              className={`w-full p-2 rounded-lg border bg-[var(--card)] ${
+              className={`w-full p-2 rounded-lg border bg-white text-black ${
                 formErrors.value ? "border-red-500" : "border-[var(--border)]"
               }`}
               rows={4}
@@ -248,7 +297,7 @@ export default function SettingsTab() {
               type="text"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full p-2 rounded-lg border border-[var(--border)] bg-[var(--card)]"
+              className="w-full p-2 rounded-lg border border-[var(--border)] bg-white text-black"
               placeholder="Заголовок сайта"
             />
           </div>
@@ -272,13 +321,21 @@ export default function SettingsTab() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold">Настройки сайта</h2>
-        <button
-          onClick={() => startCreate()}
-          className="bg-black text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-gray-800"
-        >
-          <Plus className="w-4 h-4" />
-          Добавить
-        </button>
+        <div className="flex gap-2">
+            {isDemoMode && (
+            <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                <WifiOff className="w-3 h-3" />
+                Локальный режим
+            </span>
+            )}
+            <button
+            onClick={() => startCreate()}
+            className="bg-black text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-gray-800"
+            >
+            <Plus className="w-4 h-4" />
+            Добавить
+            </button>
+        </div>
       </div>
 
       {error && (

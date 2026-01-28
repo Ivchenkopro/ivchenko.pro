@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { Trash2, Edit, Plus, Loader2, WifiOff } from "lucide-react";
+import { Trash2, Edit, Plus, Loader2, WifiOff, AlertCircle } from "lucide-react";
 import { Case, FALLBACK_CASES } from "@/lib/data";
 import IconSelector from "./IconSelector";
 import { ICON_MAP } from "@/lib/icons";
@@ -30,6 +30,7 @@ export default function CasesTab() {
 
   const fetchCases = async () => {
     setLoading(true);
+    setError("");
     try {
       const { data, error } = await supabase
         .from('cases')
@@ -37,13 +38,41 @@ export default function CasesTab() {
         .order('order', { ascending: true });
         
       if (error) throw error;
-      if (data) setCases(data);
+      if (data && data.length > 0) {
+        setCases(data);
+        setIsDemoMode(false);
+      } else {
+        // Fallback if empty
+          const localData = localStorage.getItem('cases');
+          if (localData) {
+            const parsed = JSON.parse(localData);
+            if (parsed.length > 0) {
+              setCases(parsed);
+            } else {
+              setCases(FALLBACK_CASES);
+            }
+          } else {
+            setCases(FALLBACK_CASES);
+          }
+      }
     } catch (err: any) {
       console.error("Error fetching cases:", err);
-      setError("Ошибка загрузки данных");
+      const localData = localStorage.getItem('cases');
+      if (localData) {
+        setCases(JSON.parse(localData));
+      } else {
+        setCases(FALLBACK_CASES);
+      }
+      setIsDemoMode(true);
+      setError("Нет связи с Supabase. Включен локальный режим.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const saveToLocal = (newCases: Case[]) => {
+    localStorage.setItem('cases', JSON.stringify(newCases));
+    setCases(newCases);
   };
 
   const handleEdit = (item: Case) => {
@@ -54,12 +83,32 @@ export default function CasesTab() {
 
   const handleDelete = async (id: number) => {
     if (!confirm("Вы уверены?")) return;
+    
+    setLoading(true);
     try {
-      await supabase.from('cases').delete().eq('id', id);
-      await supabase.from('audit_logs').insert([{ action: 'delete', entity: 'case', details: `Deleted case ID ${id}` }]);
-      fetchCases();
-    } catch (err) {
+      if (!isDemoMode) {
+        try {
+          const { error } = await supabase.from('cases').delete().eq('id', id);
+          if (error) throw error;
+          await supabase.from('audit_logs').insert([{ action: 'delete', entity: 'case', details: `Deleted case ID ${id}` }]);
+          await fetchCases();
+          return;
+        } catch (supaErr) {
+          console.error("Supabase failed, falling back to local:", supaErr);
+          setIsDemoMode(true);
+          setError("Ошибка Supabase. Переход в локальный режим.");
+        }
+      }
+      
+      // Local mode logic
+      const updatedList = cases.filter(c => c.id !== id);
+      saveToLocal(updatedList);
+      
+    } catch (err: any) {
       console.error(err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -70,16 +119,40 @@ export default function CasesTab() {
     try {
       const dataToSave = { ...formData, id: undefined };
 
-      if (view === "create") {
-        await supabase.from('cases').insert([dataToSave]);
-        await supabase.from('audit_logs').insert([{ action: 'create', entity: 'case', details: `Created: ${formData.title}` }]);
-      } else if (view === "edit" && currentItem) {
-        await supabase.from('cases').update(dataToSave).eq('id', currentItem.id);
-        await supabase.from('audit_logs').insert([{ action: 'update', entity: 'case', details: `Updated: ${formData.title}` }]);
+      if (!isDemoMode) {
+        try {
+          if (view === "create") {
+            const { error } = await supabase.from('cases').insert([dataToSave]);
+            if (error) throw error;
+            await supabase.from('audit_logs').insert([{ action: 'create', entity: 'case', details: `Created: ${formData.title}` }]);
+          } else if (view === "edit" && currentItem) {
+            const { error } = await supabase.from('cases').update(dataToSave).eq('id', currentItem.id);
+            if (error) throw error;
+            await supabase.from('audit_logs').insert([{ action: 'update', entity: 'case', details: `Updated: ${formData.title}` }]);
+          }
+          await fetchCases();
+          setView("list");
+          return;
+        } catch (supaErr) {
+            console.error("Supabase failed, falling back to local:", supaErr);
+            setIsDemoMode(true);
+            setError("Ошибка Supabase. Переход в локальный режим.");
+        }
       }
       
+      // Local mode logic
+      let updatedList = [...cases];
+      if (view === "create") {
+        const newId = Math.max(0, ...updatedList.map(c => c.id)) + 1;
+        updatedList.push({ ...formData, id: newId });
+      } else if (view === "edit" && currentItem) {
+        updatedList = updatedList.map(item => 
+          item.id === currentItem.id ? formData : item
+        );
+      }
+      saveToLocal(updatedList);
       setView("list");
-      fetchCases();
+      
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -110,6 +183,20 @@ export default function CasesTab() {
           Добавить
         </button>
       </div>
+
+      {error && (
+        <div className="bg-red-50 text-red-600 p-4 rounded-lg flex items-center gap-2">
+          <AlertCircle className="w-5 h-5" />
+          {error}
+        </div>
+      )}
+
+      {isDemoMode && (
+        <div className="bg-yellow-100 text-yellow-800 p-4 rounded-xl flex items-center gap-2">
+          <WifiOff className="w-5 h-5" />
+          <span>Локальный режим: изменения сохраняются только в браузере</span>
+        </div>
+      )}
 
       {view === "list" ? (
         <div className="grid gap-4">
@@ -152,7 +239,7 @@ export default function CasesTab() {
                 required
                 value={formData.title}
                 onChange={(e) => setFormData({...formData, title: e.target.value})}
-                className="w-full p-2 border rounded-lg"
+                className="w-full p-2 border rounded-lg bg-white text-black"
               />
             </div>
 
@@ -163,7 +250,7 @@ export default function CasesTab() {
                 rows={3}
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
-                className="w-full p-2 border rounded-lg"
+                className="w-full p-2 border rounded-lg bg-white text-black"
               />
             </div>
 
@@ -173,7 +260,7 @@ export default function CasesTab() {
                 rows={2}
                 value={formData.details || ""}
                 onChange={(e) => setFormData({...formData, details: e.target.value})}
-                className="w-full p-2 border rounded-lg"
+                className="w-full p-2 border rounded-lg bg-white text-black"
                 placeholder="Дополнительная информация (например, суммы)"
               />
             </div>
@@ -183,7 +270,7 @@ export default function CasesTab() {
               <input
                 value={formData.link || ""}
                 onChange={(e) => setFormData({...formData, link: e.target.value})}
-                className="w-full p-2 border rounded-lg"
+                className="w-full p-2 border rounded-lg bg-white text-black"
               />
             </div>
             
@@ -193,7 +280,7 @@ export default function CasesTab() {
                 type="number"
                 value={formData.order}
                 onChange={(e) => setFormData({...formData, order: parseInt(e.target.value)})}
-                className="w-full p-2 border rounded-lg"
+                className="w-full p-2 border rounded-lg bg-white text-black"
               />
             </div>
           </div>

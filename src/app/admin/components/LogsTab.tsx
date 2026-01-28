@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { Loader2, RefreshCw, Filter } from "lucide-react";
+import { Loader2, RefreshCw, Filter, WifiOff } from "lucide-react";
 
 interface AuditLog {
   id: number;
@@ -17,6 +17,7 @@ export default function LogsTab() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("all");
+  const [isDemoMode, setIsDemoMode] = useState(false);
 
   useEffect(() => {
     fetchLogs();
@@ -41,10 +42,13 @@ export default function LogsTab() {
       if (error) throw error;
       if (data) {
         setLogs(data);
+        setIsDemoMode(false);
       }
     } catch (err: any) {
       console.error("Error fetching logs:", err);
-      setError("Ошибка загрузки логов: " + err.message);
+      // In local mode, we just show empty logs or a message, not an error
+      setIsDemoMode(true);
+      setLogs([]);
     } finally {
       setLoading(false);
     }
@@ -74,11 +78,17 @@ export default function LogsTab() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold">Журнал действий</h2>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
+            {isDemoMode && (
+            <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full flex items-center gap-1 mr-2">
+                <WifiOff className="w-3 h-3" />
+                Локальный режим
+            </span>
+            )}
           <select 
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="border rounded-lg px-3 py-2 bg-[var(--card)] text-sm"
+            className="border rounded-lg px-3 py-2 bg-white text-black text-sm"
           >
             <option value="all">Все сущности</option>
             <option value="announcement">Объявления</option>
@@ -88,7 +98,7 @@ export default function LogsTab() {
           </select>
           <button
             onClick={fetchLogs}
-            className="p-2 border rounded-lg hover:bg-gray-50"
+            className="p-2 border rounded-lg hover:bg-gray-50 bg-white text-black"
             title="Обновить"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -98,50 +108,65 @@ export default function LogsTab() {
 
       {error && (
         <div className="bg-red-50 text-red-600 p-4 rounded-lg text-sm">
-          {error}
+            {error}
         </div>
       )}
 
-      <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl overflow-hidden">
-        <table className="w-full text-sm text-left">
-          <thead className="bg-gray-50 text-gray-500 font-medium">
-            <tr>
-              <th className="px-4 py-3">Дата</th>
-              <th className="px-4 py-3">Действие</th>
-              <th className="px-4 py-3">Сущность</th>
-              <th className="px-4 py-3">Детали</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[var(--border)]">
-            {logs.length === 0 ? (
-              <tr>
-                <td colSpan={4} className="px-4 py-8 text-center text-gray-500">
-                  {loading ? 'Загрузка...' : 'Записей нет'}
-                </td>
-              </tr>
-            ) : (
-              logs.map((log) => (
-                <tr key={log.id} className="hover:bg-gray-50/50">
-                  <td className="px-4 py-3 whitespace-nowrap text-gray-500 font-mono text-xs">
-                    {formatDate(log.created_at)}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${getActionColor(log.action)}`}>
-                      {log.action.toUpperCase()}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">
-                    {log.entity}
-                  </td>
-                  <td className="px-4 py-3 text-gray-900 max-w-md truncate" title={log.details}>
-                    {log.details}
-                  </td>
+      {isDemoMode ? (
+        <div className="text-center py-12 text-gray-500 bg-gray-50 rounded-xl border border-dashed">
+            <WifiOff className="w-8 h-8 mx-auto mb-2 opacity-50" />
+            <p>Журнал действий недоступен в локальном режиме</p>
+        </div>
+      ) : (
+        <div className="bg-white rounded-xl border overflow-hidden">
+            <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left">
+                <thead className="text-xs text-gray-500 uppercase bg-gray-50 border-b">
+                <tr>
+                    <th className="px-6 py-3">Действие</th>
+                    <th className="px-6 py-3">Сущность</th>
+                    <th className="px-6 py-3">Детали</th>
+                    <th className="px-6 py-3">Время</th>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+                </thead>
+                <tbody>
+                {loading && logs.length === 0 ? (
+                    <tr>
+                    <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                        <Loader2 className="animate-spin w-6 h-6 mx-auto" />
+                    </td>
+                    </tr>
+                ) : logs.length === 0 ? (
+                    <tr>
+                    <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                        Записей не найдено
+                    </td>
+                    </tr>
+                ) : (
+                    logs.map((log) => (
+                    <tr key={log.id} className="border-b last:border-0 hover:bg-gray-50">
+                        <td className="px-6 py-4">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getActionColor(log.action)}`}>
+                            {log.action}
+                        </span>
+                        </td>
+                        <td className="px-6 py-4 font-medium text-gray-900">
+                        {log.entity}
+                        </td>
+                        <td className="px-6 py-4 text-gray-600 max-w-xs truncate" title={log.details}>
+                        {log.details}
+                        </td>
+                        <td className="px-6 py-4 text-gray-500 whitespace-nowrap">
+                        {formatDate(log.created_at)}
+                        </td>
+                    </tr>
+                    ))
+                )}
+                </tbody>
+            </table>
+            </div>
+        </div>
+      )}
     </div>
   );
 }

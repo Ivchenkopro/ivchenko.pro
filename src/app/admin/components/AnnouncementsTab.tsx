@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { Trash2, Edit, Plus, Save, AlertCircle, Loader2, WifiOff, Tag, Link as LinkIcon } from "lucide-react";
+import { Trash2, Edit, Plus, Save, AlertCircle, Loader2, WifiOff, Tag, Link as LinkIcon, RotateCcw } from "lucide-react";
 import { Announcement, FALLBACK_ANNOUNCEMENTS } from "@/lib/data";
 
 export default function AnnouncementsTab() {
@@ -29,37 +29,57 @@ export default function AnnouncementsTab() {
   const fetchAnnouncements = async () => {
     setLoading(true);
     setError("");
+    
     try {
       const { data, error } = await supabase
         .from('announcements')
         .select('*')
         .order('id', { ascending: false });
         
-      if (error) throw error;
-      if (data && data.length > 0) {
+      if (!error && data && data.length > 0) {
         setAnnouncements(data);
         setIsDemoMode(false);
       } else {
-        // Fallback if empty
-        const localData = localStorage.getItem('announcements');
-        if (localData) {
-          setAnnouncements(JSON.parse(localData));
-        } else {
-          setAnnouncements(FALLBACK_ANNOUNCEMENTS);
-        }
+        // If Supabase is empty or has error, try local
+        throw new Error("Supabase empty or unavailable");
       }
     } catch (err: any) {
       console.error("Error fetching data:", err);
-      const localData = localStorage.getItem('announcements');
-      if (localData) {
-        setAnnouncements(JSON.parse(localData));
-      } else {
-        setAnnouncements(FALLBACK_ANNOUNCEMENTS);
-      }
+      loadFromLocal();
       setIsDemoMode(true);
-      setError("Нет связи с Supabase. Включен локальный режим.");
+      if (err.message !== "Supabase empty or unavailable") {
+         setError("Нет связи с Supabase. Включен локальный режим.");
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadFromLocal = () => {
+    const localData = localStorage.getItem('announcements');
+    if (localData) {
+      try {
+        const parsed = JSON.parse(localData);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+            setAnnouncements(parsed);
+        } else {
+            setAnnouncements(FALLBACK_ANNOUNCEMENTS);
+        }
+      } catch (e) {
+        console.error("Error parsing local data", e);
+        setAnnouncements(FALLBACK_ANNOUNCEMENTS);
+      }
+    } else {
+      setAnnouncements(FALLBACK_ANNOUNCEMENTS);
+    }
+  };
+
+  const handleReset = () => {
+    if (confirm("Это действие сбросит все изменения и вернет стандартные объявления. Продолжить?")) {
+      const defaultData = FALLBACK_ANNOUNCEMENTS;
+      localStorage.setItem('announcements', JSON.stringify(defaultData));
+      setAnnouncements(defaultData);
+      window.location.reload();
     }
   };
 
@@ -198,10 +218,16 @@ export default function AnnouncementsTab() {
         <>
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-bold text-[var(--card-foreground)]">Управление объявлениями</h2>
-            <button onClick={openCreate} className="flex items-center gap-2 bg-[#C5A66F] text-white px-4 py-2 rounded-xl font-bold hover:bg-[#b8955a] transition-colors">
-              <Plus size={20} />
-              Добавить
-            </button>
+            <div className="flex gap-2">
+              <button onClick={handleReset} className="flex items-center gap-2 bg-gray-200 text-gray-700 px-4 py-2 rounded-xl font-bold hover:bg-gray-300 transition-colors" title="Сбросить к стандартным">
+                <RotateCcw size={20} />
+                <span className="hidden sm:inline">Сброс</span>
+              </button>
+              <button onClick={openCreate} className="flex items-center gap-2 bg-[#C5A66F] text-white px-4 py-2 rounded-xl font-bold hover:bg-[#b8955a] transition-colors">
+                <Plus size={20} />
+                Добавить
+              </button>
+            </div>
           </div>
 
           {loading ? (

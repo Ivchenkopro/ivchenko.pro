@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { Trash2, Edit, Plus, Save, AlertCircle, Loader2, GripVertical, ExternalLink } from "lucide-react";
+import { Trash2, Edit, Plus, Save, AlertCircle, Loader2, GripVertical, ExternalLink, WifiOff, RotateCcw } from "lucide-react";
 import { LinkItem, FALLBACK_LINKS } from "@/lib/data";
 
 export default function LinksTab() {
@@ -51,15 +51,6 @@ export default function LinksTab() {
         } else {
           setLinks(FALLBACK_LINKS);
         }
-        // Don't necessarily set demo mode if it's just empty, but for consistency with other tabs:
-        // Actually if it's just empty, we can let them create new ones.
-        // But the user wants to see "something".
-        // Let's set it to fallback and maybe imply it's not saved?
-        // If we set fallback data, and they click save, it might fail if we try to update.
-        // So let's set isDemoMode to true if we use fallback, OR just treat it as "initial data".
-        // To be safe, let's treat it as demo/local if Supabase returns nothing.
-        // Wait, if Supabase returns [], it means connected but empty.
-        // If I show fallback, I should probably save it to local storage or just show it.
       }
     } catch (err: any) {
       console.error("Error fetching links:", err);
@@ -75,6 +66,20 @@ export default function LinksTab() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleReset = () => {
+    if (confirm("Это действие сбросит все ссылки к стандартным (пустой список). Продолжить?")) {
+      const defaultData = FALLBACK_LINKS;
+      localStorage.setItem('links', JSON.stringify(defaultData));
+      setLinks(defaultData);
+      window.location.reload();
+    }
+  };
+
+  const saveToLocal = (newLinks: LinkItem[]) => {
+    localStorage.setItem('links', JSON.stringify(newLinks));
+    setLinks(newLinks);
   };
 
   const validateForm = () => {
@@ -94,44 +99,63 @@ export default function LinksTab() {
     
     try {
       if (!isDemoMode) {
-        const payload = {
-            title: formData.title,
-            url: formData.url,
-            icon: formData.icon || null,
-            is_external: formData.is_external,
-            order: formData.order,
-            is_active: formData.is_active
-        };
+        try {
+          const payload = {
+              title: formData.title,
+              url: formData.url,
+              icon: formData.icon || null,
+              is_external: formData.is_external,
+              order: formData.order,
+              is_active: formData.is_active
+          };
 
-        if (view === "create") {
-          const { error } = await supabase
-            .from('links')
-            .insert([payload]);
-          if (error) throw error;
-          
-          await supabase.from('audit_logs').insert([{ 
-            action: 'create', 
-            entity: 'link', 
-            details: `Created link: ${formData.title}` 
-          }]);
-        } else if (view === "edit" && currentItem?.id) {
-          const { error } = await supabase
-            .from('links')
-            .update(payload)
-            .eq('id', currentItem.id);
-          if (error) throw error;
-          
-          await supabase.from('audit_logs').insert([{ 
-            action: 'update', 
-            entity: 'link', 
-            details: `Updated link ID ${currentItem.id}: ${formData.title}` 
-          }]);
+          if (view === "create") {
+            const { error } = await supabase
+              .from('links')
+              .insert([payload]);
+            if (error) throw error;
+            
+            await supabase.from('audit_logs').insert([{ 
+              action: 'create', 
+              entity: 'link', 
+              details: `Created link: ${formData.title}` 
+            }]);
+          } else if (view === "edit" && currentItem?.id) {
+            const { error } = await supabase
+              .from('links')
+              .update(payload)
+              .eq('id', currentItem.id);
+            if (error) throw error;
+            
+            await supabase.from('audit_logs').insert([{ 
+              action: 'update', 
+              entity: 'link', 
+              details: `Updated link ID ${currentItem.id}: ${formData.title}` 
+            }]);
+          }
+          await fetchLinks();
+          setView("list");
+          return;
+        } catch (supaErr) {
+          console.error("Supabase failed, falling back to local:", supaErr);
+          setIsDemoMode(true);
+          setError("Ошибка Supabase. Переход в локальный режим.");
         }
-        await fetchLinks();
-        setView("list");
-      } else {
-        alert("В демо режиме нельзя сохранять ссылки");
       }
+      
+      // Local Mode Logic
+      let updatedList = [...links];
+      if (view === "create") {
+          const newId = Math.max(...updatedList.map(l => l.id), 0) + 1;
+          updatedList.push({ ...formData, id: newId });
+      } else if (view === "edit" && currentItem?.id) {
+          updatedList = updatedList.map(item => 
+              item.id === currentItem.id ? { ...formData, id: currentItem.id } : item
+          );
+      }
+      saveToLocal(updatedList);
+      setView("list");
+
     } catch (err: any) {
       console.error("Error saving link:", err);
       setError("Ошибка при сохранении: " + err.message);
@@ -227,7 +251,7 @@ export default function LinksTab() {
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className={`w-full p-2 rounded-lg border bg-[var(--card)] ${
+              className={`w-full p-2 rounded-lg border bg-white text-black ${
                 formErrors.title ? "border-red-500" : "border-[var(--border)]"
               }`}
               placeholder="Наш Telegram"
@@ -241,7 +265,7 @@ export default function LinksTab() {
               type="text"
               value={formData.url}
               onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-              className={`w-full p-2 rounded-lg border bg-[var(--card)] ${
+              className={`w-full p-2 rounded-lg border bg-white text-black ${
                 formErrors.url ? "border-red-500" : "border-[var(--border)]"
               }`}
               placeholder="https://t.me/..."
@@ -256,7 +280,7 @@ export default function LinksTab() {
                   type="number"
                   value={formData.order}
                   onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
-                  className="w-full p-2 rounded-lg border border-[var(--border)] bg-[var(--card)]"
+                  className="w-full p-2 rounded-lg border border-[var(--border)] bg-white text-black"
                 />
              </div>
              <div>
@@ -265,7 +289,7 @@ export default function LinksTab() {
                   type="text"
                   value={formData.icon || ""}
                   onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                  className="w-full p-2 rounded-lg border border-[var(--border)] bg-[var(--card)]"
+                  className="w-full p-2 rounded-lg border border-[var(--border)] bg-white text-black"
                   placeholder="📱"
                 />
              </div>

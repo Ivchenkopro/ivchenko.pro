@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { Save, Loader2, RotateCcw, Palette } from "lucide-react";
+import { Save, Loader2, RotateCcw, Palette, WifiOff } from "lucide-react";
 
 interface ThemeSettings {
   background: string;
@@ -86,53 +86,76 @@ export default function AppearanceTab() {
           }
         });
         setColors(newColors);
+        setIsDemoMode(false);
+      } else {
+        // Try local storage if no data in supabase
+        const saved = localStorage.getItem('theme_settings');
+        if (saved) {
+           setColors(JSON.parse(saved));
+        }
       }
-      setIsDemoMode(false);
     } catch (err) {
       console.error("Error fetching theme:", err);
       setIsDemoMode(true);
+      
+      // Fallback to local storage
+      const saved = localStorage.getItem('theme_settings');
+      if (saved) {
+        setColors(JSON.parse(saved));
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const saveTheme = async (newColors: ThemeSettings) => {
-    if (isDemoMode) {
-      alert("В демо режиме нельзя сохранять тему");
-      return;
-    }
+  const saveToLocal = (newColors: ThemeSettings) => {
+    localStorage.setItem('theme_settings', JSON.stringify(newColors));
+    setColors(newColors);
+    applyThemeToRoot(newColors);
+  };
 
-    setSaving(true);
-    try {
-      const updates = Object.entries(newColors).map(([key, value]) => ({
-        key: `theme_${key}`,
-        value: value,
-        description: `Theme color for ${key}`
-      }));
-
-      const { error } = await supabase
-        .from('app_settings')
-        .upsert(updates);
-
-      if (error) throw error;
-
-      await supabase.from('audit_logs').insert([{ 
-        action: 'update', 
-        entity: 'settings', 
-        details: 'Updated theme colors' 
-      }]);
-
-      setColors(newColors);
-      
-      // Apply instantly to document for preview
+  const applyThemeToRoot = (newColors: ThemeSettings) => {
       const root = document.documentElement;
       Object.entries(newColors).forEach(([key, value]) => {
-        // Convert camelCase to kebab-case for CSS variables if needed, 
-        // but our keys match simple mapping: background -> --background
-        // cardForeground -> --card-foreground
         const cssVar = `--${key.replace(/([A-Z])/g, "-$1").toLowerCase()}`;
         root.style.setProperty(cssVar, value);
       });
+  };
+
+  const saveTheme = async (newColors: ThemeSettings) => {
+    setSaving(true);
+    try {
+      if (!isDemoMode) {
+        try {
+            const updates = Object.entries(newColors).map(([key, value]) => ({
+                key: `theme_${key}`,
+                value: value,
+                description: `Theme color for ${key}`
+            }));
+
+            const { error } = await supabase
+                .from('app_settings')
+                .upsert(updates);
+
+            if (error) throw error;
+
+            await supabase.from('audit_logs').insert([{ 
+                action: 'update', 
+                entity: 'settings', 
+                details: 'Updated theme colors' 
+            }]);
+            
+            setColors(newColors);
+            applyThemeToRoot(newColors);
+            return;
+        } catch (supaErr) {
+            console.error("Supabase failed, falling back to local:", supaErr);
+            setIsDemoMode(true);
+        }
+      }
+      
+      // Local mode logic
+      saveToLocal(newColors);
 
     } catch (err: any) {
       console.error("Error saving theme:", err);
@@ -153,7 +176,15 @@ export default function AppearanceTab() {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-xl font-bold mb-4">Внешний вид</h2>
+        <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold">Внешний вид</h2>
+            {isDemoMode && (
+            <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                <WifiOff className="w-3 h-3" />
+                Локальный режим
+            </span>
+            )}
+        </div>
         <p className="text-gray-500 mb-6">Настройте цветовую схему приложения</p>
         
         {/* Preview Card */}
@@ -217,7 +248,7 @@ export default function AppearanceTab() {
                 type="text"
                 value={colors.background}
                 onChange={(e) => setColors({ ...colors, background: e.target.value })}
-                className="flex-1 p-2 rounded border bg-[var(--card)] uppercase"
+                className="flex-1 p-2 rounded border bg-white text-black uppercase"
               />
             </div>
           </div>
@@ -235,7 +266,7 @@ export default function AppearanceTab() {
                 type="text"
                 value={colors.foreground}
                 onChange={(e) => setColors({ ...colors, foreground: e.target.value })}
-                className="flex-1 p-2 rounded border bg-[var(--card)] uppercase"
+                className="flex-1 p-2 rounded border bg-white text-black uppercase"
               />
             </div>
           </div>
@@ -253,7 +284,7 @@ export default function AppearanceTab() {
                 type="text"
                 value={colors.card}
                 onChange={(e) => setColors({ ...colors, card: e.target.value })}
-                className="flex-1 p-2 rounded border bg-[var(--card)] uppercase"
+                className="flex-1 p-2 rounded border bg-white text-black uppercase"
               />
             </div>
           </div>
@@ -271,7 +302,7 @@ export default function AppearanceTab() {
                 type="text"
                 value={colors.cardForeground}
                 onChange={(e) => setColors({ ...colors, cardForeground: e.target.value })}
-                className="flex-1 p-2 rounded border bg-[var(--card)] uppercase"
+                className="flex-1 p-2 rounded border bg-white text-black uppercase"
               />
             </div>
           </div>
@@ -289,7 +320,7 @@ export default function AppearanceTab() {
                 type="text"
                 value={colors.border}
                 onChange={(e) => setColors({ ...colors, border: e.target.value })}
-                className="flex-1 p-2 rounded border bg-[var(--card)] uppercase"
+                className="flex-1 p-2 rounded border bg-white text-black uppercase"
               />
             </div>
           </div>

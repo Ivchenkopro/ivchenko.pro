@@ -14,13 +14,19 @@ import {
   MessageSquare,
   FileText,
   Briefcase,
-  CheckCircle
+  CheckCircle,
+  Lock,
+  Car,
+  ShieldCheck,
+  Users
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { Service, FALLBACK_SERVICES } from "@/lib/data";
 import { ICON_MAP } from "@/lib/icons";
 
 function ServiceIcon({ name }: { name: string }) {
+  if (name === "lock") return <Lock size={24} />;
+  if (name === "car") return <Car size={24} />;
   const Icon = ICON_MAP[name] || Landmark;
   return <Icon size={24} />;
 }
@@ -36,9 +42,18 @@ function ConciergeItem({ icon, text }: { icon: React.ReactNode, text: string }) 
   );
 }
 
-function ServiceCard({ icon, title, description, actions }: { icon: React.ReactNode, title: string, description: string[], actions: React.ReactNode }) {
+function ServiceCard({ icon, title, description, actions, tag }: { icon: React.ReactNode, title: string, description: string[], actions: React.ReactNode, tag?: string }) {
   return (
-    <div className="bg-[var(--card)] rounded-2xl p-6 shadow-xl border border-[var(--border)] hover:border-[#C5A66F]/30 transition-colors">
+    <div className="bg-[var(--card)] rounded-2xl p-6 shadow-xl border border-[var(--border)] hover:border-[#C5A66F]/30 transition-colors relative overflow-hidden">
+      {tag && (
+        <div className={`absolute top-0 right-0 px-3 py-1 text-white text-[10px] font-bold uppercase tracking-wider rounded-bl-xl shadow-lg ${
+          tag === 'Hot' 
+            ? 'bg-gradient-to-r from-red-600 to-red-500 shadow-red-500/20' 
+            : 'bg-gradient-to-r from-[#C5A66F] to-[#b8955a] shadow-[#C5A66F]/20'
+        }`}>
+          {tag}
+        </div>
+      )}
       <div className="flex items-start justify-between mb-4">
         <div className="w-12 h-12 rounded-xl bg-[var(--secondary)] flex items-center justify-center border border-[var(--border)] shadow-sm">
           {icon}
@@ -76,7 +91,8 @@ export default function Services() {
     | "developer_center"
     | "alun_capital"
     | "global_finance"
-    | "concierge"
+    | "ivchenko_pro"
+    | "city_car"
   >(null);
 
   useEffect(() => {
@@ -146,8 +162,12 @@ export default function Services() {
       setActiveModal("global_finance");
       return;
     }
-    if (service.title === "Бизнес-консьерж") {
-      setActiveModal("concierge");
+    if (service.title === "Ivchenko.pro") {
+      setActiveModal("ivchenko_pro");
+      return;
+    }
+    if (service.title === "Инвестиции в автолизинг CityCar") {
+      setActiveModal("city_car");
       return;
     }
 
@@ -167,16 +187,6 @@ export default function Services() {
     }
   };
 
-  // Icon mapping for Concierge items to match backup design
-  const CONCIERGE_ICONS = [
-    <Search size={20} key="search" />,
-    <Landmark size={20} key="landmark" />,
-    <MessageCircle size={20} key="message" />,
-    <Plane size={20} key="plane" />,
-    <Scale size={20} key="scale" />,
-    <Package size={20} key="package" />
-  ];
-
   return (
     <main className="min-h-screen bg-[var(--background)] text-[var(--foreground)] pb-32 relative overflow-hidden">
       {/* Background Gradients */}
@@ -192,13 +202,18 @@ export default function Services() {
           </div>
         ) : (
           services.map((service) => {
-            // Special rendering for Business Concierge
-            if (service.title === "Бизнес-консьерж") {
+            // Special rendering for Ivchenko.pro
+            if (service.title === "Ivchenko.pro") {
               return (
-                <div key={service.id} className="bg-[var(--card)] rounded-2xl p-6 shadow-xl border border-[var(--border)] hover:border-[#C5A66F]/30 transition-colors">
+                <div key={service.id} className="bg-[var(--card)] rounded-2xl p-6 shadow-xl border border-[var(--border)] hover:border-[#C5A66F]/30 transition-colors relative overflow-hidden">
+                {service.tag && (
+                  <div className="absolute top-0 right-0 px-3 py-1 bg-gradient-to-r from-[#C5A66F] to-[#b8955a] text-white text-[10px] font-bold uppercase tracking-wider rounded-bl-xl shadow-lg shadow-[#C5A66F]/20">
+                    {service.tag}
+                  </div>
+                )}
                 <div className="w-12 h-12 rounded-xl bg-[var(--secondary)] flex items-center justify-center border border-[var(--border)] shadow-sm mb-4">
                   <div className="text-[#C5A66F]">
-                    {ICON_MAP[service.icon] ? <ServiceIcon name={service.icon} /> : <Search size={24} />}
+                    <Lock size={24} />
                   </div>
                 </div>
               
@@ -219,7 +234,7 @@ export default function Services() {
                 onClick={() => handleAction(service)}
                 className="w-full py-3 px-4 bg-[#2A241F] text-[#C5A66F] text-sm font-bold rounded-xl border border-[#C5A66F]/20 shadow-lg hover:bg-[#383028] hover:border-[#C5A66F]/50 active:scale-95 transition-all flex items-center justify-center gap-2"
               >
-                {service.action_text || "Обсудить сделку"}
+                {service.action_text || "Подробнее"}
                 <ChevronRight size={14} />
               </button>
                 </div>
@@ -230,9 +245,10 @@ export default function Services() {
             return (
               <ServiceCard 
                 key={service.id}
-                icon={ICON_MAP[service.icon] ? <div className="text-[#C5A66F]"><ServiceIcon name={service.icon} /></div> : null}
+                icon={service.icon === 'lock' ? <Lock size={24} className="text-[#C5A66F]" /> : service.icon === 'car' ? <Car size={24} className="text-[#C5A66F]" /> : ICON_MAP[service.icon] ? <div className="text-[#C5A66F]"><ServiceIcon name={service.icon} /></div> : null}
                 title={service.title}
                 description={service.description}
+                tag={service.tag}
                 actions={
                   <div className="flex gap-3">
                     {service.secondary_action_text && (
@@ -338,6 +354,66 @@ export default function Services() {
           </div>
         </div>
       )}
+
+      {activeModal === "ivchenko_pro" && (
+        <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[var(--card)] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[var(--border)] sm:border shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6 sticky top-0 bg-[var(--card)] z-10 pb-4 border-b border-[var(--border)]">
+              <div>
+                <h3 className="text-xl font-bold text-white">Ivchenko.pro</h3>
+              </div>
+              <button 
+                onClick={() => setActiveModal(null)} 
+                className="p-2 bg-[var(--secondary)] rounded-full hover:bg-[var(--muted)] transition-colors text-white"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-8">
+              <div>
+                <div className="flex items-center gap-2 mb-3 text-[#C5A66F]">
+                  <ShieldCheck size={20} />
+                  <h4 className="font-bold text-lg">Конфиденциальность и доверие</h4>
+                </div>
+                <p className="text-zinc-400 text-sm leading-relaxed">
+                  Ivchenko.pro — точка входа для закрытых и конфиденциальных запросов, которые не относятся к стандартным сервисам. Здесь решают сложные ситуации в бизнесе и задачи, где важны доверие, взвешенный подход и правильные люди за столом. Запросы рассматриваются точечно, в узком кругу и без лишней огласки.
+                </p>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2 mb-3 text-[#C5A66F]">
+                  <Briefcase size={20} />
+                  <h4 className="font-bold text-lg">С чем можно обратиться</h4>
+                </div>
+                <ul className="space-y-3">
+                  {[
+                    "Запросы закрытого конфиденциального характера.",
+                    "Сложные ситуации в бизнесе: кассовые разрывы, риск банкротства, проверки, претензии фискальных органов, арбитражные споры.",
+                    "Поиск партнёров в действующий или новый бизнес.",
+                    "Подбор проверенных подрядчиков под конкретные задачи.",
+                    "Поиск тёплых выходов на нужных людей для бизнес-целей."
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-start gap-3 text-zinc-300 text-sm">
+                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#C5A66F] shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <button 
+                onClick={() => window.open("https://t.me/oleg8383", "_blank")}
+                className="w-full bg-[#C5A66F] text-black font-bold py-4 px-8 rounded-xl shadow-[0_0_20px_rgba(197,166,111,0.3)] hover:bg-[#b8955a] active:scale-95 transition-all"
+              >
+                Написать в Telegram
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
 
       {activeModal === "bank_guarantees" && (
         <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
@@ -678,69 +754,6 @@ export default function Services() {
           </div>
         </div>
       )}
-
-      {activeModal === "concierge" && (
-        <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-[var(--card)] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[var(--border)] sm:border shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6 sticky top-0 bg-[var(--card)] z-10 pb-4 border-b border-[var(--border)]">
-              <div>
-                <h3 className="text-xl font-bold text-white">Бизнес-консьерж ALUN</h3>
-              </div>
-              <button 
-                onClick={() => setActiveModal(null)} 
-                className="p-2 bg-[var(--secondary)] rounded-full hover:bg-[var(--muted)] transition-colors text-white"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="space-y-8">
-              <div>
-                <div className="flex items-center gap-2 mb-3 text-[#C5A66F]">
-                  <FileText size={20} />
-                  <h4 className="font-bold text-lg">Описание услуги</h4>
-                </div>
-                <p className="text-zinc-400 text-sm leading-relaxed">
-                  Бизнес-консьерж ALUN — единая точка входа для сложных и срочных задач частных клиентов и компаний в России и за рубежом. 
-                  Закрываем вопросы медицины, документов, поездок, логистики, премиальных сервисов и юридического сопровождения, подключая проверенных партнёров.
-                </p>
-              </div>
-
-              <div>
-                <div className="flex items-center gap-2 mb-3 text-[#C5A66F]">
-                  <CheckCircle size={20} />
-                  <h4 className="font-bold text-lg">Что можно решить через консьерж</h4>
-                </div>
-                <ul className="space-y-3">
-                  {[
-                    "Медицинский консьерж: от постановки диагноза до реабилитации, премиальные клиники (GMS, EMC, «Хадасса» и др.).",
-                    "Визовый сервис и документы: загранпаспорта, визы, приглашения, переводы и апостиль, справки ЗАГС и МВД.",
-                    "Доставка редких лекарств и срочных грузов из Европы.",
-                    "Туристический сервис: туры, авиабилеты, отели, трансферы, аренда авто, вертолётов и яхт.",
-                    "Премиальный алкоголь и сигары: подбор и доставка, клубные скидки на редкий виски и коньяк.",
-                    "Билеты: поезда, ВИП-РЖД, театр, уникальные и закрытые мероприятия.",
-                    "Бизнес-авиация и VIP-перелёты.",
-                    "Юридическое сопровождение и разрешительная документация."
-                  ].map((item, i) => (
-                    <li key={i} className="flex items-start gap-3 text-zinc-300 text-sm">
-                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#C5A66F] shrink-0" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <button 
-                onClick={() => window.open("https://t.me/ALUN_Concierge", "_blank")}
-                className="w-full bg-[#C5A66F] text-black font-bold py-4 px-8 rounded-xl shadow-[0_0_20px_rgba(197,166,111,0.3)] hover:bg-[#b8955a] active:scale-95 transition-all"
-              >
-                Написать в Telegram
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
     </main>
   );
 }

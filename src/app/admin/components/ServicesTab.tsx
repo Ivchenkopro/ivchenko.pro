@@ -37,10 +37,38 @@ export default function ServicesTab() {
         .order('order', { ascending: true });
         
       if (error) throw error;
-      if (data) setServices(data);
+      if (data && data.length > 0) {
+        setServices(data);
+        setIsDemoMode(false);
+      } else {
+        // Fallback if empty
+        const localData = localStorage.getItem('services');
+        if (localData) {
+          const parsed = JSON.parse(localData);
+          if (parsed.length > 0) {
+            setServices(parsed);
+          } else {
+            setServices(FALLBACK_SERVICES);
+          }
+        } else {
+          setServices(FALLBACK_SERVICES);
+        }
+      }
     } catch (err: any) {
       console.error("Error fetching services:", err);
-      setError("Ошибка загрузки данных");
+      const localData = localStorage.getItem('services');
+      if (localData) {
+        const parsed = JSON.parse(localData);
+        if (parsed.length > 0) {
+          setServices(parsed);
+        } else {
+          setServices(FALLBACK_SERVICES);
+        }
+      } else {
+        setServices(FALLBACK_SERVICES);
+      }
+      setIsDemoMode(true);
+      setError("Нет связи с Supabase. Включен локальный режим.");
     } finally {
       setLoading(false);
     }
@@ -261,7 +289,7 @@ export default function ServicesTab() {
                 <input
                   value={formData.modal_id || ""}
                   onChange={(e) => setFormData({...formData, modal_id: e.target.value})}
-                  className="w-full p-2 border rounded-lg"
+                  className="w-full p-2 border rounded-lg bg-white text-black"
                   placeholder="bank_guarantees"
                 />
               </div>
@@ -273,7 +301,7 @@ export default function ServicesTab() {
                 type="number"
                 value={formData.order}
                 onChange={(e) => setFormData({...formData, order: parseInt(e.target.value)})}
-                className="w-full p-2 border rounded-lg"
+                className="w-full p-2 border rounded-lg bg-white text-black"
               />
             </div>
           </div>
