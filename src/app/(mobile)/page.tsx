@@ -12,31 +12,37 @@ const PROJECTS = [
     title: "ALUN Capital",
     role: "Co-Founder",
     description: "Привлечение инвестиций",
+    detailedDescription: "Сервис по привлечению капитала под рост бизнеса, новые проекты и сделки M&A. Подбор релевантных инвесторов под конкретный проект, упаковка предложений и организация переговоров до фактического закрытия сделки.",
   },
   {
     title: "Global Finance",
     role: "CEO и Co-Founder",
     description: "Кредиты, банковские гарантии, ВЭД",
+    detailedDescription: "Платёжный агент и партнёр по ВЭД-расчётам. Оплата инвойсов и международные переводы по понятным и безопасным схемам, с полным документальным сопровождением.",
   },
   {
     title: "Центр девелоперских решений",
     role: "CEO и Co-Founder",
     description: "Земля под застройку и девелопмент",
+    detailedDescription: "Подбор и купле-продажа земельных участков под застройку с полным сопровождением девелоперских проектов. Команда с опытом в Минстрое, Правительстве Москвы, усиленная ресурсами бизнес-сообщества ALUN.",
   },
   {
     title: "ALUN Estate",
     role: "CEO и Co-Founder",
     description: "Премиальная жилая и коммерческая недвижимость",
+    detailedDescription: "Агентство по работе с премиальной недвижимостью и коммерческими объектами, включая готовые арендные бизнесы. Доступ к закрытым off-market предложениям и специальным условиям.",
   },
   {
     title: "Вице-президент ALUN",
     role: "",
     description: "Сообщество предпринимателей и инвесторов",
+    detailedDescription: "ALUN — Active Leaders United Network, сообщество предпринимателей, инвесторов, выпускников бизнес-школ и первых лиц компаний. Объединяет тысячи резидентов в России и за рубежом и даёт доступ к контактам и ресурсам для решения бизнес-задач.",
   },
   {
     title: "Международный трейдинг зерна",
     role: "Co-Founder",
     description: "Международный трейдинг зерна и связанные проекты",
+    detailedDescription: "Экспорт зерновых культур и участие в проекте управления международным портом.",
   },
 ];
 
@@ -143,6 +149,7 @@ export default function Home() {
                 title={project.title}
                 role={project.role}
                 description={project.description}
+                detailedDescription={project.detailedDescription}
               />
             ))}
           </div>
@@ -199,21 +206,45 @@ export default function Home() {
   );
 }
 
-function ProjectCard({ title, role, description, link }: { title: string, role: string, description: string, link?: string }) {
+function ProjectCard({ title, role, description, detailedDescription, link }: { title: string, role: string, description: string, detailedDescription?: string, link?: string }) {
+  const [isOpen, setIsOpen] = useState(false);
+
   const CardContent = () => (
-    <div className="bg-[var(--secondary)] p-4 rounded-2xl border border-[var(--border)] hover:border-[#C5A66F]/50 transition-all active:scale-[0.99] cursor-pointer shadow-sm group h-full">
+    <div 
+      className={`bg-[var(--secondary)] p-4 rounded-2xl border border-[var(--border)] transition-all cursor-pointer shadow-sm group overflow-hidden ${isOpen ? 'border-[#C5A66F]/50' : 'hover:border-[#C5A66F]/50 active:scale-[0.99]'}`}
+      onClick={() => setIsOpen(!isOpen)}
+    >
       <div className="flex justify-between items-start mb-1">
-        <h3 className="font-bold text-[var(--card-foreground)] text-lg leading-tight group-hover:text-[#C5A66F] transition-colors">{title}</h3>
+        <h3 className={`font-bold text-[var(--card-foreground)] text-lg leading-tight transition-colors ${isOpen ? 'text-[#C5A66F]' : 'group-hover:text-[#C5A66F]'}`}>{title}</h3>
         {role && <span className="text-[10px] font-medium bg-[#C5A66F]/10 text-[#C5A66F] px-2 py-0.5 rounded-full whitespace-nowrap ml-2">{role}</span>}
       </div>
-      {description && <div className="text-sm text-[var(--muted-foreground)] line-clamp-2">{description}</div>}
+      {description && <div className="text-sm text-[var(--muted-foreground)] line-clamp-2 mb-2">{description}</div>}
+      
+      <div className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100 mt-3' : 'grid-rows-[0fr] opacity-0'}`}>
+        <div className="overflow-hidden">
+          <div className="text-sm text-white leading-relaxed border-t border-[var(--border)] pt-3">
+            {detailedDescription}
+          </div>
+        </div>
+      </div>
+       {!isOpen && (
+        <div className="flex justify-center mt-1">
+           <ChevronRight size={16} className="text-[var(--muted-foreground)] rotate-90 opacity-50" />
+        </div>
+      )}
     </div>
   );
 
   if (link) {
     return (
       <Link href={link} target={link.startsWith('http') ? '_blank' : undefined}>
-        <CardContent />
+        <div className="bg-[var(--secondary)] p-4 rounded-2xl border border-[var(--border)] hover:border-[#C5A66F]/50 transition-all active:scale-[0.99] cursor-pointer shadow-sm group h-full">
+            <div className="flex justify-between items-start mb-1">
+                <h3 className="font-bold text-[var(--card-foreground)] text-lg leading-tight group-hover:text-[#C5A66F] transition-colors">{title}</h3>
+                {role && <span className="text-[10px] font-medium bg-[#C5A66F]/10 text-[#C5A66F] px-2 py-0.5 rounded-full whitespace-nowrap ml-2">{role}</span>}
+            </div>
+            {description && <div className="text-sm text-[var(--muted-foreground)] line-clamp-2">{description}</div>}
+        </div>
       </Link>
     );
   }
