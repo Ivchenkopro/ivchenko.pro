@@ -51,6 +51,7 @@ export default function Home() {
   const [copied, setCopied] = useState("");
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [loading, setLoading] = useState(true);
+  const [expandedProject, setExpandedProject] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadData() {
@@ -150,6 +151,8 @@ export default function Home() {
                 role={project.role}
                 description={project.description}
                 detailedDescription={project.detailedDescription}
+                isOpen={expandedProject === project.title}
+                onToggle={() => setExpandedProject(expandedProject === project.title ? null : project.title)}
               />
             ))}
           </div>
@@ -206,28 +209,48 @@ export default function Home() {
   );
 }
 
-function ProjectCard({ title, role, description, detailedDescription, link }: { title: string, role: string, description: string, detailedDescription?: string, link?: string }) {
-  const [isOpen, setIsOpen] = useState(false);
+function ProjectCard({ 
+  title, 
+  role, 
+  description, 
+  detailedDescription, 
+  link,
+  isOpen,
+  onToggle 
+}: { 
+  title: string, 
+  role: string, 
+  description: string, 
+  detailedDescription?: string, 
+  link?: string,
+  isOpen?: boolean,
+  onToggle?: () => void
+}) {
+  const [localIsOpen, setLocalIsOpen] = useState(false);
+  
+  // Use prop if provided, otherwise fallback to local state (for backward compatibility if needed, though not strictly necessary here)
+  const isExpanded = isOpen !== undefined ? isOpen : localIsOpen;
+  const toggle = onToggle || (() => setLocalIsOpen(!localIsOpen));
 
   const CardContent = () => (
     <div 
-      className={`bg-[var(--secondary)] p-4 rounded-2xl border border-[var(--border)] transition-all cursor-pointer shadow-sm group overflow-hidden ${isOpen ? 'border-[#C5A66F]/50' : 'hover:border-[#C5A66F]/50 active:scale-[0.99]'}`}
-      onClick={() => setIsOpen(!isOpen)}
+      className={`bg-[var(--secondary)] p-4 rounded-2xl border border-[var(--border)] transition-all cursor-pointer shadow-sm group overflow-hidden ${isExpanded ? 'border-[#C5A66F]/50' : 'hover:border-[#C5A66F]/50 active:scale-[0.99]'}`}
+      onClick={toggle}
     >
       <div className="flex justify-between items-start mb-1">
-        <h3 className={`font-bold text-[var(--card-foreground)] text-lg leading-tight transition-colors ${isOpen ? 'text-[#C5A66F]' : 'group-hover:text-[#C5A66F]'}`}>{title}</h3>
+        <h3 className={`font-bold text-[var(--card-foreground)] text-lg leading-tight transition-colors ${isExpanded ? 'text-[#C5A66F]' : 'group-hover:text-[#C5A66F]'}`}>{title}</h3>
         {role && <span className="text-[10px] font-medium bg-[#C5A66F]/10 text-[#C5A66F] px-2 py-0.5 rounded-full whitespace-nowrap ml-2">{role}</span>}
       </div>
       {description && <div className="text-sm text-[var(--muted-foreground)] line-clamp-2 mb-2">{description}</div>}
       
-      <div className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100 mt-3' : 'grid-rows-[0fr] opacity-0'}`}>
+      <div className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${isExpanded ? 'grid-rows-[1fr] opacity-100 mt-3' : 'grid-rows-[0fr] opacity-0'}`}>
         <div className="overflow-hidden">
           <div className="text-sm text-white leading-relaxed border-t border-[var(--border)] pt-3">
             {detailedDescription}
           </div>
         </div>
       </div>
-       {!isOpen && (
+       {!isExpanded && (
         <div className="flex justify-center mt-1">
            <ChevronRight size={16} className="text-[var(--muted-foreground)] rotate-90 opacity-50" />
         </div>
