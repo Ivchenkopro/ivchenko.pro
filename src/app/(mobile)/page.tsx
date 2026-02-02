@@ -172,7 +172,7 @@ export default function Home() {
         {/* Main Image */}
         <div className="absolute inset-0 z-0">
           <Image 
-            src="/олегив.jpg" 
+            src={settings["home_main_image"] || "/олегив.jpg"} 
             alt={settings["site_title"]} 
             fill
             className="object-cover object-top"
@@ -249,7 +249,7 @@ export default function Home() {
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.15)_0%,transparent_60%)] pointer-events-none" />
 
             <div className="relative z-10">
-             <h2 className="text-2xl font-bold text-center mb-1 uppercase tracking-wider">Масштаб в цифрах</h2>
+             <h2 className="text-2xl font-bold text-center mb-1 uppercase tracking-wider">{settings["home_stats_title"]}</h2>
              
              {/* Dotted separator */}
              <div className="w-full border-t-2 border-dotted border-[var(--border)] my-6" />
@@ -257,19 +257,19 @@ export default function Home() {
              <div className="grid grid-cols-2 gap-y-10 gap-x-4 text-center">
                <div className="flex flex-col items-center">
                  <div className="text-3xl font-bold mb-2">{settings["stat_contacts"]}</div>
-                 <div className="text-[10px] text-[var(--muted-foreground)] uppercase tracking-widest leading-tight">контактов<br/>в доступе</div>
+                 <div className="text-[10px] text-[var(--muted-foreground)] uppercase tracking-widest leading-tight whitespace-pre-line">{settings["stat_contacts_label"]}</div>
                </div>
                <div className="flex flex-col items-center">
                  <div className="text-3xl font-bold mb-2">{settings["stat_projects"]}</div>
-                 <div className="text-[10px] text-[var(--muted-foreground)] uppercase tracking-widest leading-tight">проектов<br/>в 2025 г.</div>
+                 <div className="text-[10px] text-[var(--muted-foreground)] uppercase tracking-widest leading-tight whitespace-pre-line">{settings["stat_projects_label"]}</div>
                </div>
                <div className="flex flex-col items-center">
                  <div className="text-3xl font-bold mb-2">{settings["stat_deals"]}</div>
-                 <div className="text-[10px] text-[var(--muted-foreground)] uppercase tracking-widest leading-tight">сделок<br/>команды</div>
+                 <div className="text-[10px] text-[var(--muted-foreground)] uppercase tracking-widest leading-tight whitespace-pre-line">{settings["stat_deals_label"]}</div>
                </div>
                <div className="flex flex-col items-center">
                  <div className="text-3xl font-bold mb-2">{settings["stat_turnover"]}</div>
-                 <div className="text-[10px] text-[var(--muted-foreground)] uppercase tracking-widest leading-tight">годовой оборот<br/>проектов</div>
+                 <div className="text-[10px] text-[var(--muted-foreground)] uppercase tracking-widest leading-tight whitespace-pre-line">{settings["stat_turnover_label"]}</div>
                </div>
              </div>
            </div>

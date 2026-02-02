@@ -5,6 +5,7 @@ export const DEFAULT_SETTINGS: Record<string, string> = {
   // General
   "site_title": "Олег Ивченко",
   "site_description": "Предприниматель, CEO, инвестор",
+  "home_main_image": "/олегив.jpg",
   
   // Home Page - Bio
   "home_bio_1": "Я предприниматель, который из возможностей делает работающие бизнесы. Я хаб, где сходятся идеи, ресурсы и люди. Я отбираю лучшие из множества проектов, анализирую их, привлекаю деньги, исполнителей и партнеров и вместе мы ставим бизнес на рельсы.",
@@ -16,6 +17,17 @@ export const DEFAULT_SETTINGS: Record<string, string> = {
   "stat_deals": "1300+",
   "stat_turnover": "3.5 млрд",
   
+  // Home Page - Section Titles & Labels
+  "home_projects_title": "Мои проекты",
+  "home_projects_all": "Все проекты",
+  "home_stats_title": "Масштаб в цифрах",
+  
+  // Home Page - Stats Labels (use \n for line breaks)
+  "stat_contacts_label": "контактов\nв доступе",
+  "stat_projects_label": "проектов\nв 2025 г.",
+  "stat_deals_label": "сделок\nкоманды",
+  "stat_turnover_label": "годовой оборот\nпроектов",
+
   // Buttons & Labels
   "btn_share": "Поделиться визиткой",
   "btn_apply": "Оставить заявку",
@@ -35,6 +47,7 @@ export const DEFAULT_SETTINGS: Record<string, string> = {
 export const SETTING_DESCRIPTIONS: Record<string, string> = {
   "site_title": "Заголовок сайта",
   "site_description": "Описание сайта (SEO)",
+  "home_main_image": "Главное фото (URL или путь)",
   "home_bio_1": "Биография (абзац 1)",
   "home_bio_2": "Биография (абзац 2)",
   "stat_contacts": "Статистика: Контакты",
