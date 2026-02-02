@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { Trash2, Edit, Plus, Save, AlertCircle, Loader2, WifiOff, Sparkles } from "lucide-react";
+import { Trash2, Edit, Plus, Save, AlertCircle, Loader2, WifiOff, Sparkles, Upload } from "lucide-react";
 import { DEFAULT_SETTINGS, SETTING_DESCRIPTIONS } from "@/lib/settings";
 
 interface AppSetting {
@@ -14,6 +14,7 @@ interface AppSetting {
 export default function SettingsTab() {
   const [settings, setSettings] = useState<AppSetting[]>([]);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [isDemoMode, setIsDemoMode] = useState(false);
   
@@ -99,6 +100,39 @@ export default function SettingsTab() {
     } catch (err) {
       console.error("Backup failed", err);
       alert("Ошибка создания резервной копии");
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    
+    const file = e.target.files[0];
+    setUploading(true);
+    
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+      const filePath = `settings/${fileName}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('uploads')
+        .upload(filePath, file);
+        
+      if (uploadError) throw uploadError;
+      
+      const { data } = supabase.storage
+        .from('uploads')
+        .getPublicUrl(filePath);
+        
+      if (data) {
+        setFormData({ ...formData, value: data.publicUrl });
+      }
+      
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      alert('Ошибка загрузки: ' + error.message);
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -289,6 +323,27 @@ export default function SettingsTab() {
               rows={4}
             />
             {formErrors.value && <p className="text-red-500 text-xs mt-1">{formErrors.value}</p>}
+            
+            {/* Upload Button for image fields */}
+            {(formData.key.includes('image') || formData.key.includes('photo') || formData.key === 'home_main_image') && (
+              <div className="mt-2">
+                <input 
+                  type="file" 
+                  id="file-upload" 
+                  className="hidden" 
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  disabled={uploading}
+                />
+                <label 
+                  htmlFor="file-upload"
+                  className={`cursor-pointer inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 bg-blue-50 px-3 py-2 rounded-lg transition-colors ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                  {uploading ? "Загрузка..." : "Загрузить изображение"}
+                </label>
+              </div>
+            )}
           </div>
 
           <div>
@@ -357,9 +412,15 @@ export default function SettingsTab() {
               <button
                 key={key}
                 onClick={() => startCreate(key)}
-                className="text-xs bg-white border border-blue-200 text-blue-600 px-2 py-1 rounded-md hover:bg-blue-50 transition-colors"
+                className="text-xs bg-white border border-blue-200 text-blue-600 px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors flex items-center gap-2"
+                title={SETTING_DESCRIPTIONS[key]}
               >
-                + {key}
+                <span className="font-semibold">+ {key}</span>
+                {SETTING_DESCRIPTIONS[key] && (
+                  <span className="text-blue-400 border-l border-blue-100 pl-2">
+                    {SETTING_DESCRIPTIONS[key]}
+                  </span>
+                )}
               </button>
             ))}
           </div>
