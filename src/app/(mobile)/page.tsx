@@ -91,10 +91,58 @@ export default function Home() {
             link: service.action_type === 'link' ? service.action_url : undefined
           }));
           setProjects(mappedProjects);
+        } else {
+           // Fallback to localStorage if Supabase returns empty (or failed previously)
+           const localServices = localStorage.getItem('services');
+           if (localServices) {
+             try {
+               const parsedServices: Service[] = JSON.parse(localServices);
+               if (parsedServices.length > 0) {
+                 const mappedProjects: Project[] = parsedServices.map((service: Service) => ({
+                    title: service.title,
+                    role: service.role || "",
+                    description: Array.isArray(service.description) && service.description.length > 0 
+                      ? service.description[0] 
+                      : "",
+                    detailedDescription: Array.isArray(service.description) 
+                      ? service.description.join('\n\n') 
+                      : "",
+                    link: service.action_type === 'link' ? service.action_url : undefined
+                 }));
+                 setProjects(mappedProjects);
+               }
+             } catch (err) {
+               console.error("Error parsing local services:", err);
+             }
+           }
         }
       } catch (e) {
         console.error("Error loading data", e);
         setSettings(DEFAULT_SETTINGS);
+        
+        // Also try localStorage on error
+        const localServices = localStorage.getItem('services');
+        if (localServices) {
+           try {
+             const parsedServices: Service[] = JSON.parse(localServices);
+             if (parsedServices.length > 0) {
+               const mappedProjects: Project[] = parsedServices.map((service: Service) => ({
+                  title: service.title,
+                  role: service.role || "",
+                  description: Array.isArray(service.description) && service.description.length > 0 
+                    ? service.description[0] 
+                    : "",
+                  detailedDescription: Array.isArray(service.description) 
+                    ? service.description.join('\n\n') 
+                    : "",
+                  link: service.action_type === 'link' ? service.action_url : undefined
+               }));
+               setProjects(mappedProjects);
+             }
+           } catch (err) {
+             console.error("Error parsing local services:", err);
+           }
+        }
       } finally {
         setLoading(false);
       }
