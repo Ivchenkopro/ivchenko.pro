@@ -12,6 +12,7 @@ export default function ServicesTab() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [isDemoMode, setIsDemoMode] = useState(false);
+  const [usingLocalData, setUsingLocalData] = useState(false);
   const [view, setView] = useState<"list" | "edit" | "create">("list");
   const [currentItem, setCurrentItem] = useState<Service | null>(null);
   const [formData, setFormData] = useState<Service>({
@@ -40,6 +41,7 @@ export default function ServicesTab() {
       if (data && data.length > 0) {
         setServices(data);
         setIsDemoMode(false);
+        setUsingLocalData(false);
       } else {
         // Fallback if empty
         const localData = localStorage.getItem('services');
@@ -47,11 +49,14 @@ export default function ServicesTab() {
           const parsed = JSON.parse(localData);
           if (parsed.length > 0) {
             setServices(parsed);
+            setUsingLocalData(true);
           } else {
             setServices(FALLBACK_SERVICES);
+            setUsingLocalData(true);
           }
         } else {
           setServices(FALLBACK_SERVICES);
+          setUsingLocalData(true);
         }
       }
     } catch (err: any) {
@@ -68,6 +73,7 @@ export default function ServicesTab() {
         setServices(FALLBACK_SERVICES);
       }
       setIsDemoMode(true);
+      setUsingLocalData(true);
       setError("Нет связи с Supabase. Включен локальный режим.");
     } finally {
       setLoading(false);
@@ -94,6 +100,30 @@ export default function ServicesTab() {
   const saveToLocal = (newServices: Service[]) => {
     localStorage.setItem('services', JSON.stringify(newServices));
     setServices(newServices);
+  };
+
+  const handleSyncToCloud = async () => {
+    if (!confirm("Вы хотите выгрузить локальные данные в облако? Это сделает их доступными на всех устройствах.")) return;
+    setLoading(true);
+    try {
+      // 1. Prepare data (remove IDs to let DB generate them)
+      const dataToSync = services.map(({ id, ...rest }) => rest);
+      
+      // 2. Insert into Supabase
+      const { error } = await supabase.from('services').insert(dataToSync);
+      if (error) throw error;
+      
+      // 3. Clear local storage to force next load from DB
+      localStorage.removeItem('services');
+      
+      alert("Данные успешно выгружены в облако!");
+      fetchServices();
+    } catch (err: any) {
+      console.error(err);
+      setError("Ошибка синхронизации: " + err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -191,6 +221,21 @@ export default function ServicesTab() {
         <div className="bg-orange-500/10 text-orange-500 p-4 rounded-xl flex items-center gap-2">
           <WifiOff size={20} />
           <span>Локальный режим: изменения сохраняются только в браузере</span>
+        </div>
+      )}
+
+      {!isDemoMode && usingLocalData && services.length > 0 && (
+        <div className="bg-blue-500/10 text-blue-500 p-4 rounded-xl flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <AlertCircle size={20} />
+            <span>Вы используете локальные данные. Выгрузите их в облако, чтобы они появились на телефоне.</span>
+          </div>
+          <button 
+            onClick={handleSyncToCloud}
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-600 transition-colors"
+          >
+            Синхронизировать
+          </button>
         </div>
       )}
 
