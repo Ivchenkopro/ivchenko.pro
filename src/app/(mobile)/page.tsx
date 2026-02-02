@@ -6,8 +6,10 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getSettings, DEFAULT_SETTINGS } from "@/lib/settings";
+import { supabase } from "@/lib/supabase";
+import { Service } from "@/lib/data";
 
-const PROJECTS = [
+const HARDCODED_PROJECTS = [
   {
     title: "ALUN Capital",
     role: "Co-Founder",
@@ -46,20 +48,52 @@ const PROJECTS = [
   },
 ];
 
+type Project = {
+  title: string;
+  role: string;
+  description: string;
+  detailedDescription?: string;
+  link?: string;
+};
+
 export default function Home() {
   const router = useRouter();
   const [copied, setCopied] = useState("");
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [loading, setLoading] = useState(true);
   const [expandedProject, setExpandedProject] = useState<string | null>(null);
+  const [projects, setProjects] = useState<Project[]>(HARDCODED_PROJECTS);
 
   useEffect(() => {
     async function loadData() {
       try {
         const fetchedSettings = await getSettings();
         setSettings(fetchedSettings);
+        
+        // Fetch services (projects)
+        const { data: servicesData, error } = await supabase
+          .from('services')
+          .select('*')
+          .order('order', { ascending: true });
+          
+        if (servicesData && servicesData.length > 0) {
+          const mappedProjects: Project[] = servicesData.map((service: Service) => ({
+            title: service.title,
+            role: service.role || "",
+            // Use first line of description as short description, or fallback
+            description: Array.isArray(service.description) && service.description.length > 0 
+              ? service.description[0] 
+              : "",
+            // Use full description (joined) as detailed description
+            detailedDescription: Array.isArray(service.description) 
+              ? service.description.join('\n\n') 
+              : "",
+            link: service.action_type === 'link' ? service.action_url : undefined
+          }));
+          setProjects(mappedProjects);
+        }
       } catch (e) {
-        console.error("Error loading settings", e);
+        console.error("Error loading data", e);
         setSettings(DEFAULT_SETTINGS);
       } finally {
         setLoading(false);
@@ -144,7 +178,7 @@ export default function Home() {
           </div>
           
           <div className="grid grid-cols-1 gap-3">
-            {PROJECTS.map((project) => (
+            {projects.map((project) => (
               <ProjectCard 
                 key={project.title}
                 title={project.title}
