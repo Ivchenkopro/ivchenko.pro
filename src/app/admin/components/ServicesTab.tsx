@@ -189,7 +189,7 @@ export default function ServicesTab() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold">Услуги</h2>
+        <h2 className="text-xl font-bold">Услуги (на Главной)</h2>
         <button
           onClick={() => {
             setFormData({
@@ -285,19 +285,39 @@ export default function ServicesTab() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Описание (каждый пункт с новой строки)</label>
+              <label className="block text-sm font-medium mb-1">Краткое описание (для карточки)</label>
               <textarea
                 required
-                rows={5}
-                value={Array.isArray(formData.description) ? formData.description.join("\n") : formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value.split("\n")})}
+                rows={2}
+                value={Array.isArray(formData.description) ? formData.description[0] || "" : formData.description}
+                onChange={(e) => {
+                  const newDesc = [...(Array.isArray(formData.description) ? formData.description : [formData.description])];
+                  newDesc[0] = e.target.value;
+                  setFormData({...formData, description: newDesc});
+                }}
                 className="w-full p-2 border rounded-lg bg-white text-black"
+                placeholder="Краткое описание, которое видно сразу..."
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Подробное описание (раскрывается при клике)</label>
+              <textarea
+                rows={5}
+                value={Array.isArray(formData.description) && formData.description.length > 1 ? formData.description.slice(1).join("\n") : ""}
+                onChange={(e) => {
+                  const shortDesc = Array.isArray(formData.description) ? formData.description[0] || "" : formData.description;
+                  const detailed = e.target.value.split("\n");
+                  setFormData({...formData, description: [shortDesc, ...detailed]});
+                }}
+                className="w-full p-2 border rounded-lg bg-white text-black"
+                placeholder="Детальное описание, которое появляется внутри div..."
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Тип кнопки</label>
+                <label className="block text-sm font-medium mb-1">Тип действия</label>
                 <select
                   value={formData.action_type}
                   onChange={(e) => setFormData({...formData, action_type: e.target.value as any})}
@@ -308,9 +328,9 @@ export default function ServicesTab() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Текст кнопки</label>
+                <label className="block text-sm font-medium mb-1">Текст кнопки (например, "Подробнее")</label>
                 <input
-                  value={formData.action_text}
+                  value={formData.action_text || "Подробнее"}
                   onChange={(e) => setFormData({...formData, action_text: e.target.value})}
                   className="w-full p-2 border rounded-lg bg-white text-black"
                 />
@@ -319,11 +339,12 @@ export default function ServicesTab() {
 
             {formData.action_type === "link" && (
               <div>
-                <label className="block text-sm font-medium mb-1">URL Ссылки</label>
+                <label className="block text-sm font-medium mb-1">Ссылка (URL)</label>
                 <input
                   value={formData.action_url || ""}
                   onChange={(e) => setFormData({...formData, action_url: e.target.value})}
                   className="w-full p-2 border rounded-lg bg-white text-black"
+                  placeholder="https://..."
                 />
               </div>
             )}

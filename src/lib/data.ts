@@ -16,7 +16,8 @@ export type Announcement = {
   date: string;
   urgent: boolean;
   link?: string;
-  button_text?: string;
+  button_text?: string; // Text for the card button
+  link_text?: string;   // Text for the button inside the modal (e.g. "Написать в Telegram")
   created_at?: string;
   action_type?: 'link' | 'modal';
 };
@@ -79,6 +80,7 @@ export const FALLBACK_ANNOUNCEMENTS: Announcement[] = [
     urgent: true,
     link: "https://t.me/oleg8383",
     button_text: "Подробнее",
+    link_text: "Написать в Telegram",
     action_type: "modal"
   }
 ];

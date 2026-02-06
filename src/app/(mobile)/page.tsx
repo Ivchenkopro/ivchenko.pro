@@ -85,8 +85,8 @@ export default function Home() {
               ? service.description[0] 
               : "",
             // Use full description (joined) as detailed description
-            detailedDescription: Array.isArray(service.description) 
-              ? service.description.join('\n\n') 
+            detailedDescription: Array.isArray(service.description) && service.description.length > 1
+              ? service.description.slice(1).join('\n\n') 
               : "",
             link: service.action_type === 'link' ? service.action_url : undefined
           }));
@@ -104,8 +104,8 @@ export default function Home() {
                     description: Array.isArray(service.description) && service.description.length > 0 
                       ? service.description[0] 
                       : "",
-                    detailedDescription: Array.isArray(service.description) 
-                      ? service.description.join('\n\n') 
+                    detailedDescription: Array.isArray(service.description) && service.description.length > 1
+                      ? service.description.slice(1).join('\n\n') 
                       : "",
                     link: service.action_type === 'link' ? service.action_url : undefined
                  }));

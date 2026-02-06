@@ -312,9 +312,15 @@ export default function AnnouncementsTab() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-[var(--foreground)]">Ссылка (необязательно)</label>
-              <input type="text" value={formData.link || ""} onChange={(e) => setFormData({ ...formData, link: e.target.value })} className="w-full p-3 bg-white text-black border border-[var(--border)] rounded-xl focus:outline-none focus:border-[#C5A66F] transition-colors" placeholder="https://..." />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-[var(--foreground)]">Ссылка (необязательно)</label>
+                <input type="text" value={formData.link || ""} onChange={(e) => setFormData({ ...formData, link: e.target.value })} className="w-full p-3 bg-white text-black border border-[var(--border)] rounded-xl focus:outline-none focus:border-[#C5A66F] transition-colors" placeholder="https://..." />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-[var(--foreground)]">Текст кнопки ссылки</label>
+                <input type="text" value={formData.link_text || ""} onChange={(e) => setFormData({ ...formData, link_text: e.target.value })} className="w-full p-3 bg-white text-black border border-[var(--border)] rounded-xl focus:outline-none focus:border-[#C5A66F] transition-colors" placeholder="Написать в Telegram" />
+              </div>
             </div>
 
             <div className="flex items-center gap-2 pt-2">

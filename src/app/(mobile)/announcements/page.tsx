@@ -193,7 +193,7 @@ export default function Announcements() {
                   onClick={() => window.open(activeAnnouncement.link, "_blank")}
                   className="w-full bg-[#C5A66F] text-black font-bold py-4 px-8 rounded-xl shadow-[0_0_20px_rgba(197,166,111,0.3)] hover:bg-[#b8955a] active:scale-95 transition-all"
                 >
-                  Написать в Telegram
+                  {activeAnnouncement.link_text || "Написать в Telegram"}
                 </button>
               )}
             </div>
