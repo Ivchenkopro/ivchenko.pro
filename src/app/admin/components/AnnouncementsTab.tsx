@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { Trash2, Edit, Plus, Save, AlertCircle, Loader2, WifiOff, Tag, Link as LinkIcon, RotateCcw } from "lucide-react";
+import { Trash2, Edit, Plus, Save, AlertCircle, Loader2, WifiOff, Tag, Link as LinkIcon, RotateCcw, CloudUpload } from "lucide-react";
 import { Announcement, FALLBACK_ANNOUNCEMENTS } from "@/lib/data";
 
 export default function AnnouncementsTab() {
@@ -87,6 +87,35 @@ export default function AnnouncementsTab() {
       }
     } else {
       setAnnouncements(FALLBACK_ANNOUNCEMENTS);
+    }
+  };
+
+  const handleSync = async () => {
+    if (!confirm("Это действие попытается загрузить все локальные объявления в базу данных. Существующие записи могут быть обновлены. Продолжить?")) return;
+    
+    setLoading(true);
+    try {
+      // 1. Check connection
+      const { error: healthCheck } = await supabase.from('announcements').select('count').single();
+      if (healthCheck) throw new Error("Нет соединения с базой данных");
+
+      // 2. Upsert all local announcements
+      const { error: upsertError } = await supabase
+        .from('announcements')
+        .upsert(announcements, { onConflict: 'id' });
+      
+      if (upsertError) throw upsertError;
+
+      // 3. Refresh from DB to ensure consistency
+      await fetchAnnouncements();
+      setIsDemoMode(false);
+      alert("Синхронизация успешно выполнена!");
+      
+    } catch (err: any) {
+      console.error("Sync error:", err);
+      setError("Ошибка синхронизации: " + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -270,9 +299,18 @@ export default function AnnouncementsTab() {
       )}
       
       {isDemoMode && (
-        <div className="bg-orange-500/10 text-orange-500 p-4 rounded-xl flex items-center gap-2">
-          <WifiOff size={20} />
-          <span>Локальный режим: изменения сохраняются только в браузере</span>
+        <div className="bg-orange-500/10 text-orange-500 p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <WifiOff size={20} />
+            <span>Локальный режим: изменения сохраняются только в браузере</span>
+          </div>
+          <button 
+            onClick={handleSync}
+            className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-orange-600 transition-colors text-sm"
+          >
+            <CloudUpload size={16} />
+            Синхронизировать
+          </button>
         </div>
       )}
 

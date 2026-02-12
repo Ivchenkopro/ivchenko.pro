@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { Trash2, Edit, Plus, Save, AlertCircle, Loader2, WifiOff } from "lucide-react";
+import { Trash2, Edit, Plus, Save, AlertCircle, Loader2, WifiOff, CloudUpload } from "lucide-react";
 import { Service, FALLBACK_SERVICES } from "@/lib/data";
 import IconSelector from "./IconSelector";
 import { ICON_MAP } from "@/lib/icons";
@@ -89,6 +89,36 @@ export default function ServicesTab() {
       setIsDemoMode(true);
       setUsingLocalData(true);
       setError("Нет связи с Supabase. Включен локальный режим.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSync = async () => {
+    if (!confirm("Это действие попытается загрузить все локальные данные в базу данных. Существующие записи могут быть обновлены. Продолжить?")) return;
+    
+    setLoading(true);
+    try {
+      // 1. Check connection
+      const { error: healthCheck } = await supabase.from('services').select('count').single();
+      if (healthCheck) throw new Error("Нет соединения с базой данных");
+
+      // 2. Upsert all local services
+      const { error: upsertError } = await supabase
+        .from('services')
+        .upsert(services, { onConflict: 'id' });
+      
+      if (upsertError) throw upsertError;
+
+      // 3. Refresh from DB
+      await fetchServices();
+      setIsDemoMode(false);
+      setUsingLocalData(false);
+      alert("Синхронизация успешно выполнена!");
+      
+    } catch (err: any) {
+      console.error("Sync error:", err);
+      setError("Ошибка синхронизации: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -273,23 +303,17 @@ export default function ServicesTab() {
         </div>
       )}
       
-      {isDemoMode && (
-        <div className="bg-orange-500/10 text-orange-500 p-4 rounded-xl flex items-center gap-2">
-          <WifiOff size={20} />
-          <span>Локальный режим: изменения сохраняются только в браузере</span>
-        </div>
-      )}
-
-      {!isDemoMode && usingLocalData && services.length > 0 && (
-        <div className="bg-blue-500/10 text-blue-500 p-4 rounded-xl flex items-center justify-between gap-2">
+      {(isDemoMode || usingLocalData) && (
+        <div className="bg-orange-500/10 text-orange-500 p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <AlertCircle size={20} />
-            <span>Вы используете локальные данные. Выгрузите их в облако, чтобы они появились на телефоне.</span>
+            <WifiOff size={20} />
+            <span>Локальный режим: используются данные из браузера</span>
           </div>
           <button 
-            onClick={handleSyncToCloud}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-600 transition-colors"
+            onClick={handleSync}
+            className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-orange-600 transition-colors text-sm"
           >
+            <CloudUpload size={16} />
             Синхронизировать
           </button>
         </div>
