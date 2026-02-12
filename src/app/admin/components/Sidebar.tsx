@@ -10,7 +10,7 @@ interface SidebarProps {
 export default function Sidebar({ currentTab, onTabChange }: SidebarProps) {
   const menuItems = [
     { id: "announcements", label: "Объявления", icon: Megaphone },
-    { id: "services", label: "Услуги", icon: Star },
+    { id: "services", label: "Мои проекты", icon: Star },
     { id: "cases", label: "Кейсы", icon: Briefcase },
     { id: "links", label: "Ссылки", icon: LinkIcon },
     { id: "settings", label: "Контент и SEO", icon: FileText },

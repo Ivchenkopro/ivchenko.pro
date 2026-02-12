@@ -15,15 +15,25 @@ export default function ServicesTab() {
   const [usingLocalData, setUsingLocalData] = useState(false);
   const [view, setView] = useState<"list" | "edit" | "create">("list");
   const [currentItem, setCurrentItem] = useState<Service | null>(null);
+  
   const [formData, setFormData] = useState<Service>({
     id: 0,
     title: "",
     description: [""],
     icon: "landmark",
+    role: "",
     action_type: "link",
     action_text: "Подробнее",
-    order: 0
+    action_url: "",
+    secondary_action_text: "",
+    secondary_action_type: "link",
+    secondary_action_url: "",
+    order: 0,
+    tag: ""
   });
+
+  // Helper for textarea
+  const [descText, setDescText] = useState("");
 
   useEffect(() => {
     fetchServices();
@@ -83,6 +93,7 @@ export default function ServicesTab() {
   const handleEdit = (item: Service) => {
     setCurrentItem(item);
     setFormData(item);
+    setDescText(Array.isArray(item.description) ? item.description.join('\n') : item.description);
     setView("edit");
   };
 
@@ -131,10 +142,12 @@ export default function ServicesTab() {
     setLoading(true);
     
     try {
+      const descriptionArray = descText.split('\n').filter(line => line.trim() !== "");
+      
       const dataToSave = {
         ...formData,
         id: undefined,
-        description: Array.isArray(formData.description) ? formData.description : [formData.description]
+        description: descriptionArray
       };
 
       if (!isDemoMode) {
@@ -167,10 +180,10 @@ export default function ServicesTab() {
       let updatedList = [...services];
       if (view === "create") {
         const newId = Math.max(0, ...updatedList.map(s => s.id)) + 1;
-        updatedList.push({ ...formData, id: newId, description: Array.isArray(formData.description) ? formData.description : [formData.description] });
+        updatedList.push({ ...dataToSave, id: newId });
       } else if (view === "edit" && currentItem) {
         updatedList = updatedList.map(item => 
-          item.id === currentItem.id ? { ...formData, description: Array.isArray(formData.description) ? formData.description : [formData.description] } : item
+          item.id === currentItem.id ? { ...dataToSave, id: currentItem.id } : item
         );
       }
       
@@ -184,25 +197,34 @@ export default function ServicesTab() {
     }
   };
 
+  const openCreate = () => {
+    setFormData({
+      id: 0,
+      title: "",
+      description: [""],
+      icon: "landmark",
+      role: "",
+      action_type: "link",
+      action_text: "Подробнее",
+      action_url: "",
+      secondary_action_text: "",
+      secondary_action_type: "link",
+      secondary_action_url: "",
+      order: services.length + 1,
+      tag: ""
+    });
+    setDescText("");
+    setView("create");
+  };
+
   const IconComponent = ICON_MAP[formData.icon] || ICON_MAP["landmark"];
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold">Услуги (на Главной)</h2>
+        <h2 className="text-xl font-bold">Мои проекты (Услуги)</h2>
         <button
-          onClick={() => {
-            setFormData({
-              id: 0,
-              title: "",
-              description: [""],
-              icon: "landmark",
-              action_type: "link",
-              action_text: "Подробнее",
-              order: services.length + 1
-            });
-            setView("create");
-          }}
+          onClick={openCreate}
           className="bg-black text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-gray-800"
         >
           <Plus className="w-4 h-4" />
@@ -250,8 +272,12 @@ export default function ServicesTab() {
                     <ItemIcon className="w-6 h-6 text-gray-600" />
                   </div>
                   <div>
-                    <h3 className="font-bold">{item.title}</h3>
-                    <p className="text-xs text-gray-500">{item.description?.[0]}...</p>
+                    <h3 className="font-bold flex items-center gap-2">
+                      {item.title}
+                      {item.role && <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-normal">{item.role}</span>}
+                    </h3>
+                    <p className="text-xs text-gray-500">{Array.isArray(item.description) ? item.description[0] : item.description}...</p>
+                    {item.tag && <span className="text-[10px] bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full">{item.tag}</span>}
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -268,124 +294,120 @@ export default function ServicesTab() {
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-xl border">
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Иконка</label>
-              <IconSelector value={formData.icon} onChange={(val) => setFormData({...formData, icon: val})} />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium mb-1">Заголовок</label>
-              <input
-                required
-                value={formData.title}
-                onChange={(e) => setFormData({...formData, title: e.target.value})}
-                className="w-full p-2 border rounded-lg bg-white text-black"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Краткое описание (для карточки)</label>
-              <textarea
-                required
-                rows={2}
-                value={Array.isArray(formData.description) ? formData.description[0] || "" : formData.description}
-                onChange={(e) => {
-                  const newDesc = [...(Array.isArray(formData.description) ? formData.description : [formData.description])];
-                  newDesc[0] = e.target.value;
-                  setFormData({...formData, description: newDesc});
-                }}
-                className="w-full p-2 border rounded-lg bg-white text-black"
-                placeholder="Краткое описание, которое видно сразу..."
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Подробное описание (раскрывается при клике)</label>
-              <textarea
-                rows={5}
-                value={Array.isArray(formData.description) && formData.description.length > 1 ? formData.description.slice(1).join("\n") : ""}
-                onChange={(e) => {
-                  const shortDesc = Array.isArray(formData.description) ? formData.description[0] || "" : formData.description;
-                  const detailed = e.target.value.split("\n");
-                  setFormData({...formData, description: [shortDesc, ...detailed]});
-                }}
-                className="w-full p-2 border rounded-lg bg-white text-black"
-                placeholder="Детальное описание, которое появляется внутри div..."
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Тип действия</label>
-                <select
-                  value={formData.action_type}
-                  onChange={(e) => setFormData({...formData, action_type: e.target.value as any})}
-                  className="w-full p-2 border rounded-lg bg-white text-black"
-                >
-                  <option value="link">Ссылка</option>
-                  <option value="modal">Модальное окно</option>
-                </select>
+                <label className="block text-sm font-medium mb-1">Иконка</label>
+                <IconSelector value={formData.icon} onChange={(val) => setFormData({...formData, icon: val})} />
               </div>
+              
               <div>
-                <label className="block text-sm font-medium mb-1">Текст кнопки (например, "Подробнее")</label>
+                <label className="block text-sm font-medium mb-1">Заголовок</label>
                 <input
-                  value={formData.action_text || "Подробнее"}
-                  onChange={(e) => setFormData({...formData, action_text: e.target.value})}
+                  required
+                  value={formData.title}
+                  onChange={(e) => setFormData({...formData, title: e.target.value})}
                   className="w-full p-2 border rounded-lg bg-white text-black"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Роль</label>
+                <input
+                  value={formData.role || ""}
+                  onChange={(e) => setFormData({...formData, role: e.target.value})}
+                  className="w-full p-2 border rounded-lg bg-white text-black"
+                  placeholder="Например: CEO и Co-Founder"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Тег (например: HOT)</label>
+                <input
+                  value={formData.tag || ""}
+                  onChange={(e) => setFormData({...formData, tag: e.target.value})}
+                  className="w-full p-2 border rounded-lg bg-white text-black"
+                  placeholder="Оставьте пустым, если не нужно"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Описание (пункты)</label>
+                <p className="text-xs text-gray-500 mb-1">Каждая строка — отдельный пункт списка</p>
+                <textarea
+                  required
+                  rows={5}
+                  value={descText}
+                  onChange={(e) => setDescText(e.target.value)}
+                  className="w-full p-2 border rounded-lg bg-white text-black"
+                  placeholder="Пункт 1&#10;Пункт 2&#10;Пункт 3"
                 />
               </div>
             </div>
 
-            {formData.action_type === "link" && (
-              <div>
-                <label className="block text-sm font-medium mb-1">Ссылка (URL)</label>
-                <input
-                  value={formData.action_url || ""}
-                  onChange={(e) => setFormData({...formData, action_url: e.target.value})}
-                  className="w-full p-2 border rounded-lg bg-white text-black"
-                  placeholder="https://..."
-                />
+            <div className="space-y-4">
+              <h3 className="font-bold border-b pb-2">Действия</h3>
+              
+              <div className="p-4 bg-gray-50 rounded-xl space-y-3">
+                <label className="block text-sm font-bold">Основная кнопка</label>
+                <div>
+                  <label className="block text-xs mb-1">Текст</label>
+                  <input
+                    value={formData.action_text}
+                    onChange={(e) => setFormData({...formData, action_text: e.target.value})}
+                    className="w-full p-2 border rounded-lg bg-white text-black"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs mb-1">Ссылка (если не модальное окно)</label>
+                  <input
+                    value={formData.action_url || ""}
+                    onChange={(e) => setFormData({...formData, action_url: e.target.value})}
+                    className="w-full p-2 border rounded-lg bg-white text-black"
+                    placeholder="https://..."
+                  />
+                </div>
               </div>
-            )}
 
-            {formData.action_type === "modal" && (
-              <div>
-                <label className="block text-sm font-medium mb-1">ID Модального окна (для разработчиков)</label>
-                <input
-                  value={formData.modal_id || ""}
-                  onChange={(e) => setFormData({...formData, modal_id: e.target.value})}
-                  className="w-full p-2 border rounded-lg bg-white text-black"
-                  placeholder="bank_guarantees"
-                />
+              <div className="p-4 bg-gray-50 rounded-xl space-y-3">
+                <label className="block text-sm font-bold">Вторая кнопка (опционально)</label>
+                <div>
+                  <label className="block text-xs mb-1">Текст</label>
+                  <input
+                    value={formData.secondary_action_text || ""}
+                    onChange={(e) => setFormData({...formData, secondary_action_text: e.target.value})}
+                    className="w-full p-2 border rounded-lg bg-white text-black"
+                    placeholder="Например: Презентация"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs mb-1">Ссылка</label>
+                  <input
+                    value={formData.secondary_action_url || ""}
+                    onChange={(e) => setFormData({...formData, secondary_action_url: e.target.value})}
+                    className="w-full p-2 border rounded-lg bg-white text-black"
+                    placeholder="https://..."
+                  />
+                </div>
               </div>
-            )}
-            
-            <div>
-              <label className="block text-sm font-medium mb-1">Порядок сортировки</label>
-              <input
-                type="number"
-                value={formData.order}
-                onChange={(e) => setFormData({...formData, order: parseInt(e.target.value)})}
-                className="w-full p-2 border rounded-lg bg-white text-black"
-              />
             </div>
           </div>
 
-          <div className="flex gap-4">
-            <button
-              type="button"
-              onClick={() => setView("list")}
-              className="px-4 py-2 border rounded-lg hover:bg-gray-50"
-            >
-              Отмена
-            </button>
+          <div className="flex gap-3 pt-4 border-t">
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800"
+              className="px-6 py-2 bg-[#C5A66F] text-white rounded-lg font-bold hover:bg-[#b8955a] flex items-center gap-2"
             >
-              {loading ? <Loader2 className="animate-spin" /> : "Сохранить"}
+              {loading ? <Loader2 className="animate-spin" /> : <Save size={20} />}
+              Сохранить
+            </button>
+            <button
+              type="button"
+              onClick={() => setView("list")}
+              className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg font-bold hover:bg-gray-200"
+            >
+              Отмена
             </button>
           </div>
         </form>

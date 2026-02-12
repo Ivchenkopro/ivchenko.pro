@@ -12,15 +12,31 @@ export default function AnnouncementsTab() {
   const [isDemoMode, setIsDemoMode] = useState(false);
   const [view, setView] = useState<"list" | "edit" | "create">("list");
   const [currentitem, setCurrentItem] = useState<Announcement | null>(null);
+  
   const [formData, setFormData] = useState<Announcement>({
     id: 0,
     tag: "",
     title: "",
     description: "",
     date: "",
-    urgent: false
+    urgent: false,
+    link_text: "",
+    details: {
+      title: "",
+      content: [],
+      list: {
+        title: "",
+        items: []
+      },
+      footer: ""
+    }
   });
+  
   const [formErrors, setFormErrors] = useState<Partial<Record<keyof Announcement, string>>>({});
+
+  // Helper state for textareas
+  const [detailsContent, setDetailsContent] = useState("");
+  const [detailsListItems, setDetailsListItems] = useState("");
 
   useEffect(() => {
     fetchAnnouncements();
@@ -104,6 +120,18 @@ export default function AnnouncementsTab() {
     if (!validateForm()) return;
     
     setLoading(true);
+
+    // Prepare details object
+    const finalDetails = {
+      ...formData.details,
+      content: detailsContent.split('\n\n').filter(p => p.trim() !== ""),
+      list: {
+        title: formData.details?.list?.title || "",
+        items: detailsListItems.split('\n').filter(i => i.trim() !== "")
+      }
+    };
+    
+    const finalFormData = { ...formData, details: finalDetails };
     
     try {
       if (!isDemoMode) {
@@ -111,18 +139,18 @@ export default function AnnouncementsTab() {
           if (view === "create") {
             const { error } = await supabase
               .from('announcements')
-              .insert([{ ...formData, id: undefined }]);
+              .insert([{ ...finalFormData, id: undefined }]);
             if (error) throw error;
             // Log action
-            await supabase.from('audit_logs').insert([{ action: 'create', entity: 'announcement', details: `Created: ${formData.title}` }]);
+            await supabase.from('audit_logs').insert([{ action: 'create', entity: 'announcement', details: `Created: ${finalFormData.title}` }]);
           } else if (view === "edit" && currentitem?.id) {
             const { error } = await supabase
               .from('announcements')
-              .update(formData)
+              .update(finalFormData)
               .eq('id', currentitem.id);
             if (error) throw error;
             // Log action
-            await supabase.from('audit_logs').insert([{ action: 'update', entity: 'announcement', details: `Updated ID ${currentitem.id}: ${formData.title}` }]);
+            await supabase.from('audit_logs').insert([{ action: 'update', entity: 'announcement', details: `Updated ID ${currentitem.id}: ${finalFormData.title}` }]);
           }
           await fetchAnnouncements();
           setView("list");
@@ -138,10 +166,10 @@ export default function AnnouncementsTab() {
       let updatedList = [...announcements];
       if (view === "create") {
         const newId = Math.max(0, ...updatedList.map(a => a.id || 0)) + 1;
-        updatedList.unshift({ ...formData, id: newId });
+        updatedList.unshift({ ...finalFormData, id: newId });
       } else if (view === "edit" && currentitem?.id) {
         updatedList = updatedList.map(item => 
-          item.id === currentitem.id ? formData : item
+          item.id === currentitem.id ? finalFormData : item
         );
       }
       
@@ -186,14 +214,48 @@ export default function AnnouncementsTab() {
 
   const openEdit = (item: Announcement) => {
     setCurrentItem(item);
-    setFormData(item);
+    
+    // Ensure details structure exists
+    const safeDetails = {
+      title: item.details?.title || "",
+      content: item.details?.content || [],
+      list: {
+        title: item.details?.list?.title || "",
+        items: item.details?.list?.items || []
+      },
+      footer: item.details?.footer || ""
+    };
+
+    setFormData({
+      ...item,
+      details: safeDetails
+    });
+    
+    setDetailsContent(safeDetails.content.join('\n\n'));
+    setDetailsListItems(safeDetails.list.items.join('\n'));
+    
     setView("edit");
     setFormErrors({});
   };
 
   const openCreate = () => {
     setCurrentItem(null);
-    setFormData({ id: 0, tag: "", title: "", description: "", date: "Сегодня", urgent: false });
+    setFormData({ 
+      id: 0, 
+      tag: "", 
+      title: "", 
+      description: "", 
+      date: "Сегодня", 
+      urgent: false,
+      details: {
+        title: "",
+        content: [],
+        list: { title: "", items: [] },
+        footer: ""
+      }
+    });
+    setDetailsContent("");
+    setDetailsListItems("");
     setView("create");
     setFormErrors({});
   };
@@ -283,6 +345,8 @@ export default function AnnouncementsTab() {
             <span className="text-[var(--foreground)]">{view === "create" ? "Новая запись" : "Редактирование"}</span>
           </div>
           <form onSubmit={handleSubmit} className="bg-[var(--background)] p-6 rounded-2xl border border-[var(--border)] space-y-6">
+            
+            {/* Основная информация */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-bold text-[var(--foreground)]">Заголовок</label>
@@ -295,11 +359,13 @@ export default function AnnouncementsTab() {
                 {formErrors.tag && <p className="text-xs text-red-500">{formErrors.tag}</p>}
               </div>
             </div>
+            
             <div className="space-y-2">
-              <label className="text-sm font-bold text-[var(--foreground)]">Описание</label>
-              <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={4} className={`w-full p-3 bg-white text-black border rounded-xl focus:outline-none transition-colors resize-none ${formErrors.description ? "border-red-500" : "border-[var(--border)] focus:border-[#C5A66F]"}`} />
+              <label className="text-sm font-bold text-[var(--foreground)]">Краткое описание (для карточки)</label>
+              <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className={`w-full p-3 bg-white text-black border rounded-xl focus:outline-none transition-colors resize-none ${formErrors.description ? "border-red-500" : "border-[var(--border)] focus:border-[#C5A66F]"}`} />
               {formErrors.description && <p className="text-xs text-red-500">{formErrors.description}</p>}
             </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-bold text-[var(--foreground)]">Дата</label>
@@ -307,18 +373,96 @@ export default function AnnouncementsTab() {
                 {formErrors.date && <p className="text-xs text-red-500">{formErrors.date}</p>}
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-bold text-[var(--foreground)]">Текст кнопки</label>
+                <label className="text-sm font-bold text-[var(--foreground)]">Текст кнопки на карточке</label>
                 <input type="text" value={formData.button_text || ""} onChange={(e) => setFormData({ ...formData, button_text: e.target.value })} className="w-full p-3 bg-white text-black border border-[var(--border)] rounded-xl focus:outline-none focus:border-[#C5A66F] transition-colors" placeholder="Подробнее" />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Подробное содержание (Модальное окно) */}
+            <div className="border-t border-[var(--border)] pt-6 space-y-4">
+              <h3 className="font-bold text-lg text-[var(--foreground)]">Содержание модального окна</h3>
+              
               <div className="space-y-2">
-                <label className="text-sm font-bold text-[var(--foreground)]">Ссылка (необязательно)</label>
+                <label className="text-sm font-bold text-[var(--foreground)]">Заголовок внутри окна</label>
+                <input 
+                  type="text" 
+                  value={formData.details?.title || ""} 
+                  onChange={(e) => setFormData({ 
+                    ...formData, 
+                    details: { ...formData.details!, title: e.target.value } 
+                  })} 
+                  className="w-full p-3 bg-white text-black border border-[var(--border)] rounded-xl focus:outline-none focus:border-[#C5A66F]" 
+                  placeholder="Заголовок подробностей" 
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-[var(--foreground)]">Основной текст</label>
+                <p className="text-xs text-[var(--muted-foreground)] mb-1">Разделяйте абзацы пустой строкой</p>
+                <textarea 
+                  value={detailsContent} 
+                  onChange={(e) => setDetailsContent(e.target.value)} 
+                  rows={6} 
+                  className="w-full p-3 bg-white text-black border border-[var(--border)] rounded-xl focus:outline-none focus:border-[#C5A66F] resize-none" 
+                  placeholder="Текст описания..." 
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-[var(--foreground)]">Заголовок списка</label>
+                  <input 
+                    type="text" 
+                    value={formData.details?.list?.title || ""} 
+                    onChange={(e) => setFormData({ 
+                      ...formData, 
+                      details: { 
+                        ...formData.details!, 
+                        list: { ...formData.details!.list!, title: e.target.value } 
+                      } 
+                    })} 
+                    className="w-full p-3 bg-white text-black border border-[var(--border)] rounded-xl focus:outline-none focus:border-[#C5A66F]" 
+                    placeholder="Например: Ключевые параметры" 
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-[var(--foreground)]">Элементы списка</label>
+                <p className="text-xs text-[var(--muted-foreground)] mb-1">Каждый пункт с новой строки</p>
+                <textarea 
+                  value={detailsListItems} 
+                  onChange={(e) => setDetailsListItems(e.target.value)} 
+                  rows={5} 
+                  className="w-full p-3 bg-white text-black border border-[var(--border)] rounded-xl focus:outline-none focus:border-[#C5A66F] resize-none" 
+                  placeholder="- Пункт 1&#10;- Пункт 2&#10;- Пункт 3" 
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-[var(--foreground)]">Подвал (Footer)</label>
+                <textarea 
+                  value={formData.details?.footer || ""} 
+                  onChange={(e) => setFormData({ 
+                    ...formData, 
+                    details: { ...formData.details!, footer: e.target.value } 
+                  })} 
+                  rows={2} 
+                  className="w-full p-3 bg-white text-black border border-[var(--border)] rounded-xl focus:outline-none focus:border-[#C5A66F] resize-none" 
+                  placeholder="Мелкий текст внизу..." 
+                />
+              </div>
+            </div>
+
+            {/* Действия и ссылки */}
+            <div className="border-t border-[var(--border)] pt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-[var(--foreground)]">Ссылка (внешняя)</label>
                 <input type="text" value={formData.link || ""} onChange={(e) => setFormData({ ...formData, link: e.target.value })} className="w-full p-3 bg-white text-black border border-[var(--border)] rounded-xl focus:outline-none focus:border-[#C5A66F] transition-colors" placeholder="https://..." />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-bold text-[var(--foreground)]">Текст кнопки ссылки</label>
+                <label className="text-sm font-bold text-[var(--foreground)]">Текст кнопки действия</label>
+                <p className="text-xs text-[var(--muted-foreground)] mb-1">Например: Написать в Telegram</p>
                 <input type="text" value={formData.link_text || ""} onChange={(e) => setFormData({ ...formData, link_text: e.target.value })} className="w-full p-3 bg-white text-black border border-[var(--border)] rounded-xl focus:outline-none focus:border-[#C5A66F] transition-colors" placeholder="Написать в Telegram" />
               </div>
             </div>

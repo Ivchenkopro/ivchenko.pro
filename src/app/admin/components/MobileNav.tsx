@@ -10,7 +10,7 @@ interface MobileNavProps {
 export default function MobileNav({ currentTab, onTabChange }: MobileNavProps) {
   const menuItems = [
     { id: "announcements", label: "Объявления", icon: Megaphone },
-    { id: "services", label: "Услуги", icon: Star },
+    { id: "services", label: "Проекты", icon: Star },
     { id: "cases", label: "Кейсы", icon: Briefcase },
     { id: "links", label: "Ссылки", icon: LinkIcon },
     { id: "settings", label: "SEO", icon: FileText },
