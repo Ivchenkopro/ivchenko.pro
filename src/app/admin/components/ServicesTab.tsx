@@ -34,6 +34,10 @@ export default function ServicesTab() {
 
   // Helper for textarea
   const [descText, setDescText] = useState("");
+  
+  // Helpers for details
+  const [detailsContent, setDetailsContent] = useState("");
+  const [detailsListItems, setDetailsListItems] = useState("");
 
   useEffect(() => {
     fetchServices();
@@ -94,6 +98,16 @@ export default function ServicesTab() {
     setCurrentItem(item);
     setFormData(item);
     setDescText(Array.isArray(item.description) ? item.description.join('\n') : item.description);
+    
+    // Set details state
+    if (item.details) {
+      setDetailsContent(item.details.content ? item.details.content.join('\n\n') : "");
+      setDetailsListItems(item.details.list?.items ? item.details.list.items.join('\n') : "");
+    } else {
+      setDetailsContent("");
+      setDetailsListItems("");
+    }
+    
     setView("edit");
   };
 
@@ -144,10 +158,22 @@ export default function ServicesTab() {
     try {
       const descriptionArray = descText.split('\n').filter(line => line.trim() !== "");
       
+      // Prepare details
+      const finalDetails = {
+        title: formData.details?.title || "",
+        content: detailsContent.split('\n\n').filter(p => p.trim() !== ""),
+        list: {
+          title: formData.details?.list?.title || "",
+          items: detailsListItems.split('\n').filter(i => i.trim() !== "")
+        },
+        footer: formData.details?.footer || ""
+      };
+
       const dataToSave = {
         ...formData,
         id: undefined,
-        description: descriptionArray
+        description: descriptionArray,
+        details: finalDetails
       };
 
       if (!isDemoMode) {
@@ -211,9 +237,17 @@ export default function ServicesTab() {
       secondary_action_type: "link",
       secondary_action_url: "",
       order: services.length + 1,
-      tag: ""
+      tag: "",
+      details: {
+        title: "",
+        content: [],
+        list: { title: "", items: [] },
+        footer: ""
+      }
     });
     setDescText("");
+    setDetailsContent("");
+    setDetailsListItems("");
     setView("create");
   };
 
@@ -342,6 +376,76 @@ export default function ServicesTab() {
                   className="w-full p-2 border rounded-lg bg-white text-black"
                   placeholder="Пункт 1&#10;Пункт 2&#10;Пункт 3"
                 />
+              </div>
+
+              <div className="border-t pt-4 mt-4">
+                <h3 className="font-bold mb-3 text-[var(--foreground)]">Содержание модального окна (Детали)</h3>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Заголовок внутри окна</label>
+                    <input
+                      value={formData.details?.title || ""}
+                      onChange={(e) => setFormData({
+                        ...formData, 
+                        details: { ...formData.details!, title: e.target.value }
+                      })}
+                      className="w-full p-2 border rounded-lg bg-white text-black"
+                      placeholder="Заголовок деталей"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Основной текст</label>
+                    <p className="text-xs text-gray-500 mb-1">Двойной перенос строки (Enter x2) создает новый абзац</p>
+                    <textarea 
+                      value={detailsContent} 
+                      onChange={(e) => setDetailsContent(e.target.value)} 
+                      rows={6} 
+                      className="w-full p-2 border rounded-lg bg-white text-black" 
+                      placeholder="Текст описания..." 
+                    />
+                  </div>
+
+                  <div className="p-3 bg-gray-50 rounded-xl space-y-3">
+                    <label className="block text-sm font-bold">Список (опционально)</label>
+                    <div>
+                      <input 
+                        value={formData.details?.list?.title || ""} 
+                        onChange={(e) => setFormData({ 
+                          ...formData, 
+                          details: { 
+                            ...formData.details!, 
+                            list: { ...formData.details?.list!, title: e.target.value } 
+                          } 
+                        })} 
+                        className="w-full p-2 border rounded-lg bg-white text-black mb-2" 
+                        placeholder="Заголовок списка" 
+                      />
+                      <textarea 
+                        value={detailsListItems} 
+                        onChange={(e) => setDetailsListItems(e.target.value)} 
+                        rows={4} 
+                        className="w-full p-2 border rounded-lg bg-white text-black" 
+                        placeholder="Элемент списка 1&#10;Элемент списка 2" 
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Подвал (Footer)</label>
+                    <textarea 
+                      value={formData.details?.footer || ""} 
+                      onChange={(e) => setFormData({ 
+                        ...formData, 
+                        details: { ...formData.details!, footer: e.target.value } 
+                      })} 
+                      rows={2} 
+                      className="w-full p-2 border rounded-lg bg-white text-black resize-none" 
+                      placeholder="Мелкий текст внизу..." 
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 

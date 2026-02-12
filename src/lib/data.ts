@@ -39,6 +39,15 @@ export type Service = {
   order: number;
   created_at?: string;
   tag?: string; // New field for badges like "HOT" or "Exclusive"
+  details?: {
+    title?: string;
+    content: string[]; // Paragraphs
+    list?: {
+      title: string;
+      items: string[];
+    };
+    footer?: string;
+  };
 };
 
 export type Case = {

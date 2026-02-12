@@ -83,6 +83,7 @@ function ServiceCard({ icon, title, description, actions, tag }: { icon: React.R
 export default function Services() {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeService, setActiveService] = useState<Service | null>(null);
   const [activeModal, setActiveModal] = useState<
     | null
     | "alun_finance_loans"
@@ -126,6 +127,7 @@ export default function Services() {
             secondary_action_text: item.secondary_action_text || fallback?.secondary_action_text,
             secondary_action_type: item.secondary_action_type || fallback?.secondary_action_type,
             secondary_modal_id: item.secondary_modal_id || fallback?.secondary_modal_id,
+            details: item.details || fallback?.details,
           } as Service;
         });
         
@@ -142,6 +144,12 @@ export default function Services() {
   };
 
   const handleAction = (service: Service) => {
+    // Priority: Dynamic details from Admin
+    if (service.details && (service.details.title || (service.details.content && service.details.content.length > 0))) {
+      setActiveService(service);
+      return;
+    }
+
     if (service.title === "ALUN Finance") {
       setActiveModal("alun_finance_loans");
       return;
@@ -754,6 +762,70 @@ export default function Services() {
           </div>
         </div>
       )}
+      {/* Generic Dynamic Modal */}
+      {activeService && (
+        <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[var(--card)] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-10 animate-in slide-in-from-bottom duration-300 border-t border-[var(--border)] sm:border shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6 sticky top-0 bg-[var(--card)] z-10 pb-4 border-b border-[var(--border)]">
+              <div>
+                <h3 className="text-xl font-bold text-white">{activeService.details?.title || activeService.title}</h3>
+                <p className="text-xs text-zinc-500">{activeService.tag}</p>
+              </div>
+              <button 
+                onClick={() => setActiveService(null)} 
+                className="p-2 bg-[var(--secondary)] rounded-full hover:bg-[var(--muted)] transition-colors text-white"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-8">
+              {activeService.details?.content && activeService.details.content.map((paragraph, idx) => (
+                <p key={idx} className="text-zinc-400 text-sm leading-relaxed mb-4">
+                  {paragraph}
+                </p>
+              ))}
+
+              {activeService.details?.list && activeService.details.list.items.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-3 text-[#C5A66F]">
+                    <CheckCircle size={20} />
+                    <h4 className="font-bold text-lg">{activeService.details.list.title || "Детали"}</h4>
+                  </div>
+                  <ul className="space-y-3">
+                    {activeService.details.list.items.map((item, i) => (
+                      <li key={i} className="flex items-start gap-3 text-zinc-300 text-sm">
+                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#C5A66F] shrink-0" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {activeService.details?.footer && (
+                <p className="mt-4 text-xs text-zinc-500 italic">
+                  {activeService.details.footer}
+                </p>
+              )}
+
+              <button 
+                onClick={() => {
+                  if (activeService.action_url) {
+                    window.open(activeService.action_url, "_blank");
+                  } else {
+                     window.open("https://t.me/oleg8383", "_blank");
+                  }
+                }}
+                className="w-full bg-[#C5A66F] text-black font-bold py-4 px-8 rounded-xl shadow-[0_0_20px_rgba(197,166,111,0.3)] hover:bg-[#b8955a] active:scale-95 transition-all"
+              >
+                {activeService.action_text || "Подробнее"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </main>
   );
 }
