@@ -126,7 +126,15 @@ export default function ServicesTab() {
 
   const handleEdit = (item: Service) => {
     setCurrentItem(item);
-    setFormData(item);
+    setFormData({
+      ...item,
+      details: item.details || {
+        title: "",
+        content: [],
+        list: { title: "", items: [] },
+        footer: ""
+      }
+    });
     setDescText(Array.isArray(item.description) ? item.description.join('\n') : item.description);
     
     // Set details state
