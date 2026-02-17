@@ -20,6 +20,8 @@ export const DEFAULT_SETTINGS: Record<string, string> = {
   // Home Page - Section Titles & Labels
   "home_projects_title": "Мои проекты",
   "home_projects_all": "Все проекты",
+  "home_projects_link_url": "/services",
+  "home_cta_url": "/services",
   "home_stats_title": "Масштаб в цифрах",
   
   // Home Page - Stats Labels (use \n for line breaks)
@@ -50,6 +52,10 @@ export const SETTING_DESCRIPTIONS: Record<string, string> = {
   "home_main_image": "Главное фото (URL или путь)",
   "home_bio_1": "Биография (абзац 1)",
   "home_bio_2": "Биография (абзац 2)",
+  "home_projects_title": "Заголовок блока 'Мои проекты' на главной",
+  "home_projects_all": "Текст ссылки 'Все проекты' на главной",
+  "home_projects_link_url": "Ссылка 'Все проекты' на главной (URL)",
+  "home_cta_url": "Ссылка нижней кнопки на главной (URL)",
   "stat_contacts": "Статистика: Контакты",
   "stat_projects": "Статистика: Проекты",
   "stat_deals": "Статистика: Сделки",

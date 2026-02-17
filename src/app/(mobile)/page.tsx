@@ -216,12 +216,14 @@ export default function Home() {
           </div>
         </div>
         
-        {/* My Projects */}
         <section>
           <div className="flex justify-between items-end mb-4 px-1">
-            <h2 className="text-sm font-bold text-[var(--foreground)] uppercase tracking-wider">Мои проекты</h2>
-            <Link href="/services" className="text-xs text-[var(--muted-foreground)] flex items-center gap-1 hover:text-[var(--foreground)] transition-colors">
-              Все проекты <ChevronRight size={14} />
+            <h2 className="text-sm font-bold text-[var(--foreground)] uppercase tracking-wider">{settings["home_projects_title"]}</h2>
+            <Link
+              href={settings["home_projects_link_url"] || "/services"}
+              className="text-xs text-[var(--muted-foreground)] flex items-center gap-1 hover:text-[var(--foreground)] transition-colors"
+            >
+              {settings["home_projects_all"]} <ChevronRight size={14} />
             </Link>
           </div>
           
@@ -275,15 +277,21 @@ export default function Home() {
            </div>
         </section>
 
-        {/* CTA Button */}
         <div className="pt-4 pb-8">
-           <button 
-             onClick={() => router.push('/services')}
-             className="w-full bg-[#C5A66F] text-white font-bold py-4 rounded-xl shadow-[0_0_30px_rgba(197,166,111,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-           >
-             <Wallet size={20} />
-             {settings["btn_apply"]}
-           </button>
+          <button
+            onClick={() => {
+              const url = settings["home_cta_url"] || "/services";
+              if (url.startsWith("http")) {
+                window.open(url, "_blank");
+              } else {
+                router.push(url);
+              }
+            }}
+            className="w-full bg-[#C5A66F] text-white font-bold py-4 rounded-xl shadow-[0_0_30px_rgba(197,166,111,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+          >
+            <Wallet size={20} />
+            {settings["btn_apply"]}
+          </button>
         </div>
 
       </div>

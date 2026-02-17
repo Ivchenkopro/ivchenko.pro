@@ -1,0 +1,445 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
+import { DEFAULT_SETTINGS, SETTING_DESCRIPTIONS } from "@/lib/settings";
+import { Save, Loader2, AlertCircle, WifiOff, Upload } from "lucide-react";
+
+interface AppSetting {
+  key: string;
+  value: string;
+  description: string;
+}
+
+const HOME_KEYS = [
+  "site_title",
+  "site_description",
+  "home_main_image",
+  "home_bio_1",
+  "home_bio_2",
+  "home_projects_title",
+  "home_projects_all",
+  "home_projects_link_url",
+  "home_cta_url",
+  "home_stats_title",
+  "stat_contacts",
+  "stat_projects",
+  "stat_deals",
+  "stat_turnover",
+  "btn_apply",
+  "btn_share",
+  "share_message"
+] as const;
+
+export default function HomeTab() {
+  const [settings, setSettings] = useState<AppSetting[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+  const [isDemoMode, setIsDemoMode] = useState(false);
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  const fetchSettings = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const { data, error } = await supabase
+        .from("app_settings")
+        .select("*")
+        .in("key", HOME_KEYS as unknown as string[]);
+
+      if (error) throw error;
+
+      const byKey = new Map<string, AppSetting>();
+      data?.forEach((item: any) => {
+        byKey.set(item.key, {
+          key: item.key,
+          value: item.value || "",
+          description: item.description || SETTING_DESCRIPTIONS[item.key] || ""
+        });
+      });
+
+      const finalSettings: AppSetting[] = HOME_KEYS.map((key) => {
+        const existing = byKey.get(key);
+        if (existing) return existing;
+        return {
+          key,
+          value: DEFAULT_SETTINGS[key] || "",
+          description: SETTING_DESCRIPTIONS[key] || ""
+        };
+      });
+
+      setSettings(finalSettings);
+      setIsDemoMode(false);
+    } catch (err: any) {
+      setIsDemoMode(true);
+      setError("Нет связи с Supabase. Работа в локальном режиме.");
+
+      const saved = localStorage.getItem("app_settings");
+      if (saved) {
+        const parsed: AppSetting[] = JSON.parse(saved);
+        const byKey = new Map(parsed.map((s) => [s.key, s]));
+        const finalSettings: AppSetting[] = HOME_KEYS.map((key) => {
+          const existing = byKey.get(key);
+          if (existing) return existing;
+          return {
+            key,
+            value: DEFAULT_SETTINGS[key] || "",
+            description: SETTING_DESCRIPTIONS[key] || ""
+          };
+        });
+        setSettings(finalSettings);
+      } else {
+        const fallback: AppSetting[] = HOME_KEYS.map((key) => ({
+          key,
+          value: DEFAULT_SETTINGS[key] || "",
+          description: SETTING_DESCRIPTIONS[key] || ""
+        }));
+        setSettings(fallback);
+        localStorage.setItem("app_settings", JSON.stringify(fallback));
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const saveToLocal = (homeSettings: AppSetting[]) => {
+    const saved = localStorage.getItem("app_settings");
+    if (!saved) {
+      localStorage.setItem("app_settings", JSON.stringify(homeSettings));
+      return;
+    }
+    const parsed: AppSetting[] = JSON.parse(saved);
+    const byKey = new Map(parsed.map((s) => [s.key, s]));
+    homeSettings.forEach((s) => {
+      byKey.set(s.key, s);
+    });
+    const merged = Array.from(byKey.values());
+    localStorage.setItem("app_settings", JSON.stringify(merged));
+  };
+
+  const updateSetting = (key: string, value: string) => {
+    setSettings((prev) =>
+      prev.map((s) => (s.key === key ? { ...s, value } : s))
+    );
+  };
+
+  const getValue = (key: string) => {
+    const found = settings.find((s) => s.key === key);
+    return found ? found.value : "";
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    setError("");
+    try {
+      if (!isDemoMode) {
+        try {
+          const payload = settings.map((s) => ({
+            key: s.key,
+            value: s.value,
+            description: s.description
+          }));
+
+          const { error } = await supabase
+            .from("app_settings")
+            .upsert(payload, { onConflict: "key" });
+
+          if (error) throw error;
+
+          await supabase.from("audit_logs").insert([
+            {
+              action: "update",
+              entity: "settings_home",
+              details: "Updated home page settings"
+            }
+          ]);
+        } catch (supaErr) {
+          console.error("Supabase failed, falling back to local:", supaErr);
+          setIsDemoMode(true);
+          setError("Ошибка Supabase. Переход в локальный режим.");
+        }
+      }
+
+      saveToLocal(settings);
+      alert("Настройки главной страницы сохранены");
+    } catch (err: any) {
+      setError("Ошибка при сохранении: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+
+    const file = e.target.files[0];
+    setUploading(true);
+
+    try {
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+      const filePath = `settings/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("uploads")
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage.from("uploads").getPublicUrl(filePath);
+
+      if (data) {
+        updateSetting("home_main_image", data.publicUrl);
+      }
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      alert("Ошибка загрузки: " + error.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  if (loading && settings.length === 0) {
+    return (
+      <div className="flex justify-center py-12">
+        <Loader2 className="animate-spin w-8 h-8 text-gray-400" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-bold">Главная страница</h2>
+        <div className="flex items-center gap-3">
+          {isDemoMode && (
+            <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full flex items-center gap-1">
+              <WifiOff className="w-3 h-3" />
+              Локальный режим
+            </span>
+          )}
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-black text-white text-sm hover:bg-gray-800 disabled:opacity-50"
+          >
+            {saving ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Save className="w-4 h-4" />
+            )}
+            Сохранить изменения
+          </button>
+        </div>
+      </div>
+
+      {error && (
+        <div className="bg-red-50 text-red-600 p-4 rounded-lg flex items-center gap-2">
+          <AlertCircle className="w-5 h-5" />
+          {error}
+        </div>
+      )}
+
+      <div className="space-y-6">
+        <section className="border border-[var(--border)] rounded-2xl p-4 md:p-6 bg-[var(--card)]">
+          <h3 className="text-lg font-bold mb-4">Верхний блок</h3>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Заголовок сайта</label>
+              <input
+                type="text"
+                value={getValue("site_title")}
+                onChange={(e) => updateSetting("site_title", e.target.value)}
+                className="w-full p-2 rounded-lg border border-[var(--border)] bg-white text-black"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Описание сайта (SEO)</label>
+              <textarea
+                value={getValue("site_description")}
+                onChange={(e) => updateSetting("site_description", e.target.value)}
+                rows={2}
+                className="w-full p-2 rounded-lg border border-[var(--border)] bg-white text-black"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Биография</label>
+              <textarea
+                value={getValue("home_bio_1")}
+                onChange={(e) => updateSetting("home_bio_1", e.target.value)}
+                rows={3}
+                className="w-full p-2 rounded-lg border border-[var(--border)] bg-white text-black mb-2"
+              />
+              <textarea
+                value={getValue("home_bio_2")}
+                onChange={(e) => updateSetting("home_bio_2", e.target.value)}
+                rows={3}
+                className="w-full p-2 rounded-lg border border-[var(--border)] bg-white text-black"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Главное фото</label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="text"
+                  value={getValue("home_main_image")}
+                  onChange={(e) => updateSetting("home_main_image", e.target.value)}
+                  className="flex-1 p-2 rounded-lg border border-[var(--border)] bg-white text-black"
+                  placeholder="/image.jpg или URL"
+                />
+                <div>
+                  <input
+                    type="file"
+                    id="home-file-upload"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                    disabled={uploading}
+                  />
+                  <label
+                    htmlFor="home-file-upload"
+                    className={`cursor-pointer inline-flex items-center gap-2 text-xs text-blue-600 hover:text-blue-800 bg-blue-50 px-3 py-2 rounded-lg transition-colors ${
+                      uploading ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    {uploading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Upload className="w-4 h-4" />
+                    )}
+                    {uploading ? "Загрузка..." : "Загрузить"}
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="border border-[var(--border)] rounded-2xl p-4 md:p-6 bg-[var(--card)]">
+          <h3 className="text-lg font-bold mb-4">Блок «Мои проекты»</h3>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Заголовок блока</label>
+              <input
+                type="text"
+                value={getValue("home_projects_title")}
+                onChange={(e) => updateSetting("home_projects_title", e.target.value)}
+                className="w-full p-2 rounded-lg border border-[var(--border)] bg-white text-black"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Текст ссылки «Все проекты»</label>
+              <input
+                type="text"
+                value={getValue("home_projects_all")}
+                onChange={(e) => updateSetting("home_projects_all", e.target.value)}
+                className="w-full p-2 rounded-lg border border-[var(--border)] bg-white text-black"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Ссылка для «Все проекты»</label>
+              <input
+                type="text"
+                value={getValue("home_projects_link_url")}
+                onChange={(e) => updateSetting("home_projects_link_url", e.target.value)}
+                className="w-full p-2 rounded-lg border border-[var(--border)] bg-white text-black"
+                placeholder="/services или полный URL"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section className="border border-[var(--border)] rounded-2xl p-4 md:p-6 bg-[var(--card)]">
+          <h3 className="text-lg font-bold mb-4">Статистика</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Контакты</label>
+              <input
+                type="text"
+                value={getValue("stat_contacts")}
+                onChange={(e) => updateSetting("stat_contacts", e.target.value)}
+                className="w-full p-2 rounded-lg border border-[var(--border)] bg-white text-black"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Проекты</label>
+              <input
+                type="text"
+                value={getValue("stat_projects")}
+                onChange={(e) => updateSetting("stat_projects", e.target.value)}
+                className="w-full p-2 rounded-lg border border-[var(--border)] bg-white text-black"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Сделки</label>
+              <input
+                type="text"
+                value={getValue("stat_deals")}
+                onChange={(e) => updateSetting("stat_deals", e.target.value)}
+                className="w-full p-2 rounded-lg border border-[var(--border)] bg-white text-black"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Оборот</label>
+              <input
+                type="text"
+                value={getValue("stat_turnover")}
+                onChange={(e) => updateSetting("stat_turnover", e.target.value)}
+                className="w-full p-2 rounded-lg border border-[var(--border)] bg-white text-black"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section className="border border-[var(--border)] rounded-2xl p-4 md:p-6 bg-[var(--card)]">
+          <h3 className="text-lg font-bold mb-4">Кнопки и действия</h3>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Текст кнопки «Оставить заявку»</label>
+              <input
+                type="text"
+                value={getValue("btn_apply")}
+                onChange={(e) => updateSetting("btn_apply", e.target.value)}
+                className="w-full p-2 rounded-lg border border-[var(--border)] bg-white text-black"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Ссылка кнопки внизу</label>
+              <input
+                type="text"
+                value={getValue("home_cta_url")}
+                onChange={(e) => updateSetting("home_cta_url", e.target.value)}
+                className="w-full p-2 rounded-lg border border-[var(--border)] bg-white text-black"
+                placeholder="/services или внешний URL"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Текст кнопки «Поделиться визиткой»</label>
+              <input
+                type="text"
+                value={getValue("btn_share")}
+                onChange={(e) => updateSetting("btn_share", e.target.value)}
+                className="w-full p-2 rounded-lg border border-[var(--border)] bg-white text-black"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Текст при шаринге</label>
+              <textarea
+                value={getValue("share_message")}
+                onChange={(e) => updateSetting("share_message", e.target.value)}
+                rows={2}
+                className="w-full p-2 rounded-lg border border-[var(--border)] bg-white text-black"
+              />
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
+

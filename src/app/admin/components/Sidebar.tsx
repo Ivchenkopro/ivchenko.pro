@@ -1,6 +1,6 @@
-import { Megaphone, Settings, Link as LinkIcon, Palette, FileText, Activity, Briefcase, Star } from "lucide-react";
+import { Megaphone, Settings, Link as LinkIcon, Palette, FileText, Activity, Briefcase, Star, Home } from "lucide-react";
 
-type Tab = "announcements" | "settings" | "links" | "appearance" | "logs" | "services" | "cases";
+type Tab = "announcements" | "home" | "settings" | "links" | "appearance" | "logs" | "services" | "cases";
 
 interface SidebarProps {
   currentTab: Tab;
@@ -10,6 +10,7 @@ interface SidebarProps {
 export default function Sidebar({ currentTab, onTabChange }: SidebarProps) {
   const menuItems = [
     { id: "announcements", label: "Объявления", icon: Megaphone },
+    { id: "home", label: "Главная", icon: Home },
     { id: "services", label: "Мои проекты", icon: Star },
     { id: "cases", label: "Кейсы", icon: Briefcase },
     { id: "links", label: "Ссылки", icon: LinkIcon },

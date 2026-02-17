@@ -12,8 +12,9 @@ import AppearanceTab from "./components/AppearanceTab";
 import LogsTab from "./components/LogsTab";
 import ServicesTab from "./components/ServicesTab";
 import CasesTab from "./components/CasesTab";
+import HomeTab from "./components/HomeTab";
 
-type Tab = "announcements" | "settings" | "links" | "appearance" | "logs" | "services" | "cases";
+type Tab = "announcements" | "home" | "settings" | "links" | "appearance" | "logs" | "services" | "cases";
 
 export default function AdminPanel() {
   // Auth State
@@ -121,6 +122,7 @@ export default function AdminPanel() {
           <header className="flex justify-between items-center mb-8">
             <h1 className="text-2xl md:text-3xl font-bold">
               {currentTab === "announcements" && "Объявления"}
+              {currentTab === "home" && "Главная"}
               {currentTab === "settings" && "Настройки"}
               {currentTab === "links" && "Ссылки"}
               {currentTab === "appearance" && "Внешний вид"}
@@ -137,6 +139,7 @@ export default function AdminPanel() {
 
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 min-h-[500px]">
             {currentTab === "announcements" && <AnnouncementsTab />}
+            {currentTab === "home" && <HomeTab />}
             {currentTab === "services" && <ServicesTab />}
             {currentTab === "cases" && <CasesTab />}
             {currentTab === "settings" && <SettingsTab />}

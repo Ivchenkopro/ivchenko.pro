@@ -190,7 +190,7 @@ export default function Contacts() {
 
         {/* Share Button */}
         <button 
-          onClick={() => router.push('/services')}
+          onClick={handleShare}
           className="mt-8 w-full bg-[#C5A66F] text-white font-bold py-4 px-8 rounded-xl shadow-[0_0_20px_rgba(197,166,111,0.3)] flex items-center justify-center gap-2 active:scale-95 transition-transform hover:bg-[#b8955a]"
         >
           <Share2 size={20} />
