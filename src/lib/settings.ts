@@ -43,7 +43,8 @@ export const DEFAULT_SETTINGS: Record<string, string> = {
   "contact_tg_personal": "@oleg8383",
   "contact_tg_personal_url": "https://t.me/oleg8383",
   "contact_email": "oleg@ivchenko.pro",
-  "contact_email_url": "mailto:oleg@ivchenko.pro"
+  "contact_email_url": "mailto:oleg@ivchenko.pro",
+  "contact_share_url": ""
 };
 
 export const SETTING_DESCRIPTIONS: Record<string, string> = {
@@ -70,7 +71,8 @@ export const SETTING_DESCRIPTIONS: Record<string, string> = {
   "contact_tg_personal": "Личный Telegram (текст)",
   "contact_tg_personal_url": "Личный Telegram (ссылка)",
   "contact_email": "Email (текст)",
-  "contact_email_url": "Email (ссылка)"
+  "contact_email_url": "Email (ссылка)",
+  "contact_share_url": "Ссылка нижней кнопки на странице контактов (если пусто — шаринг)"
 };
 
 export async function getSettings() {

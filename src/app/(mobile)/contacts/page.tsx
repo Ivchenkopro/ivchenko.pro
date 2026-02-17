@@ -89,6 +89,19 @@ export default function Contacts() {
     }
   };
 
+  const handleMainButtonClick = () => {
+    const target = settings["contact_share_url"];
+    if (target && target.trim().length > 0) {
+      if (target.startsWith("http")) {
+        window.open(target, "_blank");
+      } else {
+        router.push(target);
+      }
+    } else {
+      handleShare();
+    }
+  };
+
   return (
     <main className="min-h-screen bg-[var(--background)] text-[var(--foreground)] pb-32 relative overflow-hidden">
       
@@ -188,9 +201,9 @@ export default function Contacts() {
 
         </div>
 
-        {/* Share Button */}
+        {/* Share / Link Button */}
         <button 
-          onClick={handleShare}
+          onClick={handleMainButtonClick}
           className="mt-8 w-full bg-[#C5A66F] text-white font-bold py-4 px-8 rounded-xl shadow-[0_0_20px_rgba(197,166,111,0.3)] flex items-center justify-center gap-2 active:scale-95 transition-transform hover:bg-[#b8955a]"
         >
           <Share2 size={20} />

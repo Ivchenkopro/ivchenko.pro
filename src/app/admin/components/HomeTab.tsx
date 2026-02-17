@@ -28,7 +28,8 @@ const HOME_KEYS = [
   "stat_turnover",
   "btn_apply",
   "btn_share",
-  "share_message"
+  "share_message",
+  "contact_share_url"
 ] as const;
 
 export default function HomeTab() {
@@ -436,10 +437,19 @@ export default function HomeTab() {
                 className="w-full p-2 rounded-lg border border-[var(--border)] bg-white text-black"
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Ссылка кнопки на странице «Контакты»</label>
+              <input
+                type="text"
+                value={getValue("contact_share_url")}
+                onChange={(e) => updateSetting("contact_share_url", e.target.value)}
+                className="w-full p-2 rounded-lg border border-[var(--border)] bg-white text-black"
+                placeholder="/route или внешний URL; если пусто — шаринг"
+              />
+            </div>
           </div>
         </section>
       </div>
     </div>
   );
 }
-
