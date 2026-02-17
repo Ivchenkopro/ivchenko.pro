@@ -271,10 +271,22 @@ export default function HomeTab() {
     setProjectsLoading(true);
     setProjectsError("");
     try {
-      const { error: healthCheck } = await supabase.from("home_projects").select("count").single();
+      const { error: healthCheck } = await supabase
+        .from("home_projects")
+        .select("count")
+        .single();
       if (healthCheck) throw new Error("Нет соединения с базой данных");
 
-      const sanitized = homeProjects.map(({ created_at, ...rest }) => rest);
+      // Объединяем текущие проекты с дефолтными, чтобы не пропадали базовые карточки
+      const existingTitles = new Set(homeProjects.map((p) => p.title));
+      const mergedProjects: HomeProject[] = [
+        ...homeProjects,
+        ...FALLBACK_HOME_PROJECTS.filter(
+          (p) => !existingTitles.has(p.title)
+        )
+      ];
+
+      const sanitized = mergedProjects.map(({ created_at, ...rest }) => rest);
       const { error: upsertError } = await supabase
         .from("home_projects")
         .upsert(sanitized, { onConflict: "id" });
@@ -293,6 +305,10 @@ export default function HomeTab() {
       setProjectsLoading(false);
     }
   };
+
+  const hasMissingDefaultHomeProjects = FALLBACK_HOME_PROJECTS.some(
+    (fallback) => !homeProjects.some((project) => project.title === fallback.title)
+  );
 
   const handleProjectEdit = (item: HomeProject) => {
     setCurrentProject(item);
@@ -559,7 +575,7 @@ export default function HomeTab() {
             </button>
           </div>
 
-          {projectsIsDemoMode && (
+          {(projectsIsDemoMode || hasMissingDefaultHomeProjects) && (
             <div className="bg-orange-500/10 text-orange-500 p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
               <div className="flex items-center gap-2">
                 <WifiOff className="w-4 h-4" />
