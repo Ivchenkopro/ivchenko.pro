@@ -72,7 +72,7 @@ export const SETTING_DESCRIPTIONS: Record<string, string> = {
   "contact_tg_personal_url": "Личный Telegram (ссылка)",
   "contact_email": "Email (текст)",
   "contact_email_url": "Email (ссылка)",
-  "contact_share_url": "Ссылка нижней кнопки на странице контактов (если пусто — шаринг)"
+  "contact_share_url": "Нижняя кнопка на странице «Контакты»: пусто — поделиться визиткой, /route — страница в приложении, https://... — внешний сайт"
 };
 
 export async function getSettings() {

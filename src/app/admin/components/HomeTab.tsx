@@ -438,14 +438,17 @@ export default function HomeTab() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Ссылка кнопки на странице «Контакты»</label>
+              <label className="block text-sm font-medium mb-1">Что делает нижняя кнопка на странице «Контакты»</label>
               <input
                 type="text"
                 value={getValue("contact_share_url")}
                 onChange={(e) => updateSetting("contact_share_url", e.target.value)}
                 className="w-full p-2 rounded-lg border border-[var(--border)] bg-white text-black"
-                placeholder="/route или внешний URL; если пусто — шаринг"
+                placeholder="Оставьте пустым — поделиться визиткой; /services или https://site.ru"
               />
+              <p className="mt-1 text-xs text-gray-500">
+                Пусто — поделиться визиткой; /route — страница в приложении; https://... — внешний сайт
+              </p>
             </div>
           </div>
         </section>

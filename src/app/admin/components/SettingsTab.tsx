@@ -408,19 +408,19 @@ export default function SettingsTab() {
             <span className="font-bold text-sm">Рекомендуемые настройки</span>
           </div>
           <div className="flex flex-wrap gap-2">
-            {missingKeys.map(key => (
+            {missingKeys.map((key) => (
               <button
                 key={key}
                 onClick={() => startCreate(key)}
                 className="text-xs bg-white border border-blue-200 text-blue-600 px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors flex items-center gap-2"
-                title={SETTING_DESCRIPTIONS[key]}
+                title={SETTING_DESCRIPTIONS[key] || key}
               >
-                <span className="font-semibold">+ {key}</span>
-                {SETTING_DESCRIPTIONS[key] && (
-                  <span className="text-blue-400 border-l border-blue-100 pl-2">
-                    {SETTING_DESCRIPTIONS[key]}
-                  </span>
-                )}
+                <span className="font-semibold">
+                  + {SETTING_DESCRIPTIONS[key] || key}
+                </span>
+                <span className="text-blue-400 border-l border-blue-100 pl-2 font-mono text-[10px]">
+                  {key}
+                </span>
               </button>
             ))}
           </div>
