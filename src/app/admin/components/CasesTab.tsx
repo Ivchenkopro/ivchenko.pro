@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { Trash2, Edit, Plus, Loader2, WifiOff, AlertCircle } from "lucide-react";
+import { Trash2, Edit, Plus, Loader2, WifiOff, AlertCircle, CloudUpload } from "lucide-react";
 import { Case, FALLBACK_CASES } from "@/lib/data";
 import IconSelector from "./IconSelector";
 import { ICON_MAP } from "@/lib/icons";
@@ -55,7 +55,7 @@ export default function CasesTab() {
             setCases(FALLBACK_CASES);
           }
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error fetching cases:", err);
       const localData = localStorage.getItem('cases');
       if (localData) {
@@ -73,6 +73,37 @@ export default function CasesTab() {
   const saveToLocal = (newCases: Case[]) => {
     localStorage.setItem('cases', JSON.stringify(newCases));
     setCases(newCases);
+  };
+
+  const handleSync = async () => {
+    if (!confirm("Это действие попытается загрузить все локальные кейсы в базу данных. Существующие записи могут быть обновлены. Продолжить?")) return;
+    
+    setLoading(true);
+    setError("");
+    try {
+      const { error: healthCheck } = await supabase.from('cases').select('count').single();
+      if (healthCheck) throw new Error("Нет соединения с базой данных");
+
+      const sanitized = cases.map(({ created_at, ...rest }) => rest);
+      const { error: upsertError } = await supabase
+        .from('cases')
+        .upsert(sanitized, { onConflict: 'id' });
+      
+      if (upsertError) throw upsertError;
+
+      await fetchCases();
+      setIsDemoMode(false);
+      alert("Синхронизация успешно выполнена!");
+    } catch (err: unknown) {
+      console.error("Sync error:", err);
+      if (err instanceof Error) {
+        setError("Ошибка синхронизации: " + err.message);
+      } else {
+        setError("Ошибка синхронизации");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleEdit = (item: Case) => {
@@ -104,9 +135,13 @@ export default function CasesTab() {
       const updatedList = cases.filter(c => c.id !== id);
       saveToLocal(updatedList);
       
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      setError(err.message);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Неизвестная ошибка");
+      }
     } finally {
       setLoading(false);
     }
@@ -153,8 +188,12 @@ export default function CasesTab() {
       saveToLocal(updatedList);
       setView("list");
       
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Неизвестная ошибка");
+      }
     } finally {
       setLoading(false);
     }
@@ -192,9 +231,18 @@ export default function CasesTab() {
       )}
 
       {isDemoMode && (
-        <div className="bg-yellow-100 text-yellow-800 p-4 rounded-xl flex items-center gap-2">
-          <WifiOff className="w-5 h-5" />
-          <span>Локальный режим: изменения сохраняются только в браузере</span>
+        <div className="bg-orange-500/10 text-orange-500 p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <WifiOff className="w-5 h-5" />
+            <span>Локальный режим: изменения сохраняются только в браузере</span>
+          </div>
+          <button 
+            onClick={handleSync}
+            className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-orange-600 transition-colors text-sm"
+          >
+            <CloudUpload className="w-4 h-4" />
+            Синхронизировать
+          </button>
         </div>
       )}
 

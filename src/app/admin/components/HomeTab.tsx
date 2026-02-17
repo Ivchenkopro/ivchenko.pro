@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { DEFAULT_SETTINGS, SETTING_DESCRIPTIONS } from "@/lib/settings";
-import { Save, Loader2, AlertCircle, WifiOff, Upload } from "lucide-react";
+import { Save, Loader2, AlertCircle, WifiOff, Upload, CloudUpload } from "lucide-react";
 import { HomeProject, FALLBACK_HOME_PROJECTS } from "@/lib/data";
 
 interface AppSetting {
@@ -43,6 +43,7 @@ export default function HomeTab() {
   const [homeProjects, setHomeProjects] = useState<HomeProject[]>([]);
   const [projectsLoading, setProjectsLoading] = useState(false);
   const [projectsError, setProjectsError] = useState("");
+  const [projectsIsDemoMode, setProjectsIsDemoMode] = useState(false);
   const [projectsView, setProjectsView] = useState<"list" | "edit" | "create">(
     "list"
   );
@@ -74,7 +75,7 @@ export default function HomeTab() {
       if (error) throw error;
 
       const byKey = new Map<string, AppSetting>();
-      data?.forEach((item: any) => {
+      data?.forEach((item) => {
         byKey.set(item.key, {
           key: item.key,
           value: item.value || "",
@@ -94,7 +95,7 @@ export default function HomeTab() {
 
       setSettings(finalSettings);
       setIsDemoMode(false);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setIsDemoMode(true);
       setError("Нет связи с Supabase. Работа в локальном режиме.");
 
@@ -186,8 +187,12 @@ export default function HomeTab() {
 
       saveToLocal(settings);
       alert("Настройки главной страницы сохранены");
-    } catch (err: any) {
-      setError("Ошибка при сохранении: " + err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError("Ошибка при сохранении: " + err.message);
+      } else {
+        setError("Ошибка при сохранении");
+      }
     } finally {
       setSaving(false);
     }
@@ -215,9 +220,13 @@ export default function HomeTab() {
       if (data) {
         updateSetting("home_main_image", data.publicUrl);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Upload error:", error);
-      alert("Ошибка загрузки: " + error.message);
+      if (error instanceof Error) {
+        alert("Ошибка загрузки: " + error.message);
+      } else {
+        alert("Ошибка загрузки");
+      }
     } finally {
       setUploading(false);
     }
@@ -238,15 +247,48 @@ export default function HomeTab() {
 
       if (data && data.length > 0) {
         setHomeProjects(data as HomeProject[]);
+        setProjectsIsDemoMode(false);
       } else {
         setHomeProjects(FALLBACK_HOME_PROJECTS);
+        setProjectsIsDemoMode(true);
+        setProjectsError(
+          "В Supabase пока нет проектов для главной, показаны дефолтные значения."
+        );
       }
     } catch (err) {
       console.error("Error fetching home projects:", err);
       setHomeProjects(FALLBACK_HOME_PROJECTS);
-      setProjectsError(
-        "Не удалось загрузить проекты с главной, показаны дефолтные значения."
-      );
+      setProjectsIsDemoMode(true);
+      setProjectsError("Нет связи с Supabase. Показаны дефолтные проекты.");
+    } finally {
+      setProjectsLoading(false);
+    }
+  };
+
+  const handleProjectsSync = async () => {
+    if (!confirm("Это действие попытается загрузить текущие проекты главной в базу данных. Существующие записи могут быть обновлены. Продолжить?")) return;
+
+    setProjectsLoading(true);
+    setProjectsError("");
+    try {
+      const { error: healthCheck } = await supabase.from("home_projects").select("count").single();
+      if (healthCheck) throw new Error("Нет соединения с базой данных");
+
+      const sanitized = homeProjects.map(({ created_at, ...rest }) => rest);
+      const { error: upsertError } = await supabase
+        .from("home_projects")
+        .upsert(sanitized, { onConflict: "id" });
+
+      if (upsertError) throw upsertError;
+
+      await fetchHomeProjects();
+      setProjectsIsDemoMode(false);
+      alert("Синхронизация проектов главной выполнена!");
+    } catch (err) {
+      console.error("Home projects sync error:", err);
+      const message =
+        err instanceof Error ? err.message : "Неизвестная ошибка синхронизации.";
+      setProjectsError("Ошибка синхронизации: " + message);
     } finally {
       setProjectsLoading(false);
     }
@@ -516,6 +558,22 @@ export default function HomeTab() {
               Добавить проект
             </button>
           </div>
+
+          {projectsIsDemoMode && (
+            <div className="bg-orange-500/10 text-orange-500 p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+              <div className="flex items-center gap-2">
+                <WifiOff className="w-4 h-4" />
+                <span>Локальный режим: показаны дефолтные или локальные проекты</span>
+              </div>
+              <button
+                onClick={handleProjectsSync}
+                className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-orange-600 transition-colors text-sm"
+              >
+                <CloudUpload className="w-4 h-4" />
+                Синхронизировать
+              </button>
+            </div>
+          )}
 
           {projectsError && (
             <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm flex items-center gap-2">

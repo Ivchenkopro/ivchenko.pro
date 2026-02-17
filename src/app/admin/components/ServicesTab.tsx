@@ -103,10 +103,11 @@ export default function ServicesTab() {
       const { error: healthCheck } = await supabase.from('services').select('count').single();
       if (healthCheck) throw new Error("Нет соединения с базой данных");
 
-      // 2. Upsert all local services
+      // 2. Upsert all local services (без created_at, чтобы не ломать not-null и дефолты)
+      const sanitized = services.map(({ created_at, ...rest }) => rest);
       const { error: upsertError } = await supabase
         .from('services')
-        .upsert(services, { onConflict: 'id' });
+        .upsert(sanitized, { onConflict: 'id' });
       
       if (upsertError) throw upsertError;
 
