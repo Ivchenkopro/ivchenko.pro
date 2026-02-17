@@ -61,6 +61,17 @@ export type Case = {
   created_at?: string;
 };
 
+export type HomeProject = {
+  id: number;
+  title: string;
+  role: string;
+  description: string;
+  detailed_description?: string;
+  link?: string;
+  order: number;
+  created_at?: string;
+};
+
 export const FALLBACK_ANNOUNCEMENTS: Announcement[] = [
   {
     id: 1,
@@ -231,6 +242,63 @@ export const FALLBACK_CASES: Case[] = [
     icon: "banknote",
     link: "https://t.me/ivchenkooleg/55",
     order: 5
+  }
+];
+
+export const FALLBACK_HOME_PROJECTS: HomeProject[] = [
+  {
+    id: 1,
+    title: "ALUN Capital",
+    role: "Co-Founder",
+    description: "Привлечение инвестиций",
+    detailed_description:
+      "Сервис по привлечению капитала под рост бизнеса, новые проекты и сделки M&A. Подбор релевантных инвесторов под конкретный проект, упаковка предложения и сопровождение сделки до закрытия.",
+    order: 1
+  },
+  {
+    id: 2,
+    title: "Global Finance",
+    role: "CEO и Co-Founder",
+    description: "Кредиты, банковские гарантии, ВЭД",
+    detailed_description:
+      "Платёжный агент и партнёр по ВЭД-расчётам. Оплата инвойсов и международные переводы по понятным и безопасным схемам, с полным документальным сопровождением.",
+    order: 2
+  },
+  {
+    id: 3,
+    title: "Центр девелоперских решений",
+    role: "CEO и Co-Founder",
+    description: "Земля под застройку и девелопмент",
+    detailed_description:
+      "Подбор и купля-продажа земельных участков под застройку с полным сопровождением девелоперских проектов. Команда с опытом в Минстрое, Правительстве Москвы и крупных девелоперских структурах.",
+    order: 3
+  },
+  {
+    id: 4,
+    title: "ALUN Estate",
+    role: "CEO и Co-Founder",
+    description: "Премиальная жилая и коммерческая недвижимость",
+    detailed_description:
+      "Агентство по работе с премиальной недвижимостью и коммерческими объектами, включая готовые арендные бизнесы. Доступ к закрытым off-market предложениям и юридическое сопровождение.",
+    order: 4
+  },
+  {
+    id: 5,
+    title: "Вице-президент ALUN",
+    role: "",
+    description: "Сообщество предпринимателей и инвесторов",
+    detailed_description:
+      "ALUN — Active Leaders United Network, сообщество предпринимателей, инвесторов, выпускников бизнес-школ и первых лиц компаний. Объединяет тысячи резидентов и усиливает проекты.",
+    order: 5
+  },
+  {
+    id: 6,
+    title: "Международный трейдинг зерна",
+    role: "Co-Founder",
+    description: "Международный трейдинг зерна и связанные проекты",
+    detailed_description:
+      "Экспорт зерновых культур и участие в проекте управления международным портом.",
+    order: 6
   }
 ];
 

@@ -6,47 +6,9 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getSettings, DEFAULT_SETTINGS } from "@/lib/settings";
+import { getSettings, DEFAULT_SETTINGS } from "@/lib/settings";
 import { supabase } from "@/lib/supabase";
-import { Service } from "@/lib/data";
-
-const HARDCODED_PROJECTS = [
-  {
-    title: "ALUN Capital",
-    role: "Co-Founder",
-    description: "Привлечение инвестиций",
-    detailedDescription: "Сервис по привлечению капитала под рост бизнеса, новые проекты и сделки M&A. Подбор релевантных инвесторов под конкретный проект, упаковка предложений и организация переговоров до фактического закрытия сделки.",
-  },
-  {
-    title: "Global Finance",
-    role: "CEO и Co-Founder",
-    description: "Кредиты, банковские гарантии, ВЭД",
-    detailedDescription: "Платёжный агент и партнёр по ВЭД-расчётам. Оплата инвойсов и международные переводы по понятным и безопасным схемам, с полным документальным сопровождением.",
-  },
-  {
-    title: "Центр девелоперских решений",
-    role: "CEO и Co-Founder",
-    description: "Земля под застройку и девелопмент",
-    detailedDescription: "Подбор и купле-продажа земельных участков под застройку с полным сопровождением девелоперских проектов. Команда с опытом в Минстрое, Правительстве Москвы, усиленная ресурсами бизнес-сообщества ALUN.",
-  },
-  {
-    title: "ALUN Estate",
-    role: "CEO и Co-Founder",
-    description: "Премиальная жилая и коммерческая недвижимость",
-    detailedDescription: "Агентство по работе с премиальной недвижимостью и коммерческими объектами, включая готовые арендные бизнесы. Доступ к закрытым off-market предложениям и специальным условиям.",
-  },
-  {
-    title: "Вице-президент ALUN",
-    role: "",
-    description: "Сообщество предпринимателей и инвесторов",
-    detailedDescription: "ALUN — Active Leaders United Network, сообщество предпринимателей, инвесторов, выпускников бизнес-школ и первых лиц компаний. Объединяет тысячи резидентов в России и за рубежом и даёт доступ к контактам и ресурсам для решения бизнес-задач.",
-  },
-  {
-    title: "Международный трейдинг зерна",
-    role: "Co-Founder",
-    description: "Международный трейдинг зерна и связанные проекты",
-    detailedDescription: "Экспорт зерновых культур и участие в проекте управления международным портом.",
-  },
-];
+import { HomeProject, FALLBACK_HOME_PROJECTS } from "@/lib/data";
 
 type Project = {
   title: string;
@@ -62,87 +24,56 @@ export default function Home() {
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [loading, setLoading] = useState(true);
   const [expandedProject, setExpandedProject] = useState<string | null>(null);
-  const [projects, setProjects] = useState<Project[]>(HARDCODED_PROJECTS);
+  const [projects, setProjects] = useState<Project[]>(FALLBACK_HOME_PROJECTS);
 
   useEffect(() => {
     async function loadData() {
       try {
         const fetchedSettings = await getSettings();
         setSettings(fetchedSettings);
-        
-        // Fetch services (projects)
-        const { data: servicesData, error } = await supabase
-          .from('services')
-          .select('*')
-          .order('order', { ascending: true });
-          
-        if (servicesData && servicesData.length > 0) {
-          const mappedProjects: Project[] = servicesData.map((service: Service) => ({
-            title: service.title,
-            role: service.role || "",
-            // Use first line of description as short description, or fallback
-            description: Array.isArray(service.description) && service.description.length > 0 
-              ? service.description[0] 
-              : "",
-            // Use full description (joined) as detailed description
-            detailedDescription: Array.isArray(service.description) && service.description.length > 1
-              ? service.description.slice(1).join('\n\n') 
-              : "",
-            link: service.action_type === 'link' ? service.action_url : undefined
+
+        const { data: homeProjectsData, error } = await supabase
+          .from("home_projects")
+          .select("*")
+          .order("order", { ascending: true });
+
+        if (error) {
+          console.error("Error fetching home projects:", error);
+        }
+
+        if (homeProjectsData && homeProjectsData.length > 0) {
+          const mappedProjects: Project[] = homeProjectsData.map((item: HomeProject) => ({
+            title: item.title,
+            role: item.role || "",
+            description: item.description,
+            detailedDescription: item.detailed_description,
+            link: item.link
           }));
           setProjects(mappedProjects);
         } else {
-           // Fallback to localStorage if Supabase returns empty (or failed previously)
-           const localServices = localStorage.getItem('services');
-           if (localServices) {
-             try {
-               const parsedServices: Service[] = JSON.parse(localServices);
-               if (parsedServices.length > 0) {
-                 const mappedProjects: Project[] = parsedServices.map((service: Service) => ({
-                    title: service.title,
-                    role: service.role || "",
-                    description: Array.isArray(service.description) && service.description.length > 0 
-                      ? service.description[0] 
-                      : "",
-                    detailedDescription: Array.isArray(service.description) && service.description.length > 1
-                      ? service.description.slice(1).join('\n\n') 
-                      : "",
-                    link: service.action_type === 'link' ? service.action_url : undefined
-                 }));
-                 setProjects(mappedProjects);
-               }
-             } catch (err) {
-               console.error("Error parsing local services:", err);
-             }
-           }
+          setProjects(
+            FALLBACK_HOME_PROJECTS.map((item) => ({
+              title: item.title,
+              role: item.role || "",
+              description: item.description,
+              detailedDescription: item.detailed_description,
+              link: item.link
+            }))
+          );
         }
       } catch (e) {
         console.error("Error loading data", e);
         setSettings(DEFAULT_SETTINGS);
         
-        // Also try localStorage on error
-        const localServices = localStorage.getItem('services');
-        if (localServices) {
-           try {
-             const parsedServices: Service[] = JSON.parse(localServices);
-             if (parsedServices.length > 0) {
-               const mappedProjects: Project[] = parsedServices.map((service: Service) => ({
-                  title: service.title,
-                  role: service.role || "",
-                  description: Array.isArray(service.description) && service.description.length > 0 
-                    ? service.description[0] 
-                    : "",
-                  detailedDescription: Array.isArray(service.description) 
-                    ? service.description.join('\n\n') 
-                    : "",
-                  link: service.action_type === 'link' ? service.action_url : undefined
-               }));
-               setProjects(mappedProjects);
-             }
-           } catch (err) {
-             console.error("Error parsing local services:", err);
-           }
-        }
+        setProjects(
+          FALLBACK_HOME_PROJECTS.map((item) => ({
+            title: item.title,
+            role: item.role || "",
+            description: item.description,
+            detailedDescription: item.detailed_description,
+            link: item.link
+          }))
+        );
       } finally {
         setLoading(false);
       }

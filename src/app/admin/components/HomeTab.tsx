@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { DEFAULT_SETTINGS, SETTING_DESCRIPTIONS } from "@/lib/settings";
 import { Save, Loader2, AlertCircle, WifiOff, Upload } from "lucide-react";
+import { HomeProject, FALLBACK_HOME_PROJECTS } from "@/lib/data";
 
 interface AppSetting {
   key: string;
@@ -39,9 +40,26 @@ export default function HomeTab() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [isDemoMode, setIsDemoMode] = useState(false);
+  const [homeProjects, setHomeProjects] = useState<HomeProject[]>([]);
+  const [projectsLoading, setProjectsLoading] = useState(false);
+  const [projectsError, setProjectsError] = useState("");
+  const [projectsView, setProjectsView] = useState<"list" | "edit" | "create">(
+    "list"
+  );
+  const [currentProject, setCurrentProject] = useState<HomeProject | null>(null);
+  const [projectForm, setProjectForm] = useState<HomeProject>({
+    id: 0,
+    title: "",
+    role: "",
+    description: "",
+    detailed_description: "",
+    link: "",
+    order: 1
+  });
 
   useEffect(() => {
     fetchSettings();
+    fetchHomeProjects();
   }, []);
 
   const fetchSettings = async () => {
@@ -205,6 +223,127 @@ export default function HomeTab() {
     }
   };
 
+  const fetchHomeProjects = async () => {
+    setProjectsLoading(true);
+    setProjectsError("");
+    try {
+      const { data, error } = await supabase
+        .from("home_projects")
+        .select("*")
+        .order("order", { ascending: true });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data && data.length > 0) {
+        setHomeProjects(data as HomeProject[]);
+      } else {
+        setHomeProjects(FALLBACK_HOME_PROJECTS);
+      }
+    } catch (err) {
+      console.error("Error fetching home projects:", err);
+      setHomeProjects(FALLBACK_HOME_PROJECTS);
+      setProjectsError(
+        "Не удалось загрузить проекты с главной, показаны дефолтные значения."
+      );
+    } finally {
+      setProjectsLoading(false);
+    }
+  };
+
+  const handleProjectEdit = (item: HomeProject) => {
+    setCurrentProject(item);
+    setProjectForm(item);
+    setProjectsView("edit");
+  };
+
+  const handleProjectDelete = async (id: number) => {
+    if (!confirm("Вы уверены, что хотите удалить этот проект?")) return;
+
+    setProjectsLoading(true);
+    setProjectsError("");
+    try {
+      const { error } = await supabase.from("home_projects").delete().eq("id", id);
+      if (error) {
+        throw error;
+      }
+
+      await supabase.from("audit_logs").insert([
+        {
+          action: "delete",
+          entity: "home_project",
+          details: `Deleted home project ID ${id}`
+        }
+      ]);
+
+      await fetchHomeProjects();
+    } catch (err) {
+      console.error("Error deleting home project:", err);
+      const message =
+        err instanceof Error ? err.message : "Неизвестная ошибка удаления.";
+      setProjectsError("Ошибка при удалении проекта: " + message);
+    } finally {
+      setProjectsLoading(false);
+    }
+  };
+
+  const handleProjectSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setProjectsLoading(true);
+    setProjectsError("");
+
+    try {
+      const dataToSave = {
+        title: projectForm.title,
+        role: projectForm.role,
+        description: projectForm.description,
+        detailed_description: projectForm.detailed_description,
+        link: projectForm.link,
+        order: projectForm.order
+      };
+
+      if (projectsView === "create") {
+        const { error } = await supabase.from("home_projects").insert([dataToSave]);
+        if (error) {
+          throw error;
+        }
+        await supabase.from("audit_logs").insert([
+          {
+            action: "create",
+            entity: "home_project",
+            details: `Created home project: ${projectForm.title}`
+          }
+        ]);
+      } else if (projectsView === "edit" && currentProject) {
+        const { error } = await supabase
+          .from("home_projects")
+          .update(dataToSave)
+          .eq("id", currentProject.id);
+        if (error) {
+          throw error;
+        }
+        await supabase.from("audit_logs").insert([
+          {
+            action: "update",
+            entity: "home_project",
+            details: `Updated home project: ${projectForm.title}`
+          }
+        ]);
+      }
+
+      await fetchHomeProjects();
+      setProjectsView("list");
+    } catch (err) {
+      console.error("Error saving home project:", err);
+      const message =
+        err instanceof Error ? err.message : "Неизвестная ошибка сохранения.";
+      setProjectsError("Ошибка при сохранении проекта: " + message);
+    } finally {
+      setProjectsLoading(false);
+    }
+  };
+
   if (loading && settings.length === 0) {
     return (
       <div className="flex justify-center py-12">
@@ -353,6 +492,204 @@ export default function HomeTab() {
               />
             </div>
           </div>
+        </section>
+
+        <section className="border border-[var(--border)] rounded-2xl p-4 md:p-6 bg-[var(--card)]">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold">Проекты на главной (список)</h3>
+            <button
+              onClick={() => {
+                setProjectForm({
+                  id: 0,
+                  title: "",
+                  role: "",
+                  description: "",
+                  detailed_description: "",
+                  link: "",
+                  order: homeProjects.length + 1
+                });
+                setCurrentProject(null);
+                setProjectsView("create");
+              }}
+              className="bg-black text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-gray-800"
+            >
+              Добавить проект
+            </button>
+          </div>
+
+          {projectsError && (
+            <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm flex items-center gap-2">
+              <AlertCircle className="w-4 h-4" />
+              {projectsError}
+            </div>
+          )}
+
+          {projectsLoading && projectsView === "list" ? (
+            <div className="flex justify-center py-6">
+              <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+            </div>
+          ) : projectsView === "list" ? (
+            <div className="space-y-3">
+              {homeProjects.map((item) => (
+                <div
+                  key={item.id}
+                  className="p-4 bg-white border rounded-xl flex items-center justify-between"
+                >
+                  <div>
+                    <div className="font-bold">{item.title}</div>
+                    {item.role && (
+                      <div className="text-xs text-gray-500 mt-0.5">{item.role}</div>
+                    )}
+                    {item.description && (
+                      <div className="text-xs text-gray-500 mt-1 line-clamp-2 max-w-md">
+                        {item.description}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleProjectEdit(item)}
+                      className="px-3 py-1 text-xs rounded-lg border border-gray-200 hover:bg-gray-50"
+                    >
+                      Редактировать
+                    </button>
+                    <button
+                      onClick={() => handleProjectDelete(item.id)}
+                      className="px-3 py-1 text-xs rounded-lg border border-red-200 text-red-600 hover:bg-red-50"
+                    >
+                      Удалить
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              {homeProjects.length === 0 && (
+                <div className="text-sm text-gray-500">
+                  Пока нет проектов. Нажмите «Добавить проект», чтобы создать первый.
+                </div>
+              )}
+            </div>
+          ) : (
+            <form onSubmit={handleProjectSubmit} className="space-y-4 bg-white p-4 rounded-xl border">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Название проекта</label>
+                  <input
+                    type="text"
+                    required
+                    value={projectForm.title}
+                    onChange={(e) =>
+                      setProjectForm({ ...projectForm, title: e.target.value })
+                    }
+                    className="w-full p-2 rounded-lg border border-[var(--border)] bg-white text-black"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Роль</label>
+                  <input
+                    type="text"
+                    value={projectForm.role}
+                    onChange={(e) =>
+                      setProjectForm({ ...projectForm, role: e.target.value })
+                    }
+                    className="w-full p-2 rounded-lg border border-[var(--border)] bg-white text-black"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Краткое описание (видно сразу на карточке)
+                </label>
+                <textarea
+                  rows={2}
+                  value={projectForm.description}
+                  onChange={(e) =>
+                    setProjectForm({
+                      ...projectForm,
+                      description: e.target.value
+                    })
+                  }
+                  className="w-full p-2 rounded-lg border border-[var(--border)] bg-white text-black"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Детальное описание (открывается при раскрытии)
+                </label>
+                <textarea
+                  rows={4}
+                  value={projectForm.detailed_description || ""}
+                  onChange={(e) =>
+                    setProjectForm({
+                      ...projectForm,
+                      detailed_description: e.target.value
+                    })
+                  }
+                  className="w-full p-2 rounded-lg border border-[var(--border)] bg-white text-black"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Порядок отображения (1 — первый)
+                  </label>
+                  <input
+                    type="number"
+                    value={projectForm.order}
+                    onChange={(e) =>
+                      setProjectForm({
+                        ...projectForm,
+                        order: Number(e.target.value) || 1
+                      })
+                    }
+                    className="w-full p-2 rounded-lg border border-[var(--border)] bg-white text-black"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Ссылка (опционально, если карточка должна вести куда-то)
+                  </label>
+                  <input
+                    type="text"
+                    value={projectForm.link || ""}
+                    onChange={(e) =>
+                      setProjectForm({
+                        ...projectForm,
+                        link: e.target.value || undefined
+                      })
+                    }
+                    className="w-full p-2 rounded-lg border border-[var(--border)] bg-white text-black"
+                    placeholder="Оставьте пустым, чтобы карточка только раскрывалась"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center pt-2">
+                <button
+                  type="button"
+                  onClick={() => setProjectsView("list")}
+                  className="text-sm text-gray-600 hover:underline"
+                >
+                  Отмена
+                </button>
+                <button
+                  type="submit"
+                  disabled={projectsLoading}
+                  className="px-4 py-2 bg-black text-white rounded-lg text-sm hover:bg-gray-800 disabled:opacity-50 flex items-center gap-2"
+                >
+                  {projectsLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Save className="w-4 h-4" />
+                  )}
+                  Сохранить проект
+                </button>
+              </div>
+            </form>
+          )}
         </section>
 
         <section className="border border-[var(--border)] rounded-2xl p-4 md:p-6 bg-[var(--card)]">
