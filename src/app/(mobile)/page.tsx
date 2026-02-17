@@ -6,7 +6,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getSettings, DEFAULT_SETTINGS } from "@/lib/settings";
-import { getSettings, DEFAULT_SETTINGS } from "@/lib/settings";
 import { supabase } from "@/lib/supabase";
 import { HomeProject, FALLBACK_HOME_PROJECTS } from "@/lib/data";
 
