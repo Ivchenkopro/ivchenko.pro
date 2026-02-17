@@ -296,10 +296,15 @@ export default function HomeTab() {
       await fetchHomeProjects();
       setProjectsIsDemoMode(false);
       alert("Синхронизация проектов главной выполнена!");
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Home projects sync error:", err);
-      const message =
-        err instanceof Error ? err.message : "Неизвестная ошибка синхронизации.";
+      let message = "Неизвестная ошибка синхронизации.";
+      if (err && typeof err === "object" && "message" in err) {
+        const anyErr = err as { message?: string };
+        if (anyErr.message) {
+          message = anyErr.message;
+        }
+      }
       setProjectsError("Ошибка синхронизации: " + message);
     } finally {
       setProjectsLoading(false);

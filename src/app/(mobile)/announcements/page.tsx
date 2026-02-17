@@ -1,6 +1,6 @@
 "use client";
 
-import { Megaphone, ArrowRight, Tag, X, CheckCircle, Car } from "lucide-react";
+import { Megaphone, ArrowRight, Tag, X, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
@@ -151,11 +151,8 @@ export default function Announcements() {
 
             <div className="space-y-8">
               {activeAnnouncement.details?.title && (
-                 <div>
-                  <div className="flex items-center gap-2 mb-3 text-[#C5A66F]">
-                    <Car size={20} />
-                    <h4 className="font-bold text-lg">{activeAnnouncement.details.title}</h4>
-                  </div>
+                <div className="mb-3 text-[#C5A66F]">
+                  <h4 className="font-bold text-lg">{activeAnnouncement.details.title}</h4>
                 </div>
               )}
               
