@@ -95,14 +95,13 @@ export default function AnnouncementsTab() {
     
     setLoading(true);
     try {
-      // 1. Check connection
       const { error: healthCheck } = await supabase.from('announcements').select('count').single();
       if (healthCheck) throw new Error("Нет соединения с базой данных");
 
-      // 2. Upsert all local announcements
+      const sanitized = announcements.map(({ created_at, ...rest }) => rest);
       const { error: upsertError } = await supabase
         .from('announcements')
-        .upsert(announcements, { onConflict: 'id' });
+        .upsert(sanitized, { onConflict: 'id' });
       
       if (upsertError) throw upsertError;
 
