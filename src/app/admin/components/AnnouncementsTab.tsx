@@ -98,7 +98,14 @@ export default function AnnouncementsTab() {
       const { error: healthCheck } = await supabase.from('announcements').select('count').single();
       if (healthCheck) throw new Error("Нет соединения с базой данных");
 
-      const sanitized = announcements.map(({ created_at, ...rest }) => rest);
+      const sanitized = announcements.map((item) => {
+        const { created_at, ...rest } = item as any;
+        return {
+          ...rest,
+          created_at: created_at ?? new Date().toISOString()
+        };
+      });
+
       const { error: upsertError } = await supabase
         .from('announcements')
         .upsert(sanitized, { onConflict: 'id' });
