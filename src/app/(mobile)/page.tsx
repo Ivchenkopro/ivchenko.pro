@@ -41,42 +41,14 @@ export default function Home() {
         }
 
         if (homeProjectsData && homeProjectsData.length > 0) {
-          const fallbackMapped: Project[] = FALLBACK_HOME_PROJECTS.map((item) => ({
+          const mappedProjects: Project[] = homeProjectsData.map((item: HomeProject) => ({
             title: item.title,
             role: item.role || "",
             description: item.description,
             detailedDescription: item.detailed_description,
             link: item.link
           }));
-
-          const overrides: Record<string, Project> = {};
-          homeProjectsData.forEach((item: HomeProject) => {
-            overrides[item.title] = {
-              title: item.title,
-              role: item.role || "",
-              description: item.description,
-              detailedDescription: item.detailed_description,
-              link: item.link
-            };
-          });
-
-          const combined = [
-            ...fallbackMapped.map((item) => overrides[item.title] || item),
-            ...homeProjectsData
-              .filter(
-                (item: HomeProject) =>
-                  !fallbackMapped.some((fallback) => fallback.title === item.title)
-              )
-              .map((item: HomeProject) => ({
-                title: item.title,
-                role: item.role || "",
-                description: item.description,
-                detailedDescription: item.detailed_description,
-                link: item.link
-              }))
-          ];
-
-          setProjects(combined);
+          setProjects(mappedProjects);
         } else {
           setProjects(
             FALLBACK_HOME_PROJECTS.map((item) => ({
